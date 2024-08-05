@@ -1011,7 +1011,7 @@ public class InputService{
             AudioUtility.SFX.playSFX("select");
 
             try {
-                Desktop.getDesktop().browse(new URI("https://google.com"));
+                Desktop.getDesktop().browse(new URI("https://github.com/ChillyPigeon742/Button-Clicker/issues/new"));
             } catch (IOException ex) {
                 ErrorHandler.IOException("INPUT", 1016);
             } catch (URISyntaxException ex) {
@@ -1417,7 +1417,6 @@ public class InputService{
             if (e.getButton() == MouseEvent.BUTTON3) {
                 if(MenuManager.isMenuOpen("Main")){
                     StorageLibrary.debugButton.setVisible(true);
-                    ErrorHandler.URISyntaxException("INPUT", 1427);
                 }
             }
 

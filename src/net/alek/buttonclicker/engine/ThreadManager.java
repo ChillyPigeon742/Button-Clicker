@@ -1,5 +1,6 @@
 package net.alek.buttonclicker.engine;
 
+import net.alek.buttonclicker.libraries.ATimer;
 import net.alek.buttonclicker.utilities.AudioUtility;
 import net.alek.buttonclicker.utilities.MessageUtility;
 
@@ -7,12 +8,12 @@ public class ThreadManager {
     public static Thread exitThread = new Thread(new Runnable() {
         @Override
         public void run() {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                ErrorHandler.InterruptedException("THREAD", 13);
-            }
-            System.exit(0);
+            ATimer timer = new ATimer();
+            timer.setDelay(2);
+            timer.setTask(() -> {
+                System.exit(0);
+            });
+            timer.start();
         }
     });
 
