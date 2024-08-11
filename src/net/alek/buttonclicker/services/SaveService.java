@@ -1,6 +1,7 @@
 package net.alek.buttonclicker.services;
 
 import net.alek.buttonclicker.engine.ErrorHandler;
+import net.alek.buttonclicker.engine.MenuManager;
 import net.alek.buttonclicker.libraries.ATimer;
 import net.alek.buttonclicker.libraries.StorageLibrary;
 
@@ -29,7 +30,7 @@ public class SaveService {
                         ATimer timer = new ATimer();
                         timer.setDelay(2);
                         timer.setTask(() -> {
-                            if(!StorageLibrary.titleText.isVisible()){
+                            if(MenuManager.isMenuOpen("Game")){
                                 StorageLibrary.titleImage.stopSpinning();
                                 StorageLibrary.titleImage.setBounds(10, 0, 100, 100);
                                 StorageLibrary.titleImage.setVisible(false);

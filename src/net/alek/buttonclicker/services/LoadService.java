@@ -1,10 +1,5 @@
 package net.alek.buttonclicker.services;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
-import net.alek.buttonclicker.engine.ErrorHandler;
-import net.alek.buttonclicker.engine.ResourceManager;
 import net.alek.buttonclicker.libraries.StorageLibrary;
 
 import net.alek.buttonclicker.utilities.AudioUtility;
@@ -12,9 +7,7 @@ import net.alek.buttonclicker.utilities.JSONUtility;
 
 import java.awt.*;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.Objects;
-import java.util.Random;
 
 public class LoadService {
     public LoadService(){

@@ -58,8 +58,6 @@ public class AudioUtility {
 
     public static class Music{
         private static boolean finishedPlaying = false;
-        public static boolean playNextSong = false;
-        public static String nextSong = "brothisshitissobadillfixitinthenextupdate";
 
         public static void playMusic(String trackName){
             if(Objects.equals(trackName, "menu1")){
@@ -99,6 +97,8 @@ public class AudioUtility {
 
                 SoundManager.getMusicAudioPlayer().play();
             }else if(Objects.equals(trackName, "loading")){
+                finishedPlaying = true;
+
                 SoundManager.loadTrack(3, "/assets/buttonclicker/audio/music/menu/loading.mp3");
                 SoundManager.refreshMusicVolume();
 
@@ -110,19 +110,9 @@ public class AudioUtility {
                         int number = random.nextInt(1,3);
 
                         if(number==1){
-                            if(MenuManager.isMenuOpen("Game")){
-                                playMusic("game1");
-                            }else{
-                                playNextSong = true;
-                                nextSong = "game1";
-                            }
+                            playMusic("game1");
                         }else if(number==2) {
-                            if(MenuManager.isMenuOpen("Game")){
-                                playMusic("game2");
-                            }else{
-                                playNextSong = true;
-                                nextSong = "game2";
-                            }
+                            playMusic("game2");
                         }
                     });
                     SoundManager.getMusicDelay().start();
@@ -141,12 +131,7 @@ public class AudioUtility {
 
                     SoundManager.getMusicDelay().setDelay(JSONUtility.readAIntFromJsonFile("Data/settings.json", "music_delay"));
                     SoundManager.getMusicDelay().setTask(() -> {
-                        if(MenuManager.isMenuOpen("Game")){
-                            playMusic("game2");
-                        }else{
-                            playNextSong = true;
-                            nextSong = "game2";
-                        }
+                        playMusic("game2");
                     });
                     SoundManager.getMusicDelay().start();
                 });
@@ -165,12 +150,7 @@ public class AudioUtility {
 
                     SoundManager.getMusicDelay().setDelay(JSONUtility.readAIntFromJsonFile("Data/settings.json", "music_delay"));
                     SoundManager.getMusicDelay().setTask(() -> {
-                        if(MenuManager.isMenuOpen("Game")){
-                            playMusic("game1");
-                        }else{
-                            playNextSong = true;
-                            nextSong = "game1";
-                        }
+                        playMusic("game1");
                     });
                     SoundManager.getMusicDelay().start();
                 });
@@ -210,7 +190,7 @@ public class AudioUtility {
         }
 
         public static void resumeMusic(){
-            if(SoundManager.getMusicAudioPlayerStatus()==MediaPlayer.Status.PAUSED){
+            if(SoundManager.getMusicAudioPlayer().getStatus()==MediaPlayer.Status.PAUSED){
                 SoundManager.getMusicAudioPlayer().play();
             }
             if(finishedPlaying){
@@ -219,8 +199,10 @@ public class AudioUtility {
         }
 
         public static void pauseMusic(){
-            if(SoundManager.getMusicAudioPlayerStatus()==MediaPlayer.Status.PLAYING){
+            if(SoundManager.getMusicAudioPlayer().getStatus()==MediaPlayer.Status.PLAYING){
                 SoundManager.getMusicAudioPlayer().pause();
+            }
+            if(finishedPlaying){
                 SoundManager.getMusicDelay().pause();
             }
         }
@@ -326,10 +308,6 @@ public class AudioUtility {
 
         public static MediaPlayer getSFXAudioPlayer(){
             return sfxAudioPlayer;
-        }
-
-        public static MediaPlayer.Status getMusicAudioPlayerStatus(){
-            return getMusicAudioPlayer().getStatus();
         }
 
         public static ATimer getMusicDelay(){

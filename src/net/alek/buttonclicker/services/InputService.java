@@ -335,14 +335,7 @@ public class InputService{
 
                     AudioUtility.SoundManager.getSMusicAudioPlayer().stop();
 
-                    if(AudioUtility.Music.playNextSong){
-                        AudioUtility.Music.playMusic(AudioUtility.Music.nextSong);
-
-                        AudioUtility.Music.playNextSong = false;
-                        AudioUtility.Music.nextSong = "brothisshitissobadillfixitinthenextupdate";
-                    }else{
-                        AudioUtility.Music.resumeMusic();
-                    }
+                    AudioUtility.Music.resumeMusic();
 
                     MenuManager.openMenu("Game");
 
@@ -441,11 +434,22 @@ public class InputService{
                     SaveService.save3();
                 }
 
-                ThreadManager.exitThread.start();
+                ATimer timer = new ATimer();
+                timer.setDelay(2);
+                timer.setTask(() -> {
+                    System.exit(0);
+                });
+                timer.start();
             }else if(Objects.equals(StorageLibrary.quitButton.getText(), "Quit")){
                 StorageLibrary.quitButton.setText("Quitting...");
                 StorageLibrary.logger.info("Quitting...");
-                ThreadManager.exitThread.start();
+
+                ATimer timer = new ATimer();
+                timer.setDelay(2);
+                timer.setTask(() -> {
+                    System.exit(0);
+                });
+                timer.start();
             }else if(Objects.equals(StorageLibrary.quitButton.getText(), "Return To Main Menu")){
                 StorageLibrary.logger.info("Returning To Main Menu...");
                 StorageLibrary.quitButton.setText("Saving...");
@@ -712,14 +716,7 @@ public class InputService{
 
                 AudioUtility.SoundManager.getSMusicAudioPlayer().stop();
 
-                if(AudioUtility.Music.playNextSong){
-                    AudioUtility.Music.playMusic(AudioUtility.Music.nextSong);
-
-                    AudioUtility.Music.playNextSong = false;
-                    AudioUtility.Music.nextSong = "brothisshitissobadillfixitinthenextupdate";
-                }else{
-                    AudioUtility.Music.resumeMusic();
-                }
+                AudioUtility.Music.resumeMusic();
 
                 StorageLibrary.logger.info("Done!");
             }
@@ -1291,27 +1288,27 @@ public class InputService{
             MenuManager.closeMenu("Game");
             MenuManager.openMenu("Shop");
 
-            StorageLibrary.shopItem1.setPrice("100 Clicks");
+            StorageLibrary.shopItem1.setPrice("1000 Clicks");
             StorageLibrary.shopItem1.setIcon(StorageLibrary.clickPowerIcon);
             StorageLibrary.shopItem1.setDescription("Gives 1 more Click Power");
 
-            StorageLibrary.shopItem2.setPrice("1000 Clicks");
+            StorageLibrary.shopItem2.setPrice("10000 Clicks");
             StorageLibrary.shopItem2.setIcon(StorageLibrary.clickPowerIcon);
             StorageLibrary.shopItem2.setDescription("Gives 10 more Click Power");
 
-            StorageLibrary.shopItem3.setPrice("10000 Clicks");
+            StorageLibrary.shopItem3.setPrice("100000 Clicks");
             StorageLibrary.shopItem3.setIcon(StorageLibrary.clickPowerIcon);
             StorageLibrary.shopItem3.setDescription("Gives 100 more Click Power");
 
-            StorageLibrary.shopItem4.setPrice("100000 Clicks");
+            StorageLibrary.shopItem4.setPrice("1 Million Clicks");
             StorageLibrary.shopItem4.setIcon(StorageLibrary.clickPowerIcon);
             StorageLibrary.shopItem4.setDescription("Gives 1000 more Click Power");
 
-            StorageLibrary.shopItem5.setPrice("1 Million Clicks");
+            StorageLibrary.shopItem5.setPrice("10 Million Clicks");
             StorageLibrary.shopItem5.setIcon(StorageLibrary.clickPowerIcon);
             StorageLibrary.shopItem5.setDescription("Gives 10000 more Click Power");
 
-            StorageLibrary.shopItem6.setPrice("10 Million Clicks");
+            StorageLibrary.shopItem6.setPrice("100 Million Clicks");
             StorageLibrary.shopItem6.setIcon(StorageLibrary.clickPowerIcon);
             StorageLibrary.shopItem6.setDescription("Gives 100000 more Click Power");
 
@@ -1443,7 +1440,7 @@ public class InputService{
                 if(e.getButton()==MouseEvent.BUTTON1){
                     if(Objects.equals(StorageLibrary.shopItem1.getDescription(), "Gives 1 more Click Power")){
                         if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<100){
+                            if(StorageLibrary.clicks1<1000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem1.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem1.setDisabled(true);
@@ -1451,21 +1448,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem1.setPrice("100 Clicks");
+                                    StorageLibrary.shopItem1.setPrice("1000 Clicks");
                                     StorageLibrary.shopItem1.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=100){
+                            }else if(StorageLibrary.clicks1>=1000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 100;
+                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 1000;
                                 StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 1;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<100){
+                            if(StorageLibrary.clicks2<1000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem1.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem1.setDisabled(true);
@@ -1473,21 +1470,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem1.setPrice("100 Clicks");
+                                    StorageLibrary.shopItem1.setPrice("1000 Clicks");
                                     StorageLibrary.shopItem1.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=100){
+                            }else if(StorageLibrary.clicks2>=1000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 100;
+                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 1000;
                                 StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 1;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<100){
+                            if(StorageLibrary.clicks3<1000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem1.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem1.setDisabled(true);
@@ -1495,14 +1492,14 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem1.setPrice("100 Clicks");
+                                    StorageLibrary.shopItem1.setPrice("1000 Clicks");
                                     StorageLibrary.shopItem1.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=100){
+                            }else if(StorageLibrary.clicks3>=1000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 100;
+                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 1000;
                                 StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 1;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
@@ -1517,7 +1514,7 @@ public class InputService{
                 if(e.getButton()==MouseEvent.BUTTON1){
                     if(Objects.equals(StorageLibrary.shopItem2.getDescription(), "Gives 10 more Click Power")){
                         if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<1000){
+                            if(StorageLibrary.clicks1<10000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem2.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem2.setDisabled(true);
@@ -1525,21 +1522,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem2.setPrice("1000 Clicks");
+                                    StorageLibrary.shopItem2.setPrice("10000 Clicks");
                                     StorageLibrary.shopItem2.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=1000){
+                            }else if(StorageLibrary.clicks1>=10000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 1000;
+                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 10000;
                                 StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 10;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<1000){
+                            if(StorageLibrary.clicks2<10000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem2.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem2.setDisabled(true);
@@ -1547,21 +1544,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem2.setPrice("1000 Clicks");
+                                    StorageLibrary.shopItem2.setPrice("10000 Clicks");
                                     StorageLibrary.shopItem2.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=1000){
+                            }else if(StorageLibrary.clicks2>=10000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 1000;
+                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 10000;
                                 StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 10;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<1000){
+                            if(StorageLibrary.clicks3<10000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem2.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem2.setDisabled(true);
@@ -1569,14 +1566,14 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem2.setPrice("1000 Clicks");
+                                    StorageLibrary.shopItem2.setPrice("10000 Clicks");
                                     StorageLibrary.shopItem2.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=1000){
+                            }else if(StorageLibrary.clicks3>=10000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 1000;
+                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 10000;
                                 StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 10;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
@@ -1591,7 +1588,7 @@ public class InputService{
                 if(e.getButton()==MouseEvent.BUTTON1){
                     if(Objects.equals(StorageLibrary.shopItem3.getDescription(), "Gives 100 more Click Power")){
                         if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<10000){
+                            if(StorageLibrary.clicks1<100000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem3.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem3.setDisabled(true);
@@ -1599,21 +1596,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem3.setPrice("10000 Clicks");
+                                    StorageLibrary.shopItem3.setPrice("100000 Clicks");
                                     StorageLibrary.shopItem3.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=10000){
+                            }else if(StorageLibrary.clicks1>=100000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 10000;
+                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 100000;
                                 StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 100;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<10000){
+                            if(StorageLibrary.clicks2<100000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem3.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem3.setDisabled(true);
@@ -1621,21 +1618,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem3.setPrice("10000 Clicks");
+                                    StorageLibrary.shopItem3.setPrice("100000 Clicks");
                                     StorageLibrary.shopItem3.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=10000){
+                            }else if(StorageLibrary.clicks2>=100000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 10000;
+                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 100000;
                                 StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 100;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<10000){
+                            if(StorageLibrary.clicks3<100000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem3.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem3.setDisabled(true);
@@ -1643,14 +1640,14 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem3.setPrice("10000 Clicks");
+                                    StorageLibrary.shopItem3.setPrice("100000 Clicks");
                                     StorageLibrary.shopItem3.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=10000){
+                            }else if(StorageLibrary.clicks3>=100000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 10000;
+                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 100000;
                                 StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 100;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
@@ -1665,7 +1662,7 @@ public class InputService{
                 if(e.getButton()==MouseEvent.BUTTON1){
                     if(Objects.equals(StorageLibrary.shopItem4.getDescription(), "Gives 1000 more Click Power")){
                         if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<100000){
+                            if(StorageLibrary.clicks1<1000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem4.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem4.setDisabled(true);
@@ -1673,21 +1670,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem4.setPrice("100000 Clicks");
+                                    StorageLibrary.shopItem4.setPrice("1 Million Clicks");
                                     StorageLibrary.shopItem4.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=100000){
+                            }else if(StorageLibrary.clicks1>=1000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 100000;
+                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 1000000;
                                 StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 1000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<100000){
+                            if(StorageLibrary.clicks2<1000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem4.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem4.setDisabled(true);
@@ -1695,21 +1692,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem4.setPrice("100000 Clicks");
+                                    StorageLibrary.shopItem4.setPrice("1 Million Clicks");
                                     StorageLibrary.shopItem4.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=100000){
+                            }else if(StorageLibrary.clicks2>=1000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 100000;
+                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 1000000;
                                 StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 1000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<100000){
+                            if(StorageLibrary.clicks3<1000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem4.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem4.setDisabled(true);
@@ -1717,14 +1714,14 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem4.setPrice("100000 Clicks");
+                                    StorageLibrary.shopItem4.setPrice("1 Million Clicks");
                                     StorageLibrary.shopItem4.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=100000){
+                            }else if(StorageLibrary.clicks3>=1000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 100000;
+                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 1000000;
                                 StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 1000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
@@ -1739,7 +1736,7 @@ public class InputService{
                 if(e.getButton()==MouseEvent.BUTTON1){
                     if(Objects.equals(StorageLibrary.shopItem5.getDescription(), "Gives 10000 more Click Power")){
                         if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<1000000){
+                            if(StorageLibrary.clicks1<10000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem5.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem5.setDisabled(true);
@@ -1747,21 +1744,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("1 Million Clicks");
+                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
                                     StorageLibrary.shopItem5.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=1000000){
+                            }else if(StorageLibrary.clicks1>=10000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 1000000;
+                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 10000000;
                                 StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 10000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<1000000){
+                            if(StorageLibrary.clicks2<10000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem5.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem5.setDisabled(true);
@@ -1769,21 +1766,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("1 Million Clicks");
+                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
                                     StorageLibrary.shopItem5.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=1000000){
+                            }else if(StorageLibrary.clicks2>=10000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 1000000;
+                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 10000000;
                                 StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 10000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<1000000){
+                            if(StorageLibrary.clicks3<10000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem5.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem5.setDisabled(true);
@@ -1791,14 +1788,14 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("1 Million Clicks");
+                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
                                     StorageLibrary.shopItem5.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=1000000){
+                            }else if(StorageLibrary.clicks3>=10000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 1000000;
+                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 10000000;
                                 StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 10000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
@@ -1813,7 +1810,7 @@ public class InputService{
                 if(e.getButton()==MouseEvent.BUTTON1){
                     if(Objects.equals(StorageLibrary.shopItem6.getDescription(), "Gives 100000 more Click Power")){
                         if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<10000000){
+                            if(StorageLibrary.clicks1<100000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem6.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem6.setDisabled(true);
@@ -1821,21 +1818,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-                                    StorageLibrary.shopItem5.setDisabled(false);
+                                    StorageLibrary.shopItem6.setPrice("100 Million Clicks");
+                                    StorageLibrary.shopItem6.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=10000000){
+                            }else if(StorageLibrary.clicks1>=100000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 10000000;
+                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 100000000;
                                 StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 100000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<10000000){
+                            if(StorageLibrary.clicks2<100000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem6.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem6.setDisabled(true);
@@ -1843,21 +1840,21 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-                                    StorageLibrary.shopItem5.setDisabled(false);
+                                    StorageLibrary.shopItem6.setPrice("100 Million Clicks");
+                                    StorageLibrary.shopItem6.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=10000000){
+                            }else if(StorageLibrary.clicks2>=100000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 10000000;
+                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 100000000;
                                 StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 100000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
                                 StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
                             }
                         } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<10000000){
+                            if(StorageLibrary.clicks3<100000000){
                                 AudioUtility.SFX.playSFX("declined");
                                 StorageLibrary.shopItem6.setPrice("Not Enough Clicks");
                                 StorageLibrary.shopItem6.setDisabled(true);
@@ -1865,14 +1862,14 @@ public class InputService{
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-                                    StorageLibrary.shopItem5.setDisabled(false);
+                                    StorageLibrary.shopItem6.setPrice("100 Million Clicks");
+                                    StorageLibrary.shopItem6.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=10000000){
+                            }else if(StorageLibrary.clicks3>=100000000){
                                 AudioUtility.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 10000000;
+                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 100000000;
                                 StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 100000;
 
                                 StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
