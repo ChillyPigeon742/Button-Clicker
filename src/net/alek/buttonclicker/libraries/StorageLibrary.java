@@ -109,7 +109,7 @@ public class StorageLibrary {
 
     public static BufferedImage portal2Whitewall;
 
-    public static final String VERSION = "0.3.0_INDEV";
+    public static final String VERSION = "0.3.1_INDEV";
 
     public static long clicks1 = 0;
     public static long clickPower1 = 1;
