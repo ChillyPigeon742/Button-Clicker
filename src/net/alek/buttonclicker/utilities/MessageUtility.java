@@ -1,7 +1,5 @@
 package net.alek.buttonclicker.utilities;
 
-import net.alek.buttonclicker.libraries.StorageLibrary;
-
 import javax.swing.*;
 
 public class MessageUtility {
@@ -13,7 +11,7 @@ public class MessageUtility {
                 "",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE,
-                StorageLibrary.errorIcon,
+                ReadUtility.errorIcon,
                 responses,
                 responses[0]);
     }
@@ -26,7 +24,7 @@ public class MessageUtility {
                 "",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.WARNING_MESSAGE,
-                StorageLibrary.questionIcon,
+                ReadUtility.questionIcon,
                 responses,
                 responses[0]);
     }
@@ -39,7 +37,7 @@ public class MessageUtility {
                 "",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.WARNING_MESSAGE,
-                StorageLibrary.warningIcon,
+                ReadUtility.warningIcon,
                 responses,
                 responses[0]);
     }
@@ -52,20 +50,7 @@ public class MessageUtility {
                 "",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
-                StorageLibrary.infoIcon,
-                responses,
-                responses[0]);
-    }
-
-    public static void TrollMessage(){
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "you really thought huh",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                StorageLibrary.trollIcon,
+                ReadUtility.infoIcon,
                 responses,
                 responses[0]);
     }
@@ -78,7 +63,7 @@ public class MessageUtility {
                 "",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE,
-                StorageLibrary.errorIcon,
+                ReadUtility.errorIcon,
                 responses,
                 responses[0]);
     }

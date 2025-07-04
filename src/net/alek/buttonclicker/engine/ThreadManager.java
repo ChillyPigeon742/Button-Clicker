@@ -1,44 +1,24 @@
 package net.alek.buttonclicker.engine;
 
-import net.alek.buttonclicker.utilities.AudioUtility;
+import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.utilities.MessageUtility;
 
 public class ThreadManager {
     public static Thread integerLimitMessageThread() {
-        return new Thread(new Runnable() {
-            @Override
-            public void run() {
-                AudioUtility.SFX.playSFX("declined");
-                MessageUtility.IntegerLimitMessage();
-            }
+        return new Thread(() -> {
+            AudioService.SFX.playSFX("declined");
+            MessageUtility.IntegerLimitMessage();
         });
     }
 
     public static Thread alreadyDeletedMessageThread() {
-        return new Thread(new Runnable() {
-            @Override
-            public void run() {
-                MessageUtility.AlreadyDeletedMessage();
-            }
-        });
-    }
-
-    public static Thread trollMessageThread() {
-        return new Thread(new Runnable() {
-            @Override
-            public void run() {
-                MessageUtility.TrollMessage();
-            }
-        });
+        return new Thread(MessageUtility::AlreadyDeletedMessage);
     }
 
     public static Thread notAllowedSaveNames() {
-        return new Thread(new Runnable() {
-            @Override
-            public void run() {
-                AudioUtility.SFX.playSFX("declined");
-                MessageUtility.NotAllowedSaveNames();
-            }
+        return new Thread(() -> {
+            AudioService.SFX.playSFX("declined");
+            MessageUtility.NotAllowedSaveNames();
         });
     }
 }

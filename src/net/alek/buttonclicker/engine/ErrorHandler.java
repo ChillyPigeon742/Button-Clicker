@@ -1,212 +1,133 @@
 package net.alek.buttonclicker.engine;
 
 import com.formdev.flatlaf.FlatLaf;
-import net.alek.buttonclicker.libraries.StorageLibrary;
-import net.alek.buttonclicker.utilities.AudioUtility;
+
+import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.services.AudioService;
+import net.alek.buttonclicker.services.RenderService;
+import net.alek.buttonclicker.utilities.ReadUtility;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class ErrorHandler {
-    public static void IOException(String clas, int line) {
-        StorageLibrary.logger.error("IOEXCP#"+clas+"#"+line+": The Program has Suffered a IO Exception!");
-
-        FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
+    public static String getCallerInfo() {
+        StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+        for (StackTraceElement element : stackTrace) {
+            String className = element.getClassName();
+            if (!className.equals(ErrorHandler.class.getName())) {
+                String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+                return simpleClassName + ":" + element.getLineNumber();
+            }
         }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
-
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
-
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "IOEXCP#"+clas+"#"+line+": The Program has Suffered a IO Exception!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
-
-        System.exit(0);
+        return "UnknownCaller";
     }
 
-    public static void URISyntaxException(String clas, int line) {
-        StorageLibrary.logger.error("URISYNTEXCP#"+clas+"#"+line+": The Passed URI Has A Invalid Syntax!");
+    private static void handleException(String typeOfException){
+        String caller = getCallerInfo();
 
+        LoggingService.Logger.error(typeOfException+"/"+caller+"/The Program has Suffered an "+typeOfException+"!");
+
+        LoggingService.Logger.error("Locking Engine...");
+        MenuManager.closeMenu("Main");
+        MenuManager.closeMenu("Save Manager");
+        MenuManager.closeMenu("Choose A Side");
+        MenuManager.closeMenu("Enter A Save Name");
+        MenuManager.closeMenu("Save Info");
+        MenuManager.closeMenu("Settings");
+        MenuManager.closeMenu("Wiki");
+        MenuManager.closeMenu("Credits");
+        MenuManager.closeMenu("Loading");
+        MenuManager.closeMenu("Game");
+        MenuManager.closeMenu("Pause");
+        MenuManager.closeMenu("Shop");
+        MenuManager.closeMenu("Debug");
+
+        RenderService.titleText.setVisible(false);
+        RenderService.titleImage.setVisible(false);
+        RenderService.backToButton.setVisible(false);
+        RenderService.forwardButton.setVisible(false);
+        RenderService.backwardButton.setVisible(false);
+
+        RenderService.frame.getContentPane().setBackground(Color.WHITE);
+
+        LoggingService.Logger.error("Unloading Resources...");
+        RenderService.frame.setIconImage(ReadUtility.missingIcon.getImage());
+        ReadUtility.unloadGame();
+
+        LoggingService.Logger.error("Unloading Themes...");
         FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
 
         try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
         }
         SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
 
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
+        LoggingService.Logger.error("Stopping Services...");
+        AudioService.Music.stopMusic();
 
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "URISYNTEXCP#"+clas+"#"+line+": The Passed URI Has A Invalid Syntax!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
+        RenderService.crashText.setVisible(true);
+        RenderService.crashText.setText("The game appears to have encountered a\nfatal error!\n\nTo prevent further error the game has \nlocked down the engine\n\nBelow are a few troubleshooting options");
 
-        System.exit(0);
+        RenderService.showConsoleButton.setVisible(true);
+        RenderService.showConsoleButton.setBounds(250, 335, 100, 20);
+
+        RenderService.showConsoleButton.setFont(new Font("Sans Serif", Font.BOLD, 9));
+        RenderService.showConsoleButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        RenderService.showConsoleButton.setFocusable(false);
     }
 
-    public static void InterruptedException(String clas, int line) {
-        StorageLibrary.logger.error("INTEREXCP#"+clas+"#"+line+": The Thread has been Interrupted!");
-
-        FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
-
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
-
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "INTEREXCP#"+clas+"#"+line+": The Thread has been Interrupted!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
-
-        System.exit(0);
+    public static void IOException() {
+        handleException("IOException");
     }
 
-    public static void JsonIOException(String clas, int line) {
-        StorageLibrary.logger.error("JSONIOEXCP#"+clas+"#"+line+": The Json Reader/Writer has Suffered a IO Exception!");
-
-        FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
-
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
-
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "JSONIOEXCP#"+clas+"#"+line+": The Json Reader/Writer has Suffered a IO Exception!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
-
-        System.exit(0);
+    public static void URISyntaxException() {
+        handleException("URISyntaxException");
     }
 
-    public static void JsonSyntaxException(String clas, int line) {
-        StorageLibrary.logger.error("JSONSYNEXCP#"+clas+"#"+line+": The Json Reader/Writer has Encountered Invalid Json Syntax!");
-
-        FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
-
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
-
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "JSONSYNEXCP#"+clas+"#"+line+": The Json Reader/Writer has Encountered Invalid Json Syntax!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
-
-        System.exit(0);
+    public static void InterruptedException() {
+        handleException("InterruptedException");
     }
 
-    public static void FontFormatException(String clas, int line) {
-        StorageLibrary.logger.error("FONTFORMEXCP#"+clas+"#"+line+": The Given Font Has A Invalid Format!");
-
-        FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
-
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
-
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "FONTFORMEXCP#"+clas+"#"+line+": The Given Font Has A Invalid Format!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
-
-        System.exit(0);
+    public static void FontFormatException() {
+        handleException("FontFormatException");
     }
 
-    public static void ExecutionException(String clas, int line) {
-        StorageLibrary.logger.error("EXEEXCP#"+clas+"#"+line+": A Execution Error Has Occurred!");
+    public static void ExecutionException() {
+        handleException("ExecutionException");
+    }
 
-        FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
+    public static void BadLocationException() {
+        handleException("BadLocationException");
+    }
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
+    public static void NoSuchMethodException() {
+        handleException("NoSuchMethodException");
+    }
 
-        StorageLibrary.frame.setVisible(false);
-        AudioUtility.Music.stopMusic();
+    public static void IllegalAccessException() {
+        handleException("IllegalAccessException");
+    }
 
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "EXEEXCP#"+clas+"#"+line+": A Execution Error Has Occurred!\n\nPlease press the report a bug button in the settings and describe the bug, give detailed steps on how to reproduce the bug, and the error code ie. IOEXCP#INPUT#174",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                UIManager.getIcon("OptionPane.errorIcon"),
-                responses,
-                responses[0]);
+    public static void InvocationTargetException() {
+        handleException("InvocationTargetException");
+    }
 
-        System.exit(0);
+    public static void IllegalArgumentException() {
+        handleException("IllegalArgumentException");
+    }
+
+    public static void ClassNotFoundException(){
+        handleException("ClassNotFoundException");
+    }
+
+    public static void NullPointerException(){
+        handleException("NullPointerException");
+    }
+
+    public static void Exception() {
+        handleException("Exception");
     }
 }

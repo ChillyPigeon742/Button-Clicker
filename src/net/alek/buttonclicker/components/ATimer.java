@@ -1,4 +1,4 @@
-package net.alek.buttonclicker.libraries;
+package net.alek.buttonclicker.components;
 
 import java.util.Timer;
 import java.util.TimerTask;

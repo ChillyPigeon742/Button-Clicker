@@ -1,4 +1,4 @@
-package net.alek.buttonclicker.libraries;
+package net.alek.buttonclicker.components;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

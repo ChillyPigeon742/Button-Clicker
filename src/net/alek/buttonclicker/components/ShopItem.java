@@ -1,4 +1,4 @@
-package net.alek.buttonclicker.libraries;
+package net.alek.buttonclicker.components;
 
 import com.formdev.flatlaf.FlatClientProperties;
 

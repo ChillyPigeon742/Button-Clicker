@@ -5,35 +5,44 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javafx.embed.swing.JFXPanel;
 
-import net.alek.buttonclicker.libraries.StorageLibrary;
-
-import net.alek.buttonclicker.services.SaveService;
-import net.alek.buttonclicker.utilities.RenderUtility;
+import net.alek.buttonclicker.data.CommandDefinitions;
+import net.alek.buttonclicker.services.AutoClickerDetectorService;
+import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.utilities.ReadUtility;
+import net.alek.buttonclicker.utilities.WriteUtility;
+import net.alek.buttonclicker.services.AudioService;
+import net.alek.buttonclicker.services.RenderService;
 
 import javax.swing.*;
-import java.util.Objects;
 
 public class Main {
+
+    public static CommandDefinitions commandDefinitions = new CommandDefinitions();
+    public static final String VERSION = "0.7.0_INDEV";
+
     public static void main(String[] args){
+        LoggingService.setupLogger();
+
         FlatLaf.registerCustomDefaultsSource("assets.buttonclicker.config");
         FlatDarculaLaf.setup();
 
-        System.setProperty("log4j.configurationFile", Objects.requireNonNull(ResourceManager.class.getResource("/assets/buttonclicker/config/log4j2.xml")).toString());
+        RenderService.frame.getRootPane().putClientProperty("JRootPane.titleBarShowTitle", false);
+        RenderService.frame.getRootPane().putClientProperty("JRootPane.titleBarShowIcon", false);
 
-        StorageLibrary.frame.getRootPane().putClientProperty("JRootPane.titleBarShowTitle", false);
-        StorageLibrary.frame.getRootPane().putClientProperty("JRootPane.titleBarShowIcon", false);
+        RenderService.backwardButton.putClientProperty("JButton.buttonType", "roundRect");
+        RenderService.forwardButton.putClientProperty("JButton.buttonType", "roundRect");
 
-        StorageLibrary.backwardButton.putClientProperty("JButton.buttonType", "roundRect");
-        StorageLibrary.forwardButton.putClientProperty("JButton.buttonType", "roundRect");
-
-        StorageLibrary.logger.info("Starting Engine...");
-        StorageLibrary.logger.info("Initializing Engine Pipelines...");
+        LoggingService.Logger.info("Starting Engine...");
+        LoggingService.Logger.info("Button Clicker "+VERSION);
+        LoggingService.Logger.info("Initializing Engine Pipelines...");
 
         new JFXPanel();
 
-        new ResourceManager();
-        SwingUtilities.invokeLater(RenderUtility::new);
+        new ReadUtility();
+        new AudioService();
+        SwingUtilities.invokeLater(RenderService::new);
 
-        SaveService.startAutosaveTimer();
+        WriteUtility.startAutosaveTimer();
+        new AutoClickerDetectorService();
     }
 }

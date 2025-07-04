@@ -2,22 +2,21 @@ package net.alek.buttonclicker.services;
 
 import javafx.scene.media.MediaPlayer;
 
-import net.alek.buttonclicker.engine.ErrorHandler;
-import net.alek.buttonclicker.engine.MenuManager;
-import net.alek.buttonclicker.engine.ResourceManager;
-import net.alek.buttonclicker.engine.ThreadManager;
+import net.alek.buttonclicker.engine.*;
 
-import net.alek.buttonclicker.libraries.ATimer;
+import net.alek.buttonclicker.components.ATimer;
 
+import net.alek.buttonclicker.data.CommandDefinitions;
 import net.alek.buttonclicker.utilities.*;
-
-import net.alek.buttonclicker.libraries.StorageLibrary;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
@@ -25,79 +24,79 @@ public class InputService{
     public static ActionListener actionListener = e -> {
         Object source = e.getSource();
 
-        if(source==StorageLibrary.startGameButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.startGameButton){
+            AudioService.SFX.playSFX("select");
 
-            if(Objects.equals(StorageLibrary.startGameButton.getText(), "Select A Save To Continue")){
-                StorageLibrary.startGameButton.setText("I said what I said.");
+            if(Objects.equals(RenderService.startGameButton.getText(), "Select A Save To Continue")){
+                RenderService.startGameButton.setText("I said what I said.");
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
                 timer.setTask(() -> {
-                    StorageLibrary.startGameButton.setText("Select A Save To Continue");
+                    RenderService.startGameButton.setText("Select A Save To Continue");
                 });
                 timer.start();
-            }else if(Objects.equals(StorageLibrary.startGameButton.getText(), "Start Game")){
-                StorageLibrary.logger.info("Loading Game...");
+            }else if(Objects.equals(RenderService.startGameButton.getText(), "Start Game")){
+                LoggingService.Logger.info("Loading Game...");
 
-                if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                    LoadService.loadSave1();
-                    StorageLibrary.playedBefore1 = true;
-                    SaveService.save1();
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                    LoadService.loadSave2();
-                    StorageLibrary.playedBefore2 = true;
-                    SaveService.save2();
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                    LoadService.loadSave3();
-                    StorageLibrary.playedBefore3 = true;
-                    SaveService.save3();
+                if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                    ReadUtility.loadSave1();
+                    WriteUtility.playedBefore1 = true;
+                    WriteUtility.save1();
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                    ReadUtility.loadSave2();
+                    WriteUtility.playedBefore2 = true;
+                    WriteUtility.save2();
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                    ReadUtility.loadSave3();
+                    WriteUtility.playedBefore3 = true;
+                    WriteUtility.save3();
                 }
 
                 MenuManager.closeMenu("Main");
                 MenuManager.openMenu("Loading");
 
-                StorageLibrary.loadingBar.setValue(0);
-                StorageLibrary.progressText.setText("[1/3] Loading Resources");
+                RenderService.loadingBar.setValue(0);
+                RenderService.progressText.setText("[1/3] Loading Resources");
 
-                RenderUtility.startProgress(StorageLibrary.loadingBar, 340);
+                RenderService.startProgress(RenderService.loadingBar, 340);
 
-                StorageLibrary.nextTipButton.setEnabled(true);
+                RenderService.nextTipButton.setEnabled(true);
 
                 Random random = new Random();
                 int number = random.nextInt(1,4);
 
                 if(number==1){
-                    StorageLibrary.tipsText.setText("Did you know you can click to\nclick?");
+                    RenderService.tipsText.setText("Did you know you can click to\nclick?");
                 }else if(number==2){
-                    StorageLibrary.tipsText.setText("Obtaining extra click power\ngains you more clicks");
+                    RenderService.tipsText.setText("Obtaining extra click power\ngains you more clicks");
                 }else if(number==3){
-                    StorageLibrary.tipsText.setText("Button Clicker was made\navailable on March 20, 2024");
+                    RenderService.tipsText.setText("Button Clicker was made\navailable on March 20, 2024");
                 }
 
-                StorageLibrary.titleText.setBounds(46, 40, 570, 80);
-                StorageLibrary.titleImage.setBounds(280,150,110,110);
+                RenderService.titleText.setBounds(46, 40, 570, 80);
+                RenderService.titleImage.setBounds(280,150,110,110);
 
-                StorageLibrary.titleImage.startSpinning();
+                RenderService.titleImage.startSpinning();
 
-                AudioUtility.Music.stopMusic();
+                AudioService.Music.stopMusic();
 
                 ATimer timer = new ATimer();
                 timer.setDelay(17);
                 timer.setTask(() -> {
-                    if(StorageLibrary.nextTipButton.isEnabled()){
+                    if(RenderService.nextTipButton.isEnabled()){
                         Random random1 = new Random();
                         int number1 = random1.nextInt(1,4);
 
                         if(number1==1){
-                            StorageLibrary.tipsText.setText("Button Clicker was originally a lot more simplistic!");
+                            RenderService.tipsText.setText("Button Clicker was originally a lot more simplistic!");
                         }else if(number1==2){
-                            StorageLibrary.tipsText.setText("Button Clicker is out now for early access on itch.io!");
+                            RenderService.tipsText.setText("Button Clicker is out now for early access on itch.io!");
                         }else if(number1==3){
-                            StorageLibrary.tipsText.setText("Rebirthing grants you easier\nprogression next time round!");
+                            RenderService.tipsText.setText("Rebirthing grants you easier\nprogression next time round!");
                         }
 
-                        StorageLibrary.nextTipButton.setEnabled(false);
+                        RenderService.nextTipButton.setEnabled(false);
                     }
                 });
                 timer.start();
@@ -105,57 +104,57 @@ public class InputService{
                 ATimer timer1 = new ATimer();
                 timer1.setDelay(3);
                 timer1.setTask(() -> {
-                    StorageLibrary.progressText.setText("[1/3] Loading Resources.");
+                    RenderService.progressText.setText("[1/3] Loading Resources.");
 
                     ATimer timer2 = new ATimer();
                     timer2.setDelay(3);
                     timer2.setTask(() -> {
-                        StorageLibrary.progressText.setText("[1/3] Loading Resources..");
+                        RenderService.progressText.setText("[1/3] Loading Resources..");
 
                         ATimer timer3 = new ATimer();
                         timer3.setDelay(3);
                         timer3.setTask(() -> {
-                            StorageLibrary.progressText.setText("[1/3] Loading Resources...");
+                            RenderService.progressText.setText("[1/3] Loading Resources...");
 
                             ATimer timer4 = new ATimer();
                             timer4.setDelay(3);
                             timer4.setTask(() -> {
-                                StorageLibrary.progressText.setText("[2/3] Loading Save");
+                                RenderService.progressText.setText("[2/3] Loading Save");
 
                                 ATimer timer5 = new ATimer();
                                 timer5.setDelay(3);
                                 timer5.setTask(() -> {
-                                    StorageLibrary.progressText.setText("[2/3] Loading Save.");
+                                    RenderService.progressText.setText("[2/3] Loading Save.");
 
                                     ATimer timer6 = new ATimer();
                                     timer6.setDelay(3);
                                     timer6.setTask(() -> {
-                                        StorageLibrary.progressText.setText("[2/3] Loading Save..");
+                                        RenderService.progressText.setText("[2/3] Loading Save..");
 
                                         ATimer timer7 = new ATimer();
                                         timer7.setDelay(3);
                                         timer7.setTask(() -> {
-                                            StorageLibrary.progressText.setText("[2/3] Loading Save...");
+                                            RenderService.progressText.setText("[2/3] Loading Save...");
 
                                             ATimer timer8 = new ATimer();
                                             timer8.setDelay(3);
                                             timer8.setTask(() -> {
-                                                StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces");
+                                                RenderService.progressText.setText("[3/3] Channeling Dark Forces");
 
                                                 ATimer timer9= new ATimer();
                                                 timer9.setDelay(3);
                                                 timer9.setTask(() -> {
-                                                    StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces.");
+                                                    RenderService.progressText.setText("[3/3] Channeling Dark Forces.");
 
                                                     ATimer timer10 = new ATimer();
                                                     timer10.setDelay(3);
                                                     timer10.setTask(() -> {
-                                                        StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces..");
+                                                        RenderService.progressText.setText("[3/3] Channeling Dark Forces..");
 
                                                         ATimer timer11 = new ATimer();
                                                         timer11.setDelay(3);
                                                         timer11.setTask(() -> {
-                                                            StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces...");
+                                                            RenderService.progressText.setText("[3/3] Channeling Dark Forces...");
                                                         });
                                                         timer11.start();
                                                     });
@@ -179,57 +178,57 @@ public class InputService{
                 });
                 timer1.start();
 
-                AudioUtility.Music.playMusic("loading");
+                AudioService.Music.playMusic("loading");
 
-                StorageLibrary.logger.info("Done!");
-            }else if(Objects.equals(StorageLibrary.startGameButton.getText(), "Resume Game")){
+                LoggingService.Logger.info("Done!");
+            }else if(Objects.equals(RenderService.startGameButton.getText(), "Resume Game")){
                 if(MenuManager.isMenuOpen("Main")){
-                    StorageLibrary.logger.info("Loading Game...");
+                    LoggingService.Logger.info("Loading Game...");
 
                     MenuManager.closeMenu("Main");
                     MenuManager.openMenu("Loading");
 
-                    StorageLibrary.loadingBar.setValue(0);
-                    StorageLibrary.progressText.setText("[1/3] Loading Resources");
+                    RenderService.loadingBar.setValue(0);
+                    RenderService.progressText.setText("[1/3] Loading Resources");
 
-                    RenderUtility.startProgress(StorageLibrary.loadingBar, 340);
+                    RenderService.startProgress(RenderService.loadingBar, 0);
 
-                    StorageLibrary.nextTipButton.setEnabled(true);
+                    RenderService.nextTipButton.setEnabled(true);
 
                     Random random = new Random();
                     int number = random.nextInt(1,4);
 
                     if(number==1){
-                        StorageLibrary.tipsText.setText("Did you know you can click to\nclick?");
+                        RenderService.tipsText.setText("Did you know you can click to\nclick?");
                     }else if(number==2){
-                        StorageLibrary.tipsText.setText("Obtaining extra click power\ngains you more clicks");
+                        RenderService.tipsText.setText("Obtaining extra click power\ngains you more clicks");
                     }else if(number==3){
-                        StorageLibrary.tipsText.setText("Button Clicker was made\navailable on March 20, 2024");
+                        RenderService.tipsText.setText("Button Clicker was made\navailable on March 20, 2024");
                     }
 
-                    StorageLibrary.titleText.setBounds(46, 40, 570, 80);
-                    StorageLibrary.titleImage.setBounds(280,150,110,110);
+                    RenderService.titleText.setBounds(46, 40, 570, 80);
+                    RenderService.titleImage.setBounds(280,150,110,110);
 
-                    StorageLibrary.titleImage.startSpinning();
+                    RenderService.titleImage.startSpinning();
 
-                    AudioUtility.Music.stopMusic();
+                    AudioService.Music.stopMusic();
 
                     ATimer timer = new ATimer();
                     timer.setDelay(17);
                     timer.setTask(() -> {
-                        if(StorageLibrary.nextTipButton.isEnabled()){
+                        if(RenderService.nextTipButton.isEnabled()){
                             Random random1 = new Random();
                             int number1 = random1.nextInt(1,4);
 
                             if(number1==1){
-                                StorageLibrary.tipsText.setText("Button Clicker was originally a lot more simplistic!");
+                                RenderService.tipsText.setText("Button Clicker was originally a lot more simplistic!");
                             }else if(number1==2){
-                                StorageLibrary.tipsText.setText("Button Clicker is out now for early access on itch.io!");
+                                RenderService.tipsText.setText("Button Clicker is out now for early access on itch.io!");
                             }else if(number1==3){
-                                StorageLibrary.tipsText.setText("Rebirthing grants you easier\nprogression next time round!");
+                                RenderService.tipsText.setText("Rebirthing grants you easier\nprogression next time round!");
                             }
 
-                            StorageLibrary.nextTipButton.setEnabled(false);
+                            RenderService.nextTipButton.setEnabled(false);
                         }
                     });
                     timer.start();
@@ -237,57 +236,57 @@ public class InputService{
                     ATimer timer1 = new ATimer();
                     timer1.setDelay(3);
                     timer1.setTask(() -> {
-                        StorageLibrary.progressText.setText("[1/3] Loading Resources.");
+                        RenderService.progressText.setText("[1/3] Loading Resources.");
 
                         ATimer timer2 = new ATimer();
                         timer2.setDelay(3);
                         timer2.setTask(() -> {
-                            StorageLibrary.progressText.setText("[1/3] Loading Resources..");
+                            RenderService.progressText.setText("[1/3] Loading Resources..");
 
                             ATimer timer3 = new ATimer();
                             timer3.setDelay(3);
                             timer3.setTask(() -> {
-                                StorageLibrary.progressText.setText("[1/3] Loading Resources...");
+                                RenderService.progressText.setText("[1/3] Loading Resources...");
 
                                 ATimer timer4 = new ATimer();
                                 timer4.setDelay(3);
                                 timer4.setTask(() -> {
-                                    StorageLibrary.progressText.setText("[2/3] Loading Save");
+                                    RenderService.progressText.setText("[2/3] Loading Save");
 
                                     ATimer timer5 = new ATimer();
                                     timer5.setDelay(3);
                                     timer5.setTask(() -> {
-                                        StorageLibrary.progressText.setText("[2/3] Loading Save.");
+                                        RenderService.progressText.setText("[2/3] Loading Save.");
 
                                         ATimer timer6 = new ATimer();
                                         timer6.setDelay(3);
                                         timer6.setTask(() -> {
-                                            StorageLibrary.progressText.setText("[2/3] Loading Save..");
+                                            RenderService.progressText.setText("[2/3] Loading Save..");
 
                                             ATimer timer7 = new ATimer();
                                             timer7.setDelay(3);
                                             timer7.setTask(() -> {
-                                                StorageLibrary.progressText.setText("[2/3] Loading Save...");
+                                                RenderService.progressText.setText("[2/3] Loading Save...");
 
                                                 ATimer timer8 = new ATimer();
                                                 timer8.setDelay(3);
                                                 timer8.setTask(() -> {
-                                                    StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces");
+                                                    RenderService.progressText.setText("[3/3] Channeling Dark Forces");
 
                                                     ATimer timer9= new ATimer();
                                                     timer9.setDelay(3);
                                                     timer9.setTask(() -> {
-                                                        StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces.");
+                                                        RenderService.progressText.setText("[3/3] Channeling Dark Forces.");
 
                                                         ATimer timer10 = new ATimer();
                                                         timer10.setDelay(3);
                                                         timer10.setTask(() -> {
-                                                            StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces..");
+                                                            RenderService.progressText.setText("[3/3] Channeling Dark Forces..");
 
                                                             ATimer timer11 = new ATimer();
                                                             timer11.setDelay(3);
                                                             timer11.setTask(() -> {
-                                                                StorageLibrary.progressText.setText("[3/3] Channeling Dark Forces...");
+                                                                RenderService.progressText.setText("[3/3] Channeling Dark Forces...");
                                                             });
                                                             timer11.start();
                                                         });
@@ -311,127 +310,113 @@ public class InputService{
                     });
                     timer1.start();
 
-                    AudioUtility.Music.playMusic("loading");
+                    AudioService.Music.playMusic("loading");
 
-                    StorageLibrary.logger.info("Done!");
+                    LoggingService.Logger.info("Done!");
                 }else if(MenuManager.isMenuOpen("Pause")){
-                    StorageLibrary.logger.info("Resuming...");
+                    LoggingService.Logger.info("Resuming...");
 
                     MenuManager.closeMenu("Pause");
 
-                    if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                        StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                        StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                        StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                        StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                        StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                        StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                    if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                        RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                        RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                        RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                        RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                        RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                        RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                     }
 
-                    StorageLibrary.titleText.setVisible(false);
-                    StorageLibrary.titleImage.setVisible(false);
+                    RenderService.titleText.setVisible(false);
+                    RenderService.titleImage.setVisible(false);
 
-                    AudioUtility.SoundManager.getSMusicAudioPlayer().stop();
+                    AudioService.SoundManager.getSMusicAudioPlayer().stop();
 
-                    AudioUtility.Music.resumeMusic();
+                    AudioService.Music.resumeMusic();
 
                     MenuManager.openMenu("Game");
 
-                    StorageLibrary.logger.info("Done!");
+                    LoggingService.Logger.info("Done!");
                 }
             }
         }
 
-        if(source==StorageLibrary.saveManagerButton){
-            StorageLibrary.logger.info("Opening Save Manager...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.saveManagerButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Main");
             MenuManager.openMenu("Save Manager");
 
-            StorageLibrary.backToButton.setVisible(true);
-            StorageLibrary.backToButton.setText("Back To Main Menu");
-            StorageLibrary.titleText.setText("Save Manager");
-
-            StorageLibrary.logger.info("Loading Saves...");
-            LoadService.loadSave1();
-            LoadService.loadSave2();
-            LoadService.loadSave3();
-
-            StorageLibrary.logger.info("Done!");
+            RenderService.backToButton.setVisible(true);
+            RenderService.backToButton.setText("Back To Main Menu");
+            RenderService.titleText.setText("Save Manager");
+            
+            ReadUtility.loadSave1();
+            ReadUtility.loadSave2();
+            ReadUtility.loadSave3();
         }
 
-        if(source==StorageLibrary.wikiButton){
-            StorageLibrary.logger.info("Opening Wiki...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.wikiButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Settings");
             MenuManager.openMenu("Wiki");
 
-            StorageLibrary.backToButton.setBounds(-10, 593, 1036, 38);
-            StorageLibrary.backToButton.setText("Back To Settings");
+            RenderService.titleText.setVisible(false);
+            RenderService.titleImage.setVisible(false);
 
-            StorageLibrary.wikiEditorPane.setText("<html>\n" +
-                    "<body>\n" +
-                    "\t<header>\n" +
-                    "\t\t<h1>Button Clicker Wiki</h1>\n" +
-                    "\t</header>\n" +
-                    "\t<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nullam non nisi est sit amet. Arcu non sodales neque sodales ut etiam sit amet. Suscipit adipiscing bibendum est ultricies integer quis auctor elit sed. Ipsum dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Netus et malesuada fames ac. Integer enim neque volutpat ac tincidunt vitae. Hendrerit dolor magna eget est lorem. Fusce ut placerat orci nulla. Sociis natoque penatibus et magnis. Facilisi cras fermentum odio eu. Urna porttitor rhoncus dolor purus non enim. At tellus at urna condimentum mattis pellentesque id. Dolor sit amet consectetur adipiscing elit pellentesque. Morbi non arcu risus quis varius quam quisque. Faucibus purus in massa tempor. Nec nam aliquam sem et tortor consequat id porta nibh.</p>\n" +
-                    "\t<p>Pellentesque elit eget gravida cum. Sapien faucibus et molestie ac feugiat. Laoreet sit amet cursus sit amet dictum sit amet. Ac auctor augue mauris augue neque. Nibh nisl condimentum id venenatis a condimentum vitae. Eget duis at tellus at. Ac odio tempor orci dapibus ultrices in iaculis nunc. Mauris cursus mattis molestie a iaculis at erat. Sollicitudin aliquam ultrices sagittis orci. Leo urna molestie at elementum. Malesuada proin libero nunc consequat interdum varius sit amet. Dignissim suspendisse in est ante. Ac felis donec et odio pellentesque diam volutpat. At tempor commodo ullamcorper a lacus. Ut tellus elementum sagittis vitae et leo duis ut. Fusce id velit ut tortor pretium viverra suspendisse potenti nullam. A iaculis at erat pellentesque adipiscing commodo elit.</p>\n" +
-                    "\t<p>Donec adipiscing tristique risus nec feugiat in fermentum. Aliquam ut porttitor leo a. Sed blandit libero volutpat sed cras. Pulvinar neque laoreet suspendisse interdum consectetur libero id faucibus. Tempor commodo ullamcorper a lacus vestibulum sed. Pharetra magna ac placerat vestibulum lectus mauris ultrices eros in. Montes nascetur ridiculus mus mauris. Mollis aliquam ut porttitor leo a diam sollicitudin tempor id. Amet risus nullam eget felis eget nunc lobortis mattis aliquam. Arcu felis bibendum ut tristique et egestas. Velit scelerisque in dictum non consectetur a erat nam. Ante metus dictum at tempor commodo ullamcorper a. Nunc mattis enim ut tellus elementum sagittis vitae et. Odio aenean sed adipiscing diam donec. Elit eget gravida cum sociis natoque penatibus et. Morbi tincidunt augue interdum velit euismod. Magna eget est lorem ipsum dolor. Elementum facilisis leo vel fringilla est ullamcorper eget.</p>\n" +
-                    "\t<p>Vel pharetra vel turpis nunc eget lorem dolor sed viverra. Mollis nunc sed id semper. Metus vulputate eu scelerisque felis. Venenatis tellus in metus vulputate. Consectetur libero id faucibus nisl tincidunt eget. Faucibus turpis in eu mi bibendum neque. Varius sit amet mattis vulputate. Convallis convallis tellus id interdum velit laoreet. Tellus orci ac auctor augue. Fames ac turpis egestas integer eget aliquet nibh praesent. Mi eget mauris pharetra et ultrices. Nunc congue nisi vitae suscipit tellus. In vitae turpis massa sed elementum tempus. Pellentesque dignissim enim sit amet venenatis urna cursus eget. Sociis natoque penatibus et magnis dis parturient montes. Phasellus vestibulum lorem sed risus ultricies. Sem nulla pharetra diam sit amet nisl suscipit adipiscing.</p>\n" +
-                    "\t<p>Donec ac odio tempor orci dapibus ultrices in. At erat pellentesque adipiscing commodo elit at imperdiet dui accumsan. Facilisi nullam vehicula ipsum a. Mauris augue neque gravida in fermentum et sollicitudin ac orci. Sed id semper risus in hendrerit. Ac odio tempor orci dapibus ultrices in iaculis nunc sed. Vulputate dignissim suspendisse in est ante in nibh. Faucibus in ornare quam viverra. Congue mauris rhoncus aenean vel. Morbi blandit cursus risus at ultrices mi. Et tortor at risus viverra adipiscing. Lectus arcu bibendum at varius vel pharetra.</p>\n" +
-                    "\t<img src="+ ResourceManager.class.getResource("/assets/buttonclicker/images/button_clicker_icon3.png") +"></img>\n" +
-                    "</body>\n" +
-                    "</html>");
-            StorageLibrary.wikiEditorPane.setBackground(new Color(50, 50, 50));
-            StorageLibrary.wikiEditorPane.setForeground(Color.WHITE);
-            StorageLibrary.wikiEditorPane.setFont(new Font("Nunito",Font.BOLD,20));
-            StorageLibrary.wikiEditorPane.setMargin(new Insets(0,5,0,0));
-            StorageLibrary.wikiEditorPane.setBackgroundImageEnabled(false);
+            RenderService.backToButton.setBounds(-10, 593, 1036, 38);
+            RenderService.backToButton.setText("Back To Settings");
 
-            StorageLibrary.frame.setSize(1031, 668);
-            StorageLibrary.frame.setLocationRelativeTo(null);
+            try {
+                RenderService.wikiEditorPane.setPage(ResourceManager.class.getResource("/assets/buttonclicker/html/wiki.html"));
+            } catch (IOException ex) {
+                ErrorHandler.IOException();
+            }
+            RenderService.wikiEditorPane.setBackground(new Color(50, 50, 50));
+            RenderService.wikiEditorPane.setForeground(Color.WHITE);
+            RenderService.wikiEditorPane.setFont(new Font("Nunito",Font.BOLD,20));
+            RenderService.wikiEditorPane.setMargin(new Insets(0,5,0,0));
+            RenderService.wikiEditorPane.setBackgroundImageEnabled(false);
 
-            if(StorageLibrary.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu){
-                StorageLibrary.wikiHelpButton.setVisible(false);
+            RenderService.frame.setSize(1031, 668);
+            RenderService.frame.setLocationRelativeTo(null);
+
+            if(MenuManager.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu){
+                RenderService.wikiHelpButton.setVisible(false);
             }
 
-            RenderUtility.setResetWindowTrigger();
-
-            StorageLibrary.logger.info("Done!");
+            RenderService.setResetWindowTrigger();
         }
 
-        if(source==StorageLibrary.creditsButton){
-            StorageLibrary.logger.info("Opening Credits...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.creditsButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Settings");
             MenuManager.openMenu("Credits");
 
-            StorageLibrary.backToButton.setText("Back To Settings");
-            StorageLibrary.backToButton.setVisible(true);
+            RenderService.backToButton.setText("Back To Settings");
+            RenderService.backToButton.setVisible(true);
 
-            StorageLibrary.titleText.setText("Credits");
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,70));
+            RenderService.titleText.setText("Credits");
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,70));
 
-            StorageLibrary.logger.info("Done!");
         }
 
-        if(source==StorageLibrary.quitButton){
-            AudioUtility.SFX.playSFX("select");
-            if(Objects.equals(StorageLibrary.quitButton.getText(), "Save & Quit")){
-                StorageLibrary.quitButton.setText("Saving...");
-                StorageLibrary.logger.info("Saving...");
+        if(source== RenderService.quitButton){
+            AudioService.SFX.playSFX("select");
+            if(Objects.equals(RenderService.quitButton.getText(), "Save & Quit")){
+                RenderService.quitButton.setText("Saving...");
+                LoggingService.Logger.info("Saving...");
 
-                if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                    SaveService.save1();
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                    SaveService.save2();
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                    SaveService.save3();
+                if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                    WriteUtility.save1();
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                    WriteUtility.save2();
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                    WriteUtility.save3();
                 }
 
                 ATimer timer = new ATimer();
@@ -440,9 +425,9 @@ public class InputService{
                     System.exit(0);
                 });
                 timer.start();
-            }else if(Objects.equals(StorageLibrary.quitButton.getText(), "Quit")){
-                StorageLibrary.quitButton.setText("Quitting...");
-                StorageLibrary.logger.info("Quitting...");
+            }else if(Objects.equals(RenderService.quitButton.getText(), "Quit")){
+                RenderService.quitButton.setText("Quitting...");
+                LoggingService.Logger.info("Quitting...");
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
@@ -450,932 +435,998 @@ public class InputService{
                     System.exit(0);
                 });
                 timer.start();
-            }else if(Objects.equals(StorageLibrary.quitButton.getText(), "Return To Main Menu")){
-                StorageLibrary.logger.info("Returning To Main Menu...");
-                StorageLibrary.quitButton.setText("Saving...");
-                StorageLibrary.logger.info("Saving...");
+            }else if(Objects.equals(RenderService.quitButton.getText(), "Return To Main Menu")){
+                RenderService.quitButton.setText("Saving...");
+                LoggingService.Logger.info("Saving...");
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
                 timer.setTask(() -> {
-                    if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                        SaveService.save1();
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                        SaveService.save2();
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                        SaveService.save3();
+                    if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                        WriteUtility.save1();
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                        WriteUtility.save2();
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                        WriteUtility.save3();
                     }
 
                     MenuManager.closeMenu("Pause");
                     MenuManager.openMenu("Main");
 
-                    StorageLibrary.startGameButton.setBounds(177,150,305,102);
-                    StorageLibrary.settingsButton.setBounds(177,348,305,102);
+                    RenderService.startGameButton.setBounds(177,150,305,102);
+                    RenderService.settingsButton.setBounds(177,348,305,102);
 
-                    StorageLibrary.quitButton.setBounds(177,447,305,102);
-                    StorageLibrary.quitButton.setFont(new Font("Nunito", Font.BOLD, 30));
-                    StorageLibrary.quitButton.setText("Save & Quit");
+                    RenderService.quitButton.setBounds(177,447,305,102);
+                    RenderService.quitButton.setFont(new Font("Nunito", Font.BOLD, 30));
+                    RenderService.quitButton.setText("Save & Quit");
 
-                    AudioUtility.SoundManager.getSMusicAudioPlayer().stop();
+                    AudioService.SoundManager.getSMusicAudioPlayer().stop();
 
                     Random random = new Random();
                     int number = random.nextInt(1,3);
 
                     if(number==1){
-                        AudioUtility.Music.playMusic("menu1");
+                        AudioService.Music.playMusic("menu1");
                     }else if(number==2){
-                        AudioUtility.Music.playMusic("menu2");
+                        AudioService.Music.playMusic("menu2");
                     }
 
-                    StorageLibrary.logger.info("Done!");
+                    LoggingService.Logger.info("Done!");
                 });
                 timer.start();
             }
         }
 
-        if(source==StorageLibrary.backToButton) {
-            if (Objects.equals(StorageLibrary.backToButton.getText(), "Back To Main Menu")) {
-                StorageLibrary.logger.info("Returning To Main Menu...");
-
+        if(source== RenderService.backToButton) {
+            if (Objects.equals(RenderService.backToButton.getText(), "Back To Main Menu")) {
                 MenuManager.closeMenu("Save Manager");
                 MenuManager.closeMenu("Settings");
+                MenuManager.closeMenu("Debug");
                 MenuManager.openMenu("Main");
 
-                StorageLibrary.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
-                StorageLibrary.titleText.setText("Button Clicker");
-                StorageLibrary.backToButton.setVisible(false);
+                RenderService.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
+                RenderService.titleText.setText("Button Clicker");
+                RenderService.backToButton.setVisible(false);
+                RenderService.forwardButton.setVisible(false);
+                RenderService.backwardButton.setVisible(false);
 
-                if(!Objects.equals(StorageLibrary.currentSave, "null")){
-                    StorageLibrary.startGameButton.setBackground(Color.GREEN);
-                    StorageLibrary.startGameButton.setFont(new Font("Nunito", Font.BOLD, 27));
-                    StorageLibrary.quitButton.setText("Save & Quit");
+                if(!Objects.equals(WriteUtility.currentSave, "null")){
+                    RenderService.startGameButton.setBackground(Color.GREEN);
+                    RenderService.startGameButton.setFont(new Font("Nunito", Font.BOLD, 27));
+                    RenderService.quitButton.setText("Save & Quit");
 
-                    if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                        if(StorageLibrary.playedBefore1){
-                            StorageLibrary.startGameButton.setText("Resume Game");
-                        }else if(!StorageLibrary.playedBefore1){
-                            StorageLibrary.startGameButton.setText("Start Game");
+                    if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                        if(WriteUtility.playedBefore1){
+                            RenderService.startGameButton.setText("Resume Game");
+                        }else if(!WriteUtility.playedBefore1){
+                            RenderService.startGameButton.setText("Start Game");
                         }
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.startGameButton.setText("Resume Game");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.startGameButton.setText("Start Game");
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.startGameButton.setText("Resume Game");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.startGameButton.setText("Start Game");
                         }
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.startGameButton.setText("Resume Game");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.startGameButton.setText("Start Game");
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.startGameButton.setText("Resume Game");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.startGameButton.setText("Start Game");
                         }
                     }
-                }else if(StorageLibrary.currentSave.equals("null")){
-                    StorageLibrary.startGameButton.setText("Select A Save To Continue");
-                    StorageLibrary.startGameButton.setBackground(Color.GRAY);
-                    StorageLibrary.startGameButton.setFont(new Font("Nunito", Font.BOLD, 21));
-                    StorageLibrary.quitButton.setText("Quit");
+                }else if(WriteUtility.currentSave.equals("null")){
+                    RenderService.startGameButton.setText("Select A Save To Continue");
+                    RenderService.startGameButton.setBackground(Color.GRAY);
+                    RenderService.startGameButton.setFont(new Font("Nunito", Font.BOLD, 21));
+                    RenderService.quitButton.setText("Quit");
                 }
 
-                if(Objects.equals(StorageLibrary.currentSave, "null")){
-                    StorageLibrary.currentSaveText.setText("Current Save: none");
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                    StorageLibrary.currentSaveText.setText("Current Save: "+StorageLibrary.save1Name);
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                    StorageLibrary.currentSaveText.setText("Current Save: "+StorageLibrary.save2Name);
-                }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                    StorageLibrary.currentSaveText.setText("Current Save: "+StorageLibrary.save3Name);
+                if(Objects.equals(WriteUtility.currentSave, "null")){
+                    RenderService.currentSaveText.setText("Current Save: none");
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                    RenderService.currentSaveText.setText("Current Save: "+ WriteUtility.save1Name);
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                    RenderService.currentSaveText.setText("Current Save: "+ WriteUtility.save2Name);
+                }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                    RenderService.currentSaveText.setText("Current Save: "+ WriteUtility.save3Name);
                 }
-
-                StorageLibrary.logger.info("Done!");
-            } else if (Objects.equals(StorageLibrary.backToButton.getText(), "Back To Save Manager")) {
-                StorageLibrary.logger.info("Returning To Save Manager...");
-
+            } else if (Objects.equals(RenderService.backToButton.getText(), "Back To Save Manager")) {
                 MenuManager.closeMenu("Save Info");
                 MenuManager.closeMenu("Choose A Side");
                 MenuManager.openMenu("Save Manager");
 
-                StorageLibrary.backToButton.setText("Back To Main Menu");
-                StorageLibrary.titleText.setText("Save Manager");
+                RenderService.backToButton.setText("Back To Main Menu");
+                RenderService.titleText.setText("Save Manager");
 
-                StorageLibrary.forwardButton.setVisible(false);
-                StorageLibrary.backwardButton.setVisible(false);
+                RenderService.forwardButton.setVisible(false);
+                RenderService.backwardButton.setVisible(false);
 
-                StorageLibrary.saveBeingCreated = 0;
+                WriteUtility.saveBeingCreated = 0;
 
-                StorageLibrary.logger.info("Loading Saves...");
-                LoadService.loadSave1();
-                LoadService.loadSave2();
-                LoadService.loadSave3();
+                ReadUtility.loadSave1();
+                ReadUtility.loadSave2();
+                ReadUtility.loadSave3();
+            } else if (Objects.equals(RenderService.backToButton.getText(), "Create Save")) {
+                RenderService.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
 
-                StorageLibrary.logger.info("Done!");
-            } else if (Objects.equals(StorageLibrary.backToButton.getText(), "Create Save")) {
-                StorageLibrary.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
-
-                if (RenderUtility.isTextFieldEmpty(StorageLibrary.saveNameField)) {
+                if (RenderService.isTextFieldEmpty(RenderService.saveNameField)) {
                     Thread thread = ThreadManager.notAllowedSaveNames();
                     thread.start();
 
-                    if(StorageLibrary.saveBeingCreated==1){
-                        SaveService.Wipe(1);
-                    }else if(StorageLibrary.saveBeingCreated==2){
-                        SaveService.Wipe(2);
-                    }else if(StorageLibrary.saveBeingCreated==3){
-                        SaveService.Wipe(3);
+                    if(WriteUtility.saveBeingCreated==1){
+                        WriteUtility.Wipe(1);
+                    }else if(WriteUtility.saveBeingCreated==2){
+                        WriteUtility.Wipe(2);
+                    }else if(WriteUtility.saveBeingCreated==3){
+                        WriteUtility.Wipe(3);
                     }
 
-                    StorageLibrary.saveBeingCreated = 0;
-                }else if(Objects.equals(StorageLibrary.saveNameField.getText(), "null")){
+                    WriteUtility.saveBeingCreated = 0;
+                }else if(Objects.equals(RenderService.saveNameField.getText(), "null")){
                     Thread thread = ThreadManager.notAllowedSaveNames();
                     thread.start();
 
-                    if(StorageLibrary.saveBeingCreated==1){
-                        SaveService.Wipe(1);
-                    }else if(StorageLibrary.saveBeingCreated==2){
-                        SaveService.Wipe(2);
-                    }else if(StorageLibrary.saveBeingCreated==3){
-                        SaveService.Wipe(3);
+                    if(WriteUtility.saveBeingCreated==1){
+                        WriteUtility.Wipe(1);
+                    }else if(WriteUtility.saveBeingCreated==2){
+                        WriteUtility.Wipe(2);
+                    }else if(WriteUtility.saveBeingCreated==3){
+                        WriteUtility.Wipe(3);
                     }
 
-                    StorageLibrary.saveBeingCreated = 0;
+                    WriteUtility.saveBeingCreated = 0;
                 } else {
-                    StorageLibrary.logger.info("Creating Save...");
+                    LoggingService.Logger.info("Creating Save...");
 
-                    if (StorageLibrary.saveBeingCreated == 1) {
-                        SaveService.createSave("Saves/save1.bcs");
+                    if (WriteUtility.saveBeingCreated == 1) {
+                        WriteUtility.createSave("Saves/save1.bcs");
 
-                        StorageLibrary.clicks1 = 0;
-                        StorageLibrary.clickPower1 = 1;
-                        StorageLibrary.save1Name = StorageLibrary.saveNameField.getText();
-                        StorageLibrary.playedBefore1 = false;
+                        WriteUtility.clicks1 = 0;
+                        WriteUtility.clickPower1 = 1;
+                        WriteUtility.save1Name = RenderService.saveNameField.getText();
+                        WriteUtility.playedBefore1 = false;
 
-                        SaveService.save1();
+                        WriteUtility.save1();
 
-                        StorageLibrary.saveBeingCreated = 0;
+                        WriteUtility.saveBeingCreated = 0;
                     }
 
-                    if (StorageLibrary.saveBeingCreated == 2) {
-                        SaveService.createSave("Saves/save2.bcs");
+                    if (WriteUtility.saveBeingCreated == 2) {
+                        WriteUtility.createSave("Saves/save2.bcs");
 
-                        StorageLibrary.clicks2 = 0;
-                        StorageLibrary.clickPower2 = 1;
-                        StorageLibrary.save2Name = StorageLibrary.saveNameField.getText();
-                        StorageLibrary.playedBefore2 = false;
+                        WriteUtility.clicks2 = 0;
+                        WriteUtility.clickPower2 = 1;
+                        WriteUtility.save2Name = RenderService.saveNameField.getText();
+                        WriteUtility.playedBefore2 = false;
 
-                        SaveService.save2();
+                        WriteUtility.save2();
 
-                        StorageLibrary.saveBeingCreated = 0;
+                        WriteUtility.saveBeingCreated = 0;
                     }
 
-                    if (StorageLibrary.saveBeingCreated == 3) {
-                        SaveService.createSave("Saves/save3.bcs");
+                    if (WriteUtility.saveBeingCreated == 3) {
+                        WriteUtility.createSave("Saves/save3.bcs");
 
-                        StorageLibrary.clicks3 = 0;
-                        StorageLibrary.clickPower3 = 1;
-                        StorageLibrary.save3Name = StorageLibrary.saveNameField.getText();
-                        StorageLibrary.playedBefore3 = false;
+                        WriteUtility.clicks3 = 0;
+                        WriteUtility.clickPower3 = 1;
+                        WriteUtility.save3Name = RenderService.saveNameField.getText();
+                        WriteUtility.playedBefore3 = false;
 
-                        SaveService.save3();
+                        WriteUtility.save3();
 
-                        StorageLibrary.saveBeingCreated = 0;
+                        WriteUtility.saveBeingCreated = 0;
                     }
 
-                    StorageLibrary.logger.info("Done!");
+                    LoggingService.Logger.info("Done!");
                 }
 
-                StorageLibrary.saveNameField.setText("");
-
-                StorageLibrary.logger.info("Returning To Save Manager...");
+                RenderService.saveNameField.setText("");
 
                 MenuManager.closeMenu("Enter A Save Name");
                 MenuManager.openMenu("Save Manager");
 
-                StorageLibrary.logger.info("Loading Saves...");
-                LoadService.loadSave1();
-                LoadService.loadSave2();
-                LoadService.loadSave3();
+                LoggingService.Logger.info("Loading Saves...");
+                ReadUtility.loadSave1();
+                ReadUtility.loadSave2();
+                ReadUtility.loadSave3();
 
-                StorageLibrary.backToButton.setText("Back To Main Menu");
-                StorageLibrary.titleText.setText("Save Manager");
+                RenderService.backToButton.setText("Back To Main Menu");
+                RenderService.titleText.setText("Save Manager");
 
-                StorageLibrary.logger.info("Done!");
-            }else if(Objects.equals(StorageLibrary.backToButton.getText(), "Back To Settings")) {
-                StorageLibrary.logger.info("Returning To Settings Menu...");
-
+                LoggingService.Logger.info("Done!");
+            }else if(Objects.equals(RenderService.backToButton.getText(), "Back To Settings")) {
                 MenuManager.closeMenu("Wiki");
                 MenuManager.closeMenu("Credits");
                 MenuManager.closeMenu("Resource Packs");
                 MenuManager.openMenu("Settings");
 
-                StorageLibrary.titleText.setVisible(true);
-                StorageLibrary.titleImage.setVisible(true);
+                RenderService.titleText.setVisible(true);
+                RenderService.titleImage.setVisible(true);
 
-                StorageLibrary.titleText.setText("Settings");
-                StorageLibrary.titleText.setFont(new Font("Nunito", Font.BOLD, 80));
+                RenderService.titleText.setText("Settings");
+                RenderService.titleText.setFont(new Font("Nunito", Font.BOLD, 80));
 
-                if(StorageLibrary.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu){
-                    StorageLibrary.backToButton.setText("Back To Pause Menu");
+                if(MenuManager.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu){
+                    RenderService.backToButton.setText("Back To Pause Menu");
                 }else{
-                    StorageLibrary.backToButton.setText("Back To Main Menu");
+                    RenderService.backToButton.setText("Back To Main Menu");
                 }
-                StorageLibrary.backToButton.setBounds(-10, 600, 667, 38);
+                RenderService.backToButton.setBounds(-10, 600, 667, 38);
 
-                RenderUtility.resetWindow();
+                RenderService.resetWindow();
 
-                if(AudioUtility.SoundManager.getMusicAudioPlayer().getStatus()==MediaPlayer.Status.PAUSED){
-                    AudioUtility.Music.resumeMusic();
+                if(AudioService.SoundManager.getMusicAudioPlayer().getStatus()==MediaPlayer.Status.PAUSED){
+                    AudioService.Music.resumeMusic();
                 }
-
-                StorageLibrary.logger.info("Done!");
-            }else if(Objects.equals(StorageLibrary.backToButton.getText(), "Back To Pause Menu")){
-                StorageLibrary.logger.info("Returning To Pause Menu...");
-
+            }else if(Objects.equals(RenderService.backToButton.getText(), "Back To Pause Menu")){
                 MenuManager.closeMenu("Settings");
                 MenuManager.openMenu("Pause");
 
-                StorageLibrary.titleText.setText("Button Clicker");
-                StorageLibrary.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
+                RenderService.titleText.setText("Button Clicker");
+                RenderService.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
 
-                StorageLibrary.backToButton.setVisible(false);
-                StorageLibrary.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu = false;
-
-                StorageLibrary.logger.info("Done!");
-            }else if(Objects.equals(StorageLibrary.backToButton.getText(), "Back To Game")){
-                StorageLibrary.logger.info("Returning To Game...");
-
+                RenderService.backToButton.setVisible(false);
+                MenuManager.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu = false;
+            }else if(Objects.equals(RenderService.backToButton.getText(), "Back To Game")){
                 MenuManager.closeMenu("Shop");
                 MenuManager.openMenu("Game");
 
-                StorageLibrary.forwardButton.setVisible(false);
-                StorageLibrary.backwardButton.setVisible(false);
-                StorageLibrary.backToButton.setVisible(false);
+                RenderService.forwardButton.setVisible(false);
+                RenderService.backwardButton.setVisible(false);
+                RenderService.backToButton.setVisible(false);
 
-                StorageLibrary.clicksField.setBounds(0, 0, 647, 50);
-                StorageLibrary.clickPowerField.setBounds(0, 50, 647, 50);
+                RenderService.clicksField.setBounds(0, 0, 647, 50);
+                RenderService.clickPowerField.setBounds(0, 50, 647, 50);
 
-                StorageLibrary.titleText.setVisible(false);
+                RenderService.titleText.setVisible(false);
 
-                AudioUtility.SoundManager.getSMusicAudioPlayer().stop();
+                AudioService.SoundManager.getSMusicAudioPlayer().stop();
 
-                AudioUtility.Music.resumeMusic();
-
-                StorageLibrary.logger.info("Done!");
+                AudioService.Music.resumeMusic();
             }
         }
 
-        if(source==StorageLibrary.save1Button){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.save1Button){
+            AudioService.SFX.playSFX("select");
 
-            if(Objects.equals(StorageLibrary.save1Name, "null")){
+            if(Objects.equals(WriteUtility.save1Name, "null")){
                 MenuManager.closeMenu("Save Manager");
                 MenuManager.openMenu("Choose A Side");
 
-                StorageLibrary.titleText.setText("Choose A Side");
-                StorageLibrary.backToButton.setText("Back To Save Manager");
+                RenderService.titleText.setText("Choose A Side");
+                RenderService.backToButton.setText("Back To Save Manager");
 
-                StorageLibrary.saveBeingCreated = 1;
-            }else if(!Objects.equals(StorageLibrary.save1Name, "null")){
-                StorageLibrary.save1Button.setText("Selected!");
+                WriteUtility.saveBeingCreated = 1;
+            }else if(!Objects.equals(WriteUtility.save1Name, "null")){
+                RenderService.save1Button.setText("Selected!");
 
                 JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "Saves/save1.bcs");
-                StorageLibrary.currentSave = "Saves/save1.bcs";
+                WriteUtility.currentSave = "Saves/save1.bcs";
 
-                StorageLibrary.logger.info("Current Save: "+StorageLibrary.currentSave);
+                LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
                 timer.setTask(() -> {
-                    StorageLibrary.save1Button.setText(StorageLibrary.save1Name);
+                    RenderService.save1Button.setText(WriteUtility.save1Name);
                 });
                 timer.start();
             }
         }
 
-        if(source==StorageLibrary.save2Button){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.save2Button){
+            AudioService.SFX.playSFX("select");
 
-            if(Objects.equals(StorageLibrary.save2Name, "null")){
+            if(Objects.equals(WriteUtility.save2Name, "null")){
                 MenuManager.closeMenu("Save Manager");
                 MenuManager.openMenu("Choose A Side");
 
-                StorageLibrary.titleText.setText("Choose A Side");
-                StorageLibrary.backToButton.setText("Back To Save Manager");
+                RenderService.titleText.setText("Choose A Side");
+                RenderService.backToButton.setText("Back To Save Manager");
 
-                StorageLibrary.saveBeingCreated = 2;
-            }else if(!Objects.equals(StorageLibrary.save2Name, "null")){
-                StorageLibrary.save2Button.setText("Selected!");
+                WriteUtility.saveBeingCreated = 2;
+            }else if(!Objects.equals(WriteUtility.save2Name, "null")){
+                RenderService.save2Button.setText("Selected!");
 
                 JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "Saves/save2.bcs");
-                StorageLibrary.currentSave = "Saves/save2.bcs";
+                WriteUtility.currentSave = "Saves/save2.bcs";
 
-                StorageLibrary.logger.info("Current Save: "+StorageLibrary.currentSave);
+                LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
                 timer.setTask(() -> {
-                    StorageLibrary.save2Button.setText(StorageLibrary.save2Name);
+                    RenderService.save2Button.setText(WriteUtility.save2Name);
                 });
                 timer.start();
             }
         }
 
-        if(source==StorageLibrary.save3Button){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.save3Button){
+            AudioService.SFX.playSFX("select");
 
-            if(Objects.equals(StorageLibrary.save3Name, "null")){
+            if(Objects.equals(WriteUtility.save3Name, "null")){
                 MenuManager.closeMenu("Save Manager");
                 MenuManager.openMenu("Choose A Side");
 
-                StorageLibrary.titleText.setText("Choose A Side");
-                StorageLibrary.backToButton.setText("Back To Save Manager");
+                RenderService.titleText.setText("Choose A Side");
+                RenderService.backToButton.setText("Back To Save Manager");
 
-                StorageLibrary.saveBeingCreated = 3;
-            }else if(!Objects.equals(StorageLibrary.save3Name, "null")){
-                StorageLibrary.save3Button.setText("Selected!");
+                WriteUtility.saveBeingCreated = 3;
+            }else if(!Objects.equals(WriteUtility.save3Name, "null")){
+                RenderService.save3Button.setText("Selected!");
 
                 JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "Saves/save3.bcs");
-                StorageLibrary.currentSave = "Saves/save3.bcs";
+                WriteUtility.currentSave = "Saves/save3.bcs";
 
-                StorageLibrary.logger.info("Current Save: "+StorageLibrary.currentSave);
+                LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
                 timer.setTask(() -> {
-                    StorageLibrary.save3Button.setText(StorageLibrary.save3Name);
+                    RenderService.save3Button.setText(WriteUtility.save3Name);
                 });
                 timer.start();
             }
         }
 
-        if(source==StorageLibrary.lightSideButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.lightSideButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Choose A Side");
             MenuManager.openMenu("Enter A Save Name");
 
-            StorageLibrary.backToButton.setText("Create Save");
-            StorageLibrary.titleText.setText("Enter a Save Name");
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,55));
+            RenderService.backToButton.setText("Create Save");
+            RenderService.titleText.setText("Enter a Save Name");
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,55));
 
-            RenderUtility.textFieldLimit(StorageLibrary.saveNameField, 10);
+            RenderService.textFieldLimit(RenderService.saveNameField, 10);
 
-            if(StorageLibrary.saveBeingCreated==1){
-                StorageLibrary.side1 = 1;
-            }else if(StorageLibrary.saveBeingCreated==2){
-                StorageLibrary.side2 = 1;
-            }else if(StorageLibrary.saveBeingCreated==3){
-                StorageLibrary.side3 = 1;
+            if(WriteUtility.saveBeingCreated==1){
+                WriteUtility.side1 = 1;
+            }else if(WriteUtility.saveBeingCreated==2){
+                WriteUtility.side2 = 1;
+            }else if(WriteUtility.saveBeingCreated==3){
+                WriteUtility.side3 = 1;
             }
         }
 
-        if(source==StorageLibrary.darkSideButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.darkSideButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Choose A Side");
             MenuManager.openMenu("Enter A Save Name");
 
-            StorageLibrary.backToButton.setText("Create Save");
-            StorageLibrary.titleText.setText("Enter a Save Name");
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,55));
+            RenderService.backToButton.setText("Create Save");
+            RenderService.titleText.setText("Enter a Save Name");
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,55));
 
-            RenderUtility.textFieldLimit(StorageLibrary.saveNameField, 10);
+            RenderService.textFieldLimit(RenderService.saveNameField, 10);
 
-            if(StorageLibrary.saveBeingCreated==1){
-                StorageLibrary.side1 = 2;
-            }else if(StorageLibrary.saveBeingCreated==2){
-                StorageLibrary.side2 = 2;
-            }else if(StorageLibrary.saveBeingCreated==3){
-                StorageLibrary.side3 = 2;
+            if(WriteUtility.saveBeingCreated==1){
+                WriteUtility.side1 = 2;
+            }else if(WriteUtility.saveBeingCreated==2){
+                WriteUtility.side2 = 2;
+            }else if(WriteUtility.saveBeingCreated==3){
+                WriteUtility.side3 = 2;
             }
         }
 
-        if(source==StorageLibrary.magicSideButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.magicSideButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Choose A Side");
             MenuManager.openMenu("Enter A Save Name");
 
-            StorageLibrary.backToButton.setText("Create Save");
-            StorageLibrary.titleText.setText("Enter a Save Name");
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,55));
+            RenderService.backToButton.setText("Create Save");
+            RenderService.titleText.setText("Enter a Save Name");
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,55));
 
-            RenderUtility.textFieldLimit(StorageLibrary.saveNameField, 10);
+            RenderService.textFieldLimit(RenderService.saveNameField, 10);
 
-            if(StorageLibrary.saveBeingCreated==1){
-                StorageLibrary.side1 = 3;
-            }else if(StorageLibrary.saveBeingCreated==2){
-                StorageLibrary.side2 = 3;
-            }else if(StorageLibrary.saveBeingCreated==3){
-                StorageLibrary.side3 = 3;
+            if(WriteUtility.saveBeingCreated==1){
+                WriteUtility.side1 = 3;
+            }else if(WriteUtility.saveBeingCreated==2){
+                WriteUtility.side2 = 3;
+            }else if(WriteUtility.saveBeingCreated==3){
+                WriteUtility.side3 = 3;
             }
         }
 
-        if(source==StorageLibrary.neutralSideButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.neutralSideButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Choose A Side");
             MenuManager.openMenu("Enter A Save Name");
 
-            StorageLibrary.backToButton.setText("Create Save");
-            StorageLibrary.titleText.setText("Enter a Save Name");
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,55));
+            RenderService.backToButton.setText("Create Save");
+            RenderService.titleText.setText("Enter a Save Name");
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,55));
 
-            RenderUtility.textFieldLimit(StorageLibrary.saveNameField, 10);
+            RenderService.textFieldLimit(RenderService.saveNameField, 10);
 
-            if(StorageLibrary.saveBeingCreated==1){
-                StorageLibrary.side1 = 4;
-            }else if(StorageLibrary.saveBeingCreated==2){
-                StorageLibrary.side2 = 4;
-            }else if(StorageLibrary.saveBeingCreated==3){
-                StorageLibrary.side3 = 4;
+            if(WriteUtility.saveBeingCreated==1){
+                WriteUtility.side1 = 4;
+            }else if(WriteUtility.saveBeingCreated==2){
+                WriteUtility.side2 = 4;
+            }else if(WriteUtility.saveBeingCreated==3){
+                WriteUtility.side3 = 4;
             }
         }
 
-        if(source==StorageLibrary.deleteSave1Button){
-            AudioUtility.SFX.playSFX("select");
-            if(!(Objects.equals(StorageLibrary.save1Name, "null"))){
+        if(source== RenderService.deleteSave1Button){
+            AudioService.SFX.playSFX("select");
+            if(!(Objects.equals(WriteUtility.save1Name, "null"))){
                 int userChoice1 = MessageUtility.DeleteMessage();
                 if(userChoice1 == 0){
                     int userChoice2 = MessageUtility.DeleteMessage2();
                     if(userChoice2 == 0){
-                        if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
+                        if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
                             JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "null");
-                            StorageLibrary.currentSave = "null";
+                            WriteUtility.currentSave = "null";
 
-                            SaveService.Wipe(1);
-                            SaveService.deleteSave("Saves/save1.bcs");
+                            WriteUtility.Wipe(1);
+                            WriteUtility.deleteSave("Saves/save1.bcs");
                         }else{
-                            SaveService.Wipe(1);
-                            SaveService.deleteSave("Saves/save1.bcs");
+                            WriteUtility.Wipe(1);
+                            WriteUtility.deleteSave("Saves/save1.bcs");
                         }
 
-                        StorageLibrary.logger.info("Current Save: "+StorageLibrary.currentSave);
+                        LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
 
-                        LoadService.loadSave1();
-                        LoadService.loadSave2();
-                        LoadService.loadSave3();
+                        ReadUtility.loadSave1();
+                        ReadUtility.loadSave2();
+                        ReadUtility.loadSave3();
                     }
                 }
-            }else if(Objects.equals(StorageLibrary.save1Name, "null")){
+            }else if(Objects.equals(WriteUtility.save1Name, "null")){
                 ThreadManager.alreadyDeletedMessageThread().start();
             }
         }
 
-        if(source==StorageLibrary.deleteSave2Button){
-            AudioUtility.SFX.playSFX("select");
-            if(!(Objects.equals(StorageLibrary.save2Name, "null"))){
+        if(source== RenderService.deleteSave2Button){
+            AudioService.SFX.playSFX("select");
+            if(!(Objects.equals(WriteUtility.save2Name, "null"))){
                 int userChoice1 = MessageUtility.DeleteMessage();
                 if(userChoice1 == 0){
                     int userChoice2 = MessageUtility.DeleteMessage2();
                     if(userChoice2 == 0){
-                        if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
+                        if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
                             JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "null");
-                            StorageLibrary.currentSave = "null";
+                            WriteUtility.currentSave = "null";
 
-                            SaveService.Wipe(2);
-                            SaveService.deleteSave("Saves/save2.bcs");
+                            WriteUtility.Wipe(2);
+                            WriteUtility.deleteSave("Saves/save2.bcs");
                         }else{
-                            SaveService.Wipe(2);
-                            SaveService.deleteSave("Saves/save2.bcs");
+                            WriteUtility.Wipe(2);
+                            WriteUtility.deleteSave("Saves/save2.bcs");
                         }
 
-                        StorageLibrary.logger.info("Current Save: "+StorageLibrary.currentSave);
+                        LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
 
-                        LoadService.loadSave1();
-                        LoadService.loadSave2();
-                        LoadService.loadSave3();
+                        ReadUtility.loadSave1();
+                        ReadUtility.loadSave2();
+                        ReadUtility.loadSave3();
                     }
                 }
-            }else if(Objects.equals(StorageLibrary.save2Name, "null")){
+            }else if(Objects.equals(WriteUtility.save2Name, "null")){
                 ThreadManager.alreadyDeletedMessageThread().start();
             }
         }
 
-        if(source==StorageLibrary.deleteSave3Button){
-            AudioUtility.SFX.playSFX("select");
-            if(!(Objects.equals(StorageLibrary.save3Name, "null"))){
+        if(source== RenderService.deleteSave3Button){
+            AudioService.SFX.playSFX("select");
+            if(!(Objects.equals(WriteUtility.save3Name, "null"))){
                 int userChoice1 = MessageUtility.DeleteMessage();
                 if(userChoice1 == 0){
                     int userChoice2 = MessageUtility.DeleteMessage2();
                     if(userChoice2 == 0){
-                        if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
+                        if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
                             JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "null");
-                            StorageLibrary.currentSave = "null";
+                            WriteUtility.currentSave = "null";
 
-                            SaveService.Wipe(3);
-                            SaveService.deleteSave("Saves/save3.bcs");
+                            WriteUtility.Wipe(3);
+                            WriteUtility.deleteSave("Saves/save3.bcs");
                         }else{
-                            SaveService.Wipe(3);
-                            SaveService.deleteSave("Saves/save3.bcs");
+                            WriteUtility.Wipe(3);
+                            WriteUtility.deleteSave("Saves/save3.bcs");
                         }
 
-                        StorageLibrary.logger.info("Current Save: "+StorageLibrary.currentSave);
+                        LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
 
-                        LoadService.loadSave1();
-                        LoadService.loadSave2();
-                        LoadService.loadSave3();
+                        ReadUtility.loadSave1();
+                        ReadUtility.loadSave2();
+                        ReadUtility.loadSave3();
                     }
                 }
-            }else if(Objects.equals(StorageLibrary.save3Name, "null")){
+            }else if(Objects.equals(WriteUtility.save3Name, "null")){
                 ThreadManager.alreadyDeletedMessageThread().start();
             }
         }
 
-        if(source==StorageLibrary.settingsButton){
-            StorageLibrary.logger.info("Opening Settings...");
-
+        if(source== RenderService.settingsButton){
             if(MenuManager.isMenuOpen("Main")){
-                StorageLibrary.backToButton.setText("Back To Main Menu");
+                RenderService.backToButton.setText("Back To Main Menu");
             }else if(MenuManager.isMenuOpen("Pause")){
-                StorageLibrary.backToButton.setText("Back To Pause Menu");
-                StorageLibrary.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu = true;
+                RenderService.backToButton.setText("Back To Pause Menu");
+                MenuManager.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu = true;
             }
 
-            AudioUtility.SFX.playSFX("select");
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Main");
             MenuManager.openMenu("Settings");
 
-            StorageLibrary.backToButton.setVisible(true);
+            RenderService.backToButton.setVisible(true);
 
-            StorageLibrary.titleText.setText("Settings");
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,77));
-
-            StorageLibrary.logger.info("Done!");
+            RenderService.titleText.setText("Settings");
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,77));
         }
 
-        if(source==StorageLibrary.bugReportButton){
-            StorageLibrary.logger.info("Opening Github...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.bugReportButton){
+            LoggingService.Logger.info("Opening Github...");
+            AudioService.SFX.playSFX("select");
 
             try {
                 Desktop.getDesktop().browse(new URI("https://github.com/ChillyPigeon742/Button-Clicker/issues/new"));
             } catch (IOException ex) {
-                ErrorHandler.IOException("INPUT", 1016);
+                ErrorHandler.IOException();
             } catch (URISyntaxException ex) {
-                ErrorHandler.URISyntaxException("INPUT", 1018);
+                ErrorHandler.URISyntaxException();
             }
 
-            StorageLibrary.logger.info("Done!");
+            LoggingService.Logger.info("Done!");
         }
 
-        if(source==StorageLibrary.debugButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.debugButton){
+            AudioService.SFX.playSFX("select");
 
-            Thread thread = ThreadManager.trollMessageThread();
-            thread.start();
+            MenuManager.closeMenu("Main");
+            MenuManager.openMenu("Debug");
+
+            RenderService.backToButton.setVisible(true);
+            RenderService.forwardButton.setVisible(true);
+            RenderService.titleText.setText("Debug");
         }
 
-        if(source==StorageLibrary.infoButton){
-            StorageLibrary.logger.info("Opening Save Info Menu...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.infoButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Save Manager");
             MenuManager.openMenu("Save Info");
 
-            StorageLibrary.titleText.setText("Save Info");
+            RenderService.titleText.setText("Save Info");
 
-            if(StorageLibrary.side1 == 0){
-                StorageLibrary.saveInfoText.setText("\n\n\n        Save 1 Isn't Created!");
-            }else if(StorageLibrary.side1 == 1){
-                if(StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Light\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                }else if(!StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Light\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+            if(WriteUtility.side1 == 0){
+                RenderService.saveInfoText.setText("\n\n\n        Save 1 Isn't Created!");
+            }else if(WriteUtility.side1 == 1){
+                if(WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Light\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                }else if(!WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Light\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                 }
-            }else if(StorageLibrary.side1 == 2){
-                if(StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Dark\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                }else if(!StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Dark\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+            }else if(WriteUtility.side1 == 2){
+                if(WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Dark\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                }else if(!WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Dark\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                 }
-            }else if(StorageLibrary.side1 == 3){
-                if(StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Magic\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                }else if(!StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Magic\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+            }else if(WriteUtility.side1 == 3){
+                if(WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Magic\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                }else if(!WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Magic\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                 }
-            }else if(StorageLibrary.side1 == 4) {
-                if(StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Neutral\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                }else if(!StorageLibrary.playedBefore1){
-                    StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Neutral\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+            }else if(WriteUtility.side1 == 4) {
+                if(WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Neutral\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                }else if(!WriteUtility.playedBefore1){
+                    RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Neutral\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                 }
             }
 
-            StorageLibrary.saveInfoText.setBounds(50, 160, 550, 400);
+            RenderService.saveInfoText.setBounds(50, 160, 550, 400);
 
-            StorageLibrary.backToButton.setText("Back To Save Manager");
-
-            StorageLibrary.logger.info("Done!");
+            RenderService.backToButton.setText("Back To Save Manager");
         }
 
-        if(source==StorageLibrary.wikiHelpButton){
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.wikiHelpButton){
+            AudioService.SFX.playSFX("select");
 
-            StorageLibrary.wikiEditorPane.setText("<html>\n" +
-                    "<body>\n" +
-                    "\t<p>the cake is a lie</p>\n" +
-                    "<p>the cake is a lie</p>\n" +
-                    "<p>the cake is a lie</p>\n" +
-                    "<p>the cake is a lie</p>\n" +
-                    "</body>\n" +
-                    "</html>");
-            StorageLibrary.wikiEditorPane.setForeground(Color.BLACK);
-            StorageLibrary.wikiEditorPane.setBackground(new Color(181, 181, 181));
-            StorageLibrary.wikiEditorPane.setFont(new Font("Indie Flower", Font.PLAIN, 20));
-            StorageLibrary.wikiEditorPane.setMargin(new Insets(180,285,0,0));
-            StorageLibrary.wikiEditorPane.setBackgroundImageEnabled(true);
-            StorageLibrary.wikiEditorPane.setFocusable(false);
+            try {
+                RenderService.wikiEditorPane.setPage(ResourceManager.class.getResource("/assets/buttonclicker/html/cake.html"));
+            } catch (IOException ex) {
+                ErrorHandler.IOException();
+            }
+            RenderService.wikiEditorPane.setForeground(Color.BLACK);
+            RenderService.wikiEditorPane.setBackground(new Color(181, 181, 181));
+            RenderService.wikiEditorPane.setFont(new Font("Indie Flower", Font.PLAIN, 20));
+            RenderService.wikiEditorPane.setMargin(new Insets(180,285,0,0));
+            RenderService.wikiEditorPane.setBackgroundImageEnabled(true);
 
-            StorageLibrary.wikiHelpButton.setVisible(false);
+            RenderService.wikiHelpButton.setVisible(false);
 
-            AudioUtility.Music.pauseMusic();
+            AudioService.Music.pauseMusic();
 
-            StorageLibrary.logger.info("the cake is a lie");
+            LoggingService.Logger.info("the cake is a lie");
         }
 
-        if(source==StorageLibrary.backwardButton){
+        if(source== RenderService.backwardButton){
             if(MenuManager.isMenuOpen("Save Info")){
-                if(StorageLibrary.saveInfoText.getText().contains("Save 2")){
-                    if(StorageLibrary.side1 == 0){
-                        StorageLibrary.saveInfoText.setText("\n\n\n        Save 1 Isn't Created!");
-                    }else if(StorageLibrary.side1 == 1){
-                        if(StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Light\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Light\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+                if(RenderService.saveInfoText.getText().contains("Save 2")){
+                    if(WriteUtility.side1 == 0){
+                        RenderService.saveInfoText.setText("\n\n\n        Save 1 Isn't Created!");
+                    }else if(WriteUtility.side1 == 1){
+                        if(WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Light\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Light\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side1 == 2){
-                        if(StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Dark\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Dark\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side1 == 2){
+                        if(WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Dark\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Dark\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side1 == 3){
-                        if(StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Magic\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Magic\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side1 == 3){
+                        if(WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Magic\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Magic\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side1 == 4) {
-                        if(StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Neutral\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore1){
-                            StorageLibrary.saveInfoText.setText("                     Save 1\n\nClicks: "+StorageLibrary.clicks1+"\nClick Power: "+StorageLibrary.clickPower1+"\nSide: Neutral\nSave Name: "+StorageLibrary.save1Name+"\nPlayed Before: No");
-                        }
-                    }
-
-                    StorageLibrary.backwardButton.setVisible(false);
-                }else if(StorageLibrary.saveInfoText.getText().contains("Save 3")){
-                    if(StorageLibrary.side2 == 0){
-                        StorageLibrary.saveInfoText.setText("\n\n\n        Save 2 Isn't Created!");
-                    }else if(StorageLibrary.side2 == 1){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Light\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Light\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
-                        }
-                    }else if(StorageLibrary.side2 == 2){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Dark\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Dark\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
-                        }
-                    }else if(StorageLibrary.side2 == 3){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Magic\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Magic\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
-                        }
-                    }else if(StorageLibrary.side2 == 4){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Neutral\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Neutral\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
-                        }
-                    }
-                }else if(StorageLibrary.saveInfoText.getText().contains("Current Save")){
-                    if (StorageLibrary.side3 == 0) {
-                        StorageLibrary.saveInfoText.setText("\n\n\n        Save 3 Isn't Created!");
-                    }else if(StorageLibrary.side3 == 1){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Light\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Light\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
-                        }
-                    }else if(StorageLibrary.side3 == 2){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Dark\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Dark\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
-                        }
-                    }else if(StorageLibrary.side3 == 3){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Magic\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Magic\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
-                        }
-                    }else if(StorageLibrary.side3 == 4){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Neutral\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Neutral\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side1 == 4) {
+                        if(WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Neutral\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore1){
+                            RenderService.saveInfoText.setText("                     Save 1\n\nClicks: "+ WriteUtility.clicks1+"\nClick Power: "+ WriteUtility.clickPower1+"\nSide: Neutral\nSave Name: "+ WriteUtility.save1Name+"\nPlayed Before: No");
                         }
                     }
 
-                    StorageLibrary.saveInfoText.setBounds(50, 160, 550, 400);
-                    StorageLibrary.forwardButton.setVisible(true);
+                    RenderService.backwardButton.setVisible(false);
+                }else if(RenderService.saveInfoText.getText().contains("Save 3")){
+                    if(WriteUtility.side2 == 0){
+                        RenderService.saveInfoText.setText("\n\n\n        Save 2 Isn't Created!");
+                    }else if(WriteUtility.side2 == 1){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Light\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Light\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
+                        }
+                    }else if(WriteUtility.side2 == 2){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Dark\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Dark\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
+                        }
+                    }else if(WriteUtility.side2 == 3){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Magic\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Magic\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
+                        }
+                    }else if(WriteUtility.side2 == 4){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Neutral\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Neutral\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
+                        }
+                    }
+                }else if(RenderService.saveInfoText.getText().contains("Current Save")){
+                    if (WriteUtility.side3 == 0) {
+                        RenderService.saveInfoText.setText("\n\n\n        Save 3 Isn't Created!");
+                    }else if(WriteUtility.side3 == 1){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Light\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Light\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
+                        }
+                    }else if(WriteUtility.side3 == 2){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Dark\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Dark\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
+                        }
+                    }else if(WriteUtility.side3 == 3){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Magic\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Magic\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
+                        }
+                    }else if(WriteUtility.side3 == 4){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Neutral\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Neutral\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
+                        }
+                    }
+
+                    RenderService.saveInfoText.setBounds(50, 160, 550, 400);
+                    RenderService.forwardButton.setVisible(true);
                 }
             }
         }
 
-        if(source==StorageLibrary.forwardButton){
+        if(source== RenderService.forwardButton){
             if(MenuManager.isMenuOpen("Save Info")){
-                if(StorageLibrary.saveInfoText.getText().contains("Save 1")) {
-                    if(StorageLibrary.side2 == 0){
-                        StorageLibrary.saveInfoText.setText("\n\n\n        Save 2 Isn't Created!");
-                    }else if(StorageLibrary.side2 == 1){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Light\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Light\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
+                if(RenderService.saveInfoText.getText().contains("Save 1")) {
+                    if(WriteUtility.side2 == 0){
+                        RenderService.saveInfoText.setText("\n\n\n        Save 2 Isn't Created!");
+                    }else if(WriteUtility.side2 == 1){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Light\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Light\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side2 == 2){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Dark\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Dark\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side2 == 2){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Dark\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Dark\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side2 == 3){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Magic\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Magic\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side2 == 3){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Magic\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Magic\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side2 == 4){
-                        if(StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Neutral\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore2){
-                            StorageLibrary.saveInfoText.setText("                     Save 2\n\nClicks: "+StorageLibrary.clicks2+"\nClick Power: "+StorageLibrary.clickPower2+"\nSide: Neutral\nSave Name: "+StorageLibrary.save2Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side2 == 4){
+                        if(WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Neutral\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore2){
+                            RenderService.saveInfoText.setText("                     Save 2\n\nClicks: "+ WriteUtility.clicks2+"\nClick Power: "+ WriteUtility.clickPower2+"\nSide: Neutral\nSave Name: "+ WriteUtility.save2Name+"\nPlayed Before: No");
                         }
                     }
 
-                    StorageLibrary.backwardButton.setVisible(true);
-                }else if(StorageLibrary.saveInfoText.getText().contains("Save 2")){
-                    if (StorageLibrary.side3 == 0) {
-                        StorageLibrary.saveInfoText.setText("\n\n\n        Save 3 Isn't Created!");
-                    }else if(StorageLibrary.side3 == 1){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Light\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Light\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
+                    RenderService.backwardButton.setVisible(true);
+                }else if(RenderService.saveInfoText.getText().contains("Save 2")){
+                    if (WriteUtility.side3 == 0) {
+                        RenderService.saveInfoText.setText("\n\n\n        Save 3 Isn't Created!");
+                    }else if(WriteUtility.side3 == 1){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Light\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Light\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side3 == 2){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Dark\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Dark\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side3 == 2){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Dark\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Dark\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side3 == 3){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Magic\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Magic\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side3 == 3){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Magic\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Magic\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
                         }
-                    }else if(StorageLibrary.side3 == 4){
-                        if(StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Neutral\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: Yes");
-                        }else if(!StorageLibrary.playedBefore3){
-                            StorageLibrary.saveInfoText.setText("                     Save 3\n\nClicks: "+StorageLibrary.clicks3+"\nClick Power: "+StorageLibrary.clickPower3+"\nSide: Neutral\nSave Name: "+StorageLibrary.save3Name+"\nPlayed Before: No");
+                    }else if(WriteUtility.side3 == 4){
+                        if(WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Neutral\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: Yes");
+                        }else if(!WriteUtility.playedBefore3){
+                            RenderService.saveInfoText.setText("                     Save 3\n\nClicks: "+ WriteUtility.clicks3+"\nClick Power: "+ WriteUtility.clickPower3+"\nSide: Neutral\nSave Name: "+ WriteUtility.save3Name+"\nPlayed Before: No");
                         }
                     }
-                }else if(StorageLibrary.saveInfoText.getText().contains("Save 3")){
-                    if(Objects.equals(StorageLibrary.currentSave, "null")){
-                        StorageLibrary.saveInfoText.setText("Current Save:\nnone");
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                        StorageLibrary.saveInfoText.setText("Current Save:\n"+StorageLibrary.save1Name);
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                        StorageLibrary.saveInfoText.setText("Current Save:\n"+StorageLibrary.save2Name);
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                        StorageLibrary.saveInfoText.setText("Current Save:\n"+StorageLibrary.save3Name);
+                }else if(RenderService.saveInfoText.getText().contains("Save 3")){
+                    if(Objects.equals(WriteUtility.currentSave, "null")){
+                        RenderService.saveInfoText.setText("Current Save:\nnone");
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
+                        RenderService.saveInfoText.setText("Current Save:\n"+ WriteUtility.save1Name);
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")){
+                        RenderService.saveInfoText.setText("Current Save:\n"+ WriteUtility.save2Name);
+                    }else if(Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")){
+                        RenderService.saveInfoText.setText("Current Save:\n"+ WriteUtility.save3Name);
                     }
 
-                    StorageLibrary.saveInfoText.setBounds(180, 290, 550, 350);
-                    StorageLibrary.forwardButton.setVisible(false);
+                    RenderService.saveInfoText.setBounds(180, 290, 550, 350);
+                    RenderService.forwardButton.setVisible(false);
                 }
             }
         }
 
-        if(source==StorageLibrary.nextTipButton){
+        if(source== RenderService.nextTipButton){
             Random random1 = new Random();
             int number1 = random1.nextInt(1,4);
 
             if(number1==1){
-                StorageLibrary.tipsText.setText("Button Clicker was originally a lot more simplistic!");
+                RenderService.tipsText.setText("Button Clicker was originally a lot more simplistic!");
             }else if(number1==2){
-                StorageLibrary.tipsText.setText("Button Clicker is out now for early access on itch.io!");
+                RenderService.tipsText.setText("Button Clicker is out now for early access on itch.io!");
             }else if(number1==3){
-                StorageLibrary.tipsText.setText("Rebirthing grants you easier\nprogression next time round!");
+                RenderService.tipsText.setText("Rebirthing grants you easier\nprogression next time round!");
             }
 
-            StorageLibrary.nextTipButton.setEnabled(false);
+            RenderService.nextTipButton.setEnabled(false);
         }
 
-        if(source==StorageLibrary.shopButton){
-            StorageLibrary.logger.info("Opening Shop...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.shopButton){
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Game");
             MenuManager.openMenu("Shop");
 
-            StorageLibrary.shopItem1.setPrice("1000 Clicks");
-            StorageLibrary.shopItem1.setIcon(StorageLibrary.clickPowerIcon);
-            StorageLibrary.shopItem1.setDescription("Gives 1 more Click Power");
+            RenderService.shopItem1.setPrice("1000 Clicks");
+            RenderService.shopItem1.setIcon(ResourceManager.clickPowerIcon);
+            RenderService.shopItem1.setDescription("Gives 1 more Click Power");
 
-            StorageLibrary.shopItem2.setPrice("10000 Clicks");
-            StorageLibrary.shopItem2.setIcon(StorageLibrary.clickPowerIcon);
-            StorageLibrary.shopItem2.setDescription("Gives 10 more Click Power");
+            RenderService.shopItem2.setPrice("10000 Clicks");
+            RenderService.shopItem2.setIcon(ResourceManager.clickPowerIcon);
+            RenderService.shopItem2.setDescription("Gives 10 more Click Power");
 
-            StorageLibrary.shopItem3.setPrice("100000 Clicks");
-            StorageLibrary.shopItem3.setIcon(StorageLibrary.clickPowerIcon);
-            StorageLibrary.shopItem3.setDescription("Gives 100 more Click Power");
+            RenderService.shopItem3.setPrice("100000 Clicks");
+            RenderService.shopItem3.setIcon(ResourceManager.clickPowerIcon);
+            RenderService.shopItem3.setDescription("Gives 100 more Click Power");
 
-            StorageLibrary.shopItem4.setPrice("1 Million Clicks");
-            StorageLibrary.shopItem4.setIcon(StorageLibrary.clickPowerIcon);
-            StorageLibrary.shopItem4.setDescription("Gives 1000 more Click Power");
+            RenderService.shopItem4.setPrice("1 Million Clicks");
+            RenderService.shopItem4.setIcon(ResourceManager.clickPowerIcon);
+            RenderService.shopItem4.setDescription("Gives 1000 more Click Power");
 
-            StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-            StorageLibrary.shopItem5.setIcon(StorageLibrary.clickPowerIcon);
-            StorageLibrary.shopItem5.setDescription("Gives 10000 more Click Power");
+            RenderService.shopItem5.setPrice("10 Million Clicks");
+            RenderService.shopItem5.setIcon(ResourceManager.clickPowerIcon);
+            RenderService.shopItem5.setDescription("Gives 10000 more Click Power");
 
-            StorageLibrary.shopItem6.setPrice("100 Million Clicks");
-            StorageLibrary.shopItem6.setIcon(StorageLibrary.clickPowerIcon);
-            StorageLibrary.shopItem6.setDescription("Gives 100000 more Click Power");
+            RenderService.shopItem6.setPrice("100 Million Clicks");
+            RenderService.shopItem6.setIcon(ResourceManager.clickPowerIcon);
+            RenderService.shopItem6.setDescription("Gives 100000 more Click Power");
 
-            StorageLibrary.forwardButton.setVisible(true);
-            StorageLibrary.backwardButton.setVisible(false);
+            RenderService.forwardButton.setVisible(true);
+            RenderService.backwardButton.setVisible(false);
 
-            StorageLibrary.backToButton.setVisible(true);
-            StorageLibrary.backToButton.setText("Back To Game");
+            RenderService.backToButton.setVisible(true);
+            RenderService.backToButton.setText("Back To Game");
 
-            StorageLibrary.clicksField.setVisible(true);
-            StorageLibrary.clicksField.setBounds(0, 54, 647, 50);
+            RenderService.clicksField.setVisible(true);
+            RenderService.clicksField.setBounds(0, 54, 647, 50);
 
-            StorageLibrary.clickPowerField.setVisible(true);
-            StorageLibrary.clickPowerField.setBounds(0, 104, 647, 50);
+            RenderService.clickPowerField.setVisible(true);
+            RenderService.clickPowerField.setBounds(0, 104, 647, 50);
 
-            StorageLibrary.titleText.setVisible(true);
-            StorageLibrary.titleText.setText("Shop");
-            StorageLibrary.titleText.setBounds(100, -2, 460, 55);
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,50));
+            RenderService.titleText.setVisible(true);
+            RenderService.titleText.setText("Shop");
+            RenderService.titleText.setBounds(100, -2, 460, 55);
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,50));
 
-            StorageLibrary.titleImage.stopSpinning();
-            StorageLibrary.titleImage.setBounds(10, 0, 100, 100);
-            StorageLibrary.titleImage.setVisible(false);
+            RenderService.titleImage.stopSpinning();
+            RenderService.titleImage.setBounds(10, 0, 100, 100);
+            RenderService.titleImage.setVisible(false);
 
-            StorageLibrary.autoSavingText.setVisible(false);
+            RenderService.autoSavingText.setVisible(false);
 
-            AudioUtility.Music.pauseMusic();
-            AudioUtility.Music.playMusic("shop");
-
-            StorageLibrary.logger.info("Done!");
+            AudioService.Music.pauseMusic();
+            AudioService.Music.playMusic("shop");
         }
 
-        if(source==StorageLibrary.pauseButton){
-            StorageLibrary.logger.info("Pausing...");
-            AudioUtility.SFX.playSFX("select");
+        if(source== RenderService.pauseButton){
+            LoggingService.Logger.info("Pausing...");
+            AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Game");
             MenuManager.openMenu("Pause");
 
-            StorageLibrary.titleText.setText("Button Clicker");
-            StorageLibrary.titleText.setBounds(100, 20, 570, 80);
-            StorageLibrary.titleText.setFont(new Font("Nunito",Font.BOLD,70));
-            StorageLibrary.titleText.setVisible(true);
+            RenderService.titleText.setText("Button Clicker");
+            RenderService.titleText.setBounds(100, 20, 570, 80);
+            RenderService.titleText.setFont(new Font("Nunito",Font.BOLD,70));
+            RenderService.titleText.setVisible(true);
 
-            StorageLibrary.titleImage.stopSpinning();
-            StorageLibrary.titleImage.setBounds(10,0,100,100);
-            StorageLibrary.titleImage.setVisible(true);
+            RenderService.titleImage.stopSpinning();
+            RenderService.titleImage.setBounds(10,0,100,100);
+            RenderService.titleImage.setVisible(true);
 
-            StorageLibrary.startGameButton.setBounds(177,199,305,102);
-            StorageLibrary.startGameButton.setText("Resume Game");
+            RenderService.startGameButton.setBounds(177,199,305,102);
+            RenderService.startGameButton.setText("Resume Game");
 
-            StorageLibrary.settingsButton.setBounds(177,298,305,102);
+            RenderService.settingsButton.setBounds(177,298,305,102);
 
-            StorageLibrary.quitButton.setText("Return To Main Menu");
-            StorageLibrary.quitButton.setFont(new Font("Nunito", Font.BOLD, 29));
-            StorageLibrary.quitButton.setBounds(177,397,305,102);
+            RenderService.quitButton.setText("Return To Main Menu");
+            RenderService.quitButton.setFont(new Font("Nunito", Font.BOLD, 29));
+            RenderService.quitButton.setBounds(177,397,305,102);
 
-            StorageLibrary.autoSavingText.setVisible(false);
+            RenderService.autoSavingText.setVisible(false);
 
-            AudioUtility.Music.pauseMusic();
-            AudioUtility.Music.playMusic("pause");
+            AudioService.Music.pauseMusic();
+            AudioService.Music.playMusic("pause");
 
-            StorageLibrary.logger.info("Done!");
+            LoggingService.Logger.info("Done!");
+        }
+
+        if(source== RenderService.showConsoleButton){
+            AudioService.SFX.playSFX("select");
+
+            if(Objects.equals(RenderService.showConsoleButton.getText(), "Show Console")){
+                RenderService.showConsoleButton.setText("Hide Console");
+                RenderService.frame.setSize(1263, 675);
+                RenderService.frame.setLocationRelativeTo(null);
+
+                RenderService.console.setVisible(true);
+                RenderService.consoleScrollPane.setVisible(true);
+                RenderService.commandBar.setVisible(true);
+                RenderService.consoleSettingsButton.setVisible(true);
+            }else if(Objects.equals(RenderService.showConsoleButton.getText(), "Hide Console")){
+                RenderService.showConsoleButton.setText("Show Console");
+                RenderService.frame.setSize(663, 675);
+                RenderService.frame.setLocationRelativeTo(null);
+
+                RenderService.console.setVisible(false);
+                RenderService.consoleScrollPane.setVisible(false);
+                RenderService.commandBar.setVisible(false);
+                RenderService.consoleSettingsButton.setVisible(false);
+            }
+        }
+
+        if(source== RenderService.crashButton){
+            AudioService.SFX.playSFX("select");
+
+            ErrorHandler.IOException();
+        }
+
+        if(source== RenderService.consoleSettingsButton){
+            AudioService.SFX.playSFX("select");
         }
     };
 
+
     public static class keyListener implements KeyListener {
+        private Method[] findMethodsByName(String command) {
+            return Arrays.stream(CommandDefinitions.class.getMethods())
+                    .filter(method -> method.getName().equals(command))
+                    .toArray(Method[]::new);
+        }
+
+        private Method findMatchingMethod(Method[] methods, int argumentCount) {
+            for (Method method : methods) {
+                if (method.getParameterCount() == argumentCount) {
+                    return method;
+                }
+            }
+            return null;
+        }
+
+        private String generateExpectedArgumentsMessage(Method[] methods) {
+            StringBuilder message = new StringBuilder("Expected:");
+            for (Method method : methods) {
+                Class<?>[] paramTypes = method.getParameterTypes();
+                message.append(" [");
+                for (Class<?> paramType : paramTypes) {
+                    message.append(paramType.getSimpleName()).append(", ");
+                }
+                if (paramTypes.length > 0) {
+                    message.setLength(message.length() - 2);
+                }
+                message.append("]");
+            }
+            return message.toString();
+        }
+
+        private Object convertArgument(Object arg, Class<?> expectedType) {
+            String argStr = arg.toString();
+            try {
+                if (expectedType == String.class) {
+                    return argStr;
+                } else if (expectedType == int.class || expectedType == Integer.class) {
+                    return Integer.parseInt(argStr);
+                } else if (expectedType == boolean.class || expectedType == Boolean.class) {
+                    return Boolean.parseBoolean(argStr);
+                } else if (expectedType == long.class || expectedType == Long.class) {
+                    return Long.parseLong(argStr);
+                } else if (expectedType == double.class || expectedType == Double.class) {
+                    return Double.parseDouble(argStr);
+                } else if (expectedType == float.class || expectedType == Float.class) {
+                    return Float.parseFloat(argStr);
+                } else if (expectedType == short.class || expectedType == Short.class) {
+                    return Short.parseShort(argStr);
+                } else if (expectedType == byte.class || expectedType == Byte.class) {
+                    return Byte.parseByte(argStr);
+                } else if (expectedType == char.class || expectedType == Character.class) {
+                    if (argStr.length() == 1) {
+                        return argStr.charAt(0);
+                    } else {
+                        throw new IllegalArgumentException("Invalid char: " + argStr);
+                    }
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid argument type! Expected: " + expectedType.getSimpleName() + " but got " + argStr);
+            }
+            throw new IllegalArgumentException("Unsupported argument type: " + expectedType.getSimpleName());
+        }
 
         @Override
         public void keyTyped(KeyEvent e) {
@@ -1384,7 +1435,75 @@ public class InputService{
 
         @Override
         public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getSource() == RenderService.commandBar) {
+                    String input = RenderService.commandBar.getText().trim();
 
+                    RenderService.frame.getContentPane().requestFocus();
+                    RenderService.commandBar.setForeground(Color.GRAY);
+                    RenderService.commandBar.setText("Enter any command, type help for a list of all the commands");
+                    RenderService.commandBar.setFont(new Font("Nunito", Font.BOLD, 14));
+
+                    if (input.isEmpty()) {
+                        AudioService.SFX.playSFX("declined");
+                        RenderService.commandBar.setText("Please enter a command!");
+                        return;
+                    }
+
+                    String[] arguments = input.split(" ");
+                    String command = arguments[0];
+
+                    Object[] commandArgs = new Object[arguments.length - 1];
+                    for (int i = 0; i < commandArgs.length; i++) {
+                        commandArgs[i] = arguments[i + 1];
+                    }
+
+                    try {
+                        Method[] possibleMethods = findMethodsByName(command);
+
+                        if (possibleMethods.length == 0) {
+                            throw new NoSuchMethodException("No definition found for command: " + command);
+                        }
+
+                        Method method = findMatchingMethod(possibleMethods, commandArgs.length);
+
+                        if (method == null) {
+                            String expectedArgsInfo = generateExpectedArgumentsMessage(possibleMethods);
+                            AudioService.SFX.playSFX("declined");
+                            RenderService.commandBar.setText("Invalid number of arguments for command " + command + ". " + expectedArgsInfo);
+                            return;
+                        }
+
+                        Class<?>[] paramTypes = method.getParameterTypes();
+                        for (int i = 0; i < commandArgs.length; i++) {
+                            commandArgs[i] = convertArgument(commandArgs[i], paramTypes[i]);
+                        }
+
+                        method.invoke(Main.commandDefinitions, commandArgs);
+
+                    } catch (NoSuchMethodException ex) {
+                        AudioService.SFX.playSFX("declined");
+                        RenderService.commandBar.setText("No definition found for command: " + command);
+                        ErrorHandler.NoSuchMethodException();
+                    } catch (IllegalAccessException ex) {
+                        AudioService.SFX.playSFX("declined");
+                        RenderService.commandBar.setText("Access error! Unable to invoke method.");
+                        ErrorHandler.IllegalAccessException();
+                    } catch (InvocationTargetException ex) {
+                        AudioService.SFX.playSFX("declined");
+                        RenderService.commandBar.setText("Invocation error! Something went wrong during method execution.");
+                        ErrorHandler.InvocationTargetException();
+                    } catch (IllegalArgumentException ex) {
+                        AudioService.SFX.playSFX("declined");
+                        RenderService.commandBar.setText("Invalid argument types provided for command: " + command);
+                        ErrorHandler.IllegalArgumentException();
+                    } catch (Exception ex) {
+                        AudioService.SFX.playSFX("declined");
+                        RenderService.commandBar.setText("An unknown error occurred while processing the command!");
+                        ErrorHandler.Exception();
+                    }
+                }
+            }
         }
 
         @Override
@@ -1397,483 +1516,464 @@ public class InputService{
 
         @Override
         public void mouseClicked(MouseEvent e) {
-
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            if(e.getSource()==StorageLibrary.buttonTop){
-                if(e.getButton()==MouseEvent.BUTTON1){
-                    StorageLibrary.buttonTop.setLocation(30, 35);
-                }
-            }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
+            if(e.getButton()==MouseEvent.BUTTON1){
+                if(e.getSource()== RenderService.frame){
+                    RenderService.frame.getContentPane().requestFocus();
+                }
+            }
+
             if (e.getButton() == MouseEvent.BUTTON3) {
                 if(MenuManager.isMenuOpen("Main")){
-                    StorageLibrary.debugButton.setVisible(true);
+                    RenderService.debugButton.setVisible(true);
                 }
             }
 
-            if(e.getSource()==StorageLibrary.buttonTop) {
+            if(e.getSource()== RenderService.shopItem1){
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    StorageLibrary.buttonTop.setLocation(30, 30);
-
-                    if(Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")){
-                        StorageLibrary.clicks1 += StorageLibrary.clickPower1;
-                        StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")){
-                        StorageLibrary.clicks2 += StorageLibrary.clickPower2;
-                        StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                    }else if(Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")){
-                        StorageLibrary.clicks3 += StorageLibrary.clickPower3;
-                        StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                    }
-
-                    AudioUtility.SFX.playSFX("click");
-                }
-            }
-
-            if(e.getSource()==StorageLibrary.shopItem1){
-                if(e.getButton()==MouseEvent.BUTTON1){
-                    if(Objects.equals(StorageLibrary.shopItem1.getDescription(), "Gives 1 more Click Power")){
-                        if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<1000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem1.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem1.setDisabled(true);
+                    if(Objects.equals(RenderService.shopItem1.getDescription(), "Gives 1 more Click Power")){
+                        if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
+                            if(WriteUtility.clicks1<1000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem1.setPrice("Not Enough Clicks");
+                                RenderService.shopItem1.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem1.setPrice("1000 Clicks");
-                                    StorageLibrary.shopItem1.setDisabled(false);
+                                    RenderService.shopItem1.setPrice("1000 Clicks");
+                                    RenderService.shopItem1.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=1000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks1>=1000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 1000;
-                                StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 1;
+                                WriteUtility.clicks1 = WriteUtility.clicks1 - 1000;
+                                WriteUtility.clickPower1 = WriteUtility.clickPower1 + 1;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<1000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem1.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem1.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")) {
+                            if(WriteUtility.clicks2<1000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem1.setPrice("Not Enough Clicks");
+                                RenderService.shopItem1.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem1.setPrice("1000 Clicks");
-                                    StorageLibrary.shopItem1.setDisabled(false);
+                                    RenderService.shopItem1.setPrice("1000 Clicks");
+                                    RenderService.shopItem1.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=1000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks2>=1000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 1000;
-                                StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 1;
+                                WriteUtility.clicks2 = WriteUtility.clicks2 - 1000;
+                                WriteUtility.clickPower2 = WriteUtility.clickPower2 + 1;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<1000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem1.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem1.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")) {
+                            if(WriteUtility.clicks3<1000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem1.setPrice("Not Enough Clicks");
+                                RenderService.shopItem1.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem1.setPrice("1000 Clicks");
-                                    StorageLibrary.shopItem1.setDisabled(false);
+                                    RenderService.shopItem1.setPrice("1000 Clicks");
+                                    RenderService.shopItem1.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=1000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks3>=1000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 1000;
-                                StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 1;
+                                WriteUtility.clicks3 = WriteUtility.clicks3 - 1000;
+                                WriteUtility.clickPower3 = WriteUtility.clickPower3 + 1;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                             }
                         }
                     }
                 }
             }
 
-            if(e.getSource()==StorageLibrary.shopItem2){
+            if(e.getSource()== RenderService.shopItem2){
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    if(Objects.equals(StorageLibrary.shopItem2.getDescription(), "Gives 10 more Click Power")){
-                        if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<10000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem2.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem2.setDisabled(true);
+                    if(Objects.equals(RenderService.shopItem2.getDescription(), "Gives 10 more Click Power")){
+                        if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
+                            if(WriteUtility.clicks1<10000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem2.setPrice("Not Enough Clicks");
+                                RenderService.shopItem2.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem2.setPrice("10000 Clicks");
-                                    StorageLibrary.shopItem2.setDisabled(false);
+                                    RenderService.shopItem2.setPrice("10000 Clicks");
+                                    RenderService.shopItem2.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=10000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks1>=10000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 10000;
-                                StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 10;
+                                WriteUtility.clicks1 = WriteUtility.clicks1 - 10000;
+                                WriteUtility.clickPower1 = WriteUtility.clickPower1 + 10;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<10000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem2.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem2.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")) {
+                            if(WriteUtility.clicks2<10000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem2.setPrice("Not Enough Clicks");
+                                RenderService.shopItem2.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem2.setPrice("10000 Clicks");
-                                    StorageLibrary.shopItem2.setDisabled(false);
+                                    RenderService.shopItem2.setPrice("10000 Clicks");
+                                    RenderService.shopItem2.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=10000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks2>=10000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 10000;
-                                StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 10;
+                                WriteUtility.clicks2 = WriteUtility.clicks2 - 10000;
+                                WriteUtility.clickPower2 = WriteUtility.clickPower2 + 10;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<10000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem2.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem2.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")) {
+                            if(WriteUtility.clicks3<10000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem2.setPrice("Not Enough Clicks");
+                                RenderService.shopItem2.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem2.setPrice("10000 Clicks");
-                                    StorageLibrary.shopItem2.setDisabled(false);
+                                    RenderService.shopItem2.setPrice("10000 Clicks");
+                                    RenderService.shopItem2.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=10000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks3>=10000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 10000;
-                                StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 10;
+                                WriteUtility.clicks3 = WriteUtility.clicks3 - 10000;
+                                WriteUtility.clickPower3 = WriteUtility.clickPower3 + 10;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                             }
                         }
                     }
                 }
             }
 
-            if(e.getSource()==StorageLibrary.shopItem3){
+            if(e.getSource()== RenderService.shopItem3){
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    if(Objects.equals(StorageLibrary.shopItem3.getDescription(), "Gives 100 more Click Power")){
-                        if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<100000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem3.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem3.setDisabled(true);
+                    if(Objects.equals(RenderService.shopItem3.getDescription(), "Gives 100 more Click Power")){
+                        if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
+                            if(WriteUtility.clicks1<100000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem3.setPrice("Not Enough Clicks");
+                                RenderService.shopItem3.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem3.setPrice("100000 Clicks");
-                                    StorageLibrary.shopItem3.setDisabled(false);
+                                    RenderService.shopItem3.setPrice("100000 Clicks");
+                                    RenderService.shopItem3.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=100000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks1>=100000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 100000;
-                                StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 100;
+                                WriteUtility.clicks1 = WriteUtility.clicks1 - 100000;
+                                WriteUtility.clickPower1 = WriteUtility.clickPower1 + 100;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<100000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem3.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem3.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")) {
+                            if(WriteUtility.clicks2<100000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem3.setPrice("Not Enough Clicks");
+                                RenderService.shopItem3.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem3.setPrice("100000 Clicks");
-                                    StorageLibrary.shopItem3.setDisabled(false);
+                                    RenderService.shopItem3.setPrice("100000 Clicks");
+                                    RenderService.shopItem3.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=100000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks2>=100000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 100000;
-                                StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 100;
+                                WriteUtility.clicks2 = WriteUtility.clicks2 - 100000;
+                                WriteUtility.clickPower2 = WriteUtility.clickPower2 + 100;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<100000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem3.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem3.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")) {
+                            if(WriteUtility.clicks3<100000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem3.setPrice("Not Enough Clicks");
+                                RenderService.shopItem3.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem3.setPrice("100000 Clicks");
-                                    StorageLibrary.shopItem3.setDisabled(false);
+                                    RenderService.shopItem3.setPrice("100000 Clicks");
+                                    RenderService.shopItem3.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=100000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks3>=100000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 100000;
-                                StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 100;
+                                WriteUtility.clicks3 = WriteUtility.clicks3 - 100000;
+                                WriteUtility.clickPower3 = WriteUtility.clickPower3 + 100;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                             }
                         }
                     }
                 }
             }
 
-            if(e.getSource()==StorageLibrary.shopItem4){
+            if(e.getSource()== RenderService.shopItem4){
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    if(Objects.equals(StorageLibrary.shopItem4.getDescription(), "Gives 1000 more Click Power")){
-                        if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<1000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem4.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem4.setDisabled(true);
+                    if(Objects.equals(RenderService.shopItem4.getDescription(), "Gives 1000 more Click Power")){
+                        if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
+                            if(WriteUtility.clicks1<1000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem4.setPrice("Not Enough Clicks");
+                                RenderService.shopItem4.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem4.setPrice("1 Million Clicks");
-                                    StorageLibrary.shopItem4.setDisabled(false);
+                                    RenderService.shopItem4.setPrice("1 Million Clicks");
+                                    RenderService.shopItem4.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=1000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks1>=1000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 1000000;
-                                StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 1000;
+                                WriteUtility.clicks1 = WriteUtility.clicks1 - 1000000;
+                                WriteUtility.clickPower1 = WriteUtility.clickPower1 + 1000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<1000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem4.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem4.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")) {
+                            if(WriteUtility.clicks2<1000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem4.setPrice("Not Enough Clicks");
+                                RenderService.shopItem4.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem4.setPrice("1 Million Clicks");
-                                    StorageLibrary.shopItem4.setDisabled(false);
+                                    RenderService.shopItem4.setPrice("1 Million Clicks");
+                                    RenderService.shopItem4.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=1000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks2>=1000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 1000000;
-                                StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 1000;
+                                WriteUtility.clicks2 = WriteUtility.clicks2 - 1000000;
+                                WriteUtility.clickPower2 = WriteUtility.clickPower2 + 1000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<1000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem4.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem4.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")) {
+                            if(WriteUtility.clicks3<1000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem4.setPrice("Not Enough Clicks");
+                                RenderService.shopItem4.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem4.setPrice("1 Million Clicks");
-                                    StorageLibrary.shopItem4.setDisabled(false);
+                                    RenderService.shopItem4.setPrice("1 Million Clicks");
+                                    RenderService.shopItem4.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=1000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks3>=1000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 1000000;
-                                StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 1000;
+                                WriteUtility.clicks3 = WriteUtility.clicks3 - 1000000;
+                                WriteUtility.clickPower3 = WriteUtility.clickPower3 + 1000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                             }
                         }
                     }
                 }
             }
 
-            if(e.getSource()==StorageLibrary.shopItem5){
+            if(e.getSource()== RenderService.shopItem5){
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    if(Objects.equals(StorageLibrary.shopItem5.getDescription(), "Gives 10000 more Click Power")){
-                        if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<10000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem5.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem5.setDisabled(true);
+                    if(Objects.equals(RenderService.shopItem5.getDescription(), "Gives 10000 more Click Power")){
+                        if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
+                            if(WriteUtility.clicks1<10000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem5.setPrice("Not Enough Clicks");
+                                RenderService.shopItem5.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-                                    StorageLibrary.shopItem5.setDisabled(false);
+                                    RenderService.shopItem5.setPrice("10 Million Clicks");
+                                    RenderService.shopItem5.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=10000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks1>=10000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 10000000;
-                                StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 10000;
+                                WriteUtility.clicks1 = WriteUtility.clicks1 - 10000000;
+                                WriteUtility.clickPower1 = WriteUtility.clickPower1 + 10000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<10000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem5.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem5.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")) {
+                            if(WriteUtility.clicks2<10000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem5.setPrice("Not Enough Clicks");
+                                RenderService.shopItem5.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-                                    StorageLibrary.shopItem5.setDisabled(false);
+                                    RenderService.shopItem5.setPrice("10 Million Clicks");
+                                    RenderService.shopItem5.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=10000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks2>=10000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 10000000;
-                                StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 10000;
+                                WriteUtility.clicks2 = WriteUtility.clicks2 - 10000000;
+                                WriteUtility.clickPower2 = WriteUtility.clickPower2 + 10000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<10000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem5.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem5.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")) {
+                            if(WriteUtility.clicks3<10000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem5.setPrice("Not Enough Clicks");
+                                RenderService.shopItem5.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem5.setPrice("10 Million Clicks");
-                                    StorageLibrary.shopItem5.setDisabled(false);
+                                    RenderService.shopItem5.setPrice("10 Million Clicks");
+                                    RenderService.shopItem5.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=10000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks3>=10000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 10000000;
-                                StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 10000;
+                                WriteUtility.clicks3 = WriteUtility.clicks3 - 10000000;
+                                WriteUtility.clickPower3 = WriteUtility.clickPower3 + 10000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                             }
                         }
                     }
                 }
             }
 
-            if(e.getSource()==StorageLibrary.shopItem6){
+            if(e.getSource()== RenderService.shopItem6){
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    if(Objects.equals(StorageLibrary.shopItem6.getDescription(), "Gives 100000 more Click Power")){
-                        if (Objects.equals(StorageLibrary.currentSave, "Saves/save1.bcs")) {
-                            if(StorageLibrary.clicks1<100000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem6.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem6.setDisabled(true);
+                    if(Objects.equals(RenderService.shopItem6.getDescription(), "Gives 100000 more Click Power")){
+                        if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
+                            if(WriteUtility.clicks1<100000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem6.setPrice("Not Enough Clicks");
+                                RenderService.shopItem6.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem6.setPrice("100 Million Clicks");
-                                    StorageLibrary.shopItem6.setDisabled(false);
+                                    RenderService.shopItem6.setPrice("100 Million Clicks");
+                                    RenderService.shopItem6.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks1>=100000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks1>=100000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks1 = StorageLibrary.clicks1 - 100000000;
-                                StorageLibrary.clickPower1 = StorageLibrary.clickPower1 + 100000;
+                                WriteUtility.clicks1 = WriteUtility.clicks1 - 100000000;
+                                WriteUtility.clickPower1 = WriteUtility.clickPower1 + 100000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks1);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower1);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks1);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower1);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save2.bcs")) {
-                            if(StorageLibrary.clicks2<100000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem6.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem6.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save2.bcs")) {
+                            if(WriteUtility.clicks2<100000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem6.setPrice("Not Enough Clicks");
+                                RenderService.shopItem6.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem6.setPrice("100 Million Clicks");
-                                    StorageLibrary.shopItem6.setDisabled(false);
+                                    RenderService.shopItem6.setPrice("100 Million Clicks");
+                                    RenderService.shopItem6.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks2>=100000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks2>=100000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks2 = StorageLibrary.clicks2 - 100000000;
-                                StorageLibrary.clickPower2 = StorageLibrary.clickPower2 + 100000;
+                                WriteUtility.clicks2 = WriteUtility.clicks2 - 100000000;
+                                WriteUtility.clickPower2 = WriteUtility.clickPower2 + 100000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks2);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower2);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks2);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower2);
                             }
-                        } else if (Objects.equals(StorageLibrary.currentSave, "Saves/save3.bcs")) {
-                            if(StorageLibrary.clicks3<100000000){
-                                AudioUtility.SFX.playSFX("declined");
-                                StorageLibrary.shopItem6.setPrice("Not Enough Clicks");
-                                StorageLibrary.shopItem6.setDisabled(true);
+                        } else if (Objects.equals(WriteUtility.currentSave, "Saves/save3.bcs")) {
+                            if(WriteUtility.clicks3<100000000){
+                                AudioService.SFX.playSFX("declined");
+                                RenderService.shopItem6.setPrice("Not Enough Clicks");
+                                RenderService.shopItem6.setDisabled(true);
 
                                 ATimer timer = new ATimer();
                                 timer.setDelay(2);
                                 timer.setTask(() -> {
-                                    StorageLibrary.shopItem6.setPrice("100 Million Clicks");
-                                    StorageLibrary.shopItem6.setDisabled(false);
+                                    RenderService.shopItem6.setPrice("100 Million Clicks");
+                                    RenderService.shopItem6.setDisabled(false);
                                 });
                                 timer.start();
-                            }else if(StorageLibrary.clicks3>=100000000){
-                                AudioUtility.SFX.playSFX("purchase");
+                            }else if(WriteUtility.clicks3>=100000000){
+                                AudioService.SFX.playSFX("purchase");
 
-                                StorageLibrary.clicks3 = StorageLibrary.clicks3 - 100000000;
-                                StorageLibrary.clickPower3 = StorageLibrary.clickPower3 + 100000;
+                                WriteUtility.clicks3 = WriteUtility.clicks3 - 100000000;
+                                WriteUtility.clickPower3 = WriteUtility.clickPower3 + 100000;
 
-                                StorageLibrary.clicksField.setText("Clicks: "+StorageLibrary.clicks3);
-                                StorageLibrary.clickPowerField.setText("Click Power: "+StorageLibrary.clickPower3);
+                                RenderService.clicksField.setText("Clicks: "+ WriteUtility.clicks3);
+                                RenderService.clickPowerField.setText("Click Power: "+ WriteUtility.clickPower3);
                             }
                         }
                     }
