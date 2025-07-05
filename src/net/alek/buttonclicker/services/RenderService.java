@@ -7,8 +7,8 @@ import net.alek.buttonclicker.engine.ErrorHandler;
 import net.alek.buttonclicker.engine.Main;
 import net.alek.buttonclicker.engine.MenuManager;
 
-import net.alek.buttonclicker.utilities.ReadUtility;
-import net.alek.buttonclicker.utilities.WriteUtility;
+import net.alek.buttonclicker.utilities.read.ReadUtility;
+import net.alek.buttonclicker.utilities.write.WriteUtility;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -19,6 +19,8 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class RenderService {
+    public static GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
     public static JFrame frame = new JFrame();
 
     public static JLayeredPane contentPane = new JLayeredPane();

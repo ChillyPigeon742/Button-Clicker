@@ -5,10 +5,11 @@ import com.formdev.flatlaf.FlatLaf;
 import net.alek.buttonclicker.services.LoggingService;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.services.RenderService;
-import net.alek.buttonclicker.utilities.ReadUtility;
+import net.alek.buttonclicker.utilities.read.ReadUtility;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class ErrorHandler {
     public static String getCallerInfo() {
@@ -23,10 +24,10 @@ public class ErrorHandler {
         return "UnknownCaller";
     }
 
-    private static void handleException(String typeOfException){
+    private static void handleException(String name, String cause, String message, String packageName, String stackTrace){
         String caller = getCallerInfo();
 
-        LoggingService.Logger.error(typeOfException+"/"+caller+"/The Program has Suffered an "+typeOfException+"!");
+        LoggingService.Logger.error(name+"/"+caller+"/The Program has Suffered an "+name+"!");
 
         LoggingService.Logger.error("Locking Engine...");
         MenuManager.closeMenu("Main");
@@ -79,55 +80,13 @@ public class ErrorHandler {
         RenderService.showConsoleButton.setFocusable(false);
     }
 
-    public static void IOException() {
-        handleException("IOException");
-    }
+    public static void Exception(Exception e) {
+        String name = e.getClass().getSimpleName();
+        String packageName = e.getClass().getName();
+        String cause = (e.getCause() != null) ? e.getCause().toString() : "No cause";
+        String message = e.getMessage();
+        String stackTrace = Arrays.toString(e.getStackTrace());
 
-    public static void URISyntaxException() {
-        handleException("URISyntaxException");
-    }
-
-    public static void InterruptedException() {
-        handleException("InterruptedException");
-    }
-
-    public static void FontFormatException() {
-        handleException("FontFormatException");
-    }
-
-    public static void ExecutionException() {
-        handleException("ExecutionException");
-    }
-
-    public static void BadLocationException() {
-        handleException("BadLocationException");
-    }
-
-    public static void NoSuchMethodException() {
-        handleException("NoSuchMethodException");
-    }
-
-    public static void IllegalAccessException() {
-        handleException("IllegalAccessException");
-    }
-
-    public static void InvocationTargetException() {
-        handleException("InvocationTargetException");
-    }
-
-    public static void IllegalArgumentException() {
-        handleException("IllegalArgumentException");
-    }
-
-    public static void ClassNotFoundException(){
-        handleException("ClassNotFoundException");
-    }
-
-    public static void NullPointerException(){
-        handleException("NullPointerException");
-    }
-
-    public static void Exception() {
-        handleException("Exception");
+        handleException(name, cause, message, packageName, stackTrace);
     }
 }

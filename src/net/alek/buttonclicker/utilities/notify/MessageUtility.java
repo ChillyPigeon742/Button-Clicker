@@ -1,21 +1,10 @@
-package net.alek.buttonclicker.utilities;
+package net.alek.buttonclicker.utilities.notify;
+
+import net.alek.buttonclicker.utilities.read.ReadUtility;
 
 import javax.swing.*;
 
 public class MessageUtility {
-    public static void IntegerLimitMessage() {
-        String[] responses = {"Ok"};
-        JOptionPane.showOptionDialog(
-                null,
-                "Cannot Surpass 9223372036854775807, Pressing Back One Billion Clicks To Prevent Loop Back",
-                "",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                ReadUtility.errorIcon,
-                responses,
-                responses[0]);
-    }
-
     public static int DeleteMessage(){
         String[] responses = {"Ok", "Cancel"};
         return JOptionPane.showOptionDialog(

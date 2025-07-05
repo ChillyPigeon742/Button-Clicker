@@ -7,7 +7,9 @@ import net.alek.buttonclicker.engine.*;
 import net.alek.buttonclicker.components.ATimer;
 
 import net.alek.buttonclicker.data.CommandDefinitions;
-import net.alek.buttonclicker.utilities.*;
+import net.alek.buttonclicker.utilities.notify.MessageUtility;
+import net.alek.buttonclicker.utilities.read.ReadUtility;
+import net.alek.buttonclicker.utilities.write.WriteUtility;
 
 import java.awt.*;
 import java.awt.event.*;

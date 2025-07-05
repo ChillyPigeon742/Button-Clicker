@@ -8,14 +8,15 @@ import javafx.embed.swing.JFXPanel;
 import net.alek.buttonclicker.data.CommandDefinitions;
 import net.alek.buttonclicker.services.AutoClickerDetectorService;
 import net.alek.buttonclicker.services.LoggingService;
-import net.alek.buttonclicker.utilities.ReadUtility;
-import net.alek.buttonclicker.utilities.WriteUtility;
+import net.alek.buttonclicker.superclasses.Igniter;
+import net.alek.buttonclicker.utilities.read.ReadUtility;
+import net.alek.buttonclicker.utilities.write.WriteUtility;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.services.RenderService;
 
 import javax.swing.*;
 
-public class Main {
+public class Main extends Igniter {
 
     public static CommandDefinitions commandDefinitions = new CommandDefinitions();
     public static final String VERSION = "0.7.0_INDEV";
@@ -38,11 +39,13 @@ public class Main {
 
         new JFXPanel();
 
-        new ReadUtility();
+        ReadUtility.loadGame();
         new AudioService();
-        SwingUtilities.invokeLater(RenderService::new);
+        SwingUtilities.invokeLater(() -> {
+            new RenderService();
 
-        WriteUtility.startAutosaveTimer();
-        new AutoClickerDetectorService();
+            WriteUtility.startAutosaveTimer();
+            new AutoClickerDetectorService();
+        });
     }
 }
