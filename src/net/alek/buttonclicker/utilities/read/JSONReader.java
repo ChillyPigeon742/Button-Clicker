@@ -9,9 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -19,20 +17,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class JSONReader {
-    private static String json;
-    private static int index;
 
-    private static final Map<Class<?>, Function<Object, ?>> deserializers = new ConcurrentHashMap<>();
+    private final String json;
+    private final Object root;
 
-    static {
+    private final Map<Class<?>, Function<Object, ?>> deserializers = new ConcurrentHashMap<>();
+    private int index;
+
+    public JSONReader(String json) {
+        this.json = json;
+        this.index = 0;
+
         deserializers.put(Color.class, JSONReader::deserializeColor);
-        deserializers.put(Enum.class, JSONReader::deserializeEnum);
         deserializers.put(LocalDate.class, JSONReader::deserializeLocalDate);
         deserializers.put(LocalDateTime.class, JSONReader::deserializeLocalDateTime);
         deserializers.put(ZonedDateTime.class, JSONReader::deserializeZonedDateTime);
+
+        this.root = parseRoot();
     }
 
-    private static <T> T readJson(String filePath, String key) {
+    public static JSONReader fromFile(String filePath) {
         File file = new File(filePath);
         if (!file.exists()) return null;
 
@@ -44,14 +48,7 @@ public class JSONReader {
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
             }
-
-            json = sb.toString();
-            index = 0;
-            skipWhitespaceAndComments();
-            Map<String, Object> data = parseObject();
-
-            Object rawValue = data.get(key);
-            return castWithDeserialization(rawValue, null);
+            return new JSONReader(sb.toString());
 
         } catch (Exception e) {
             LoggingService.Logger.error("Could not read JSON file! " + e.getMessage());
@@ -60,8 +57,17 @@ public class JSONReader {
         }
     }
 
+    private Object parseRoot() {
+        skipWhitespaceAndComments();
+        if (peek() == '{') return parseObject();
+        if (peek() == '[') return parseArray();
+
+        ErrorHandler.Exception(new RuntimeException("Invalid JSON root element"));
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
-    private static <T> T castWithDeserialization(Object obj, Class<T> targetClass) {
+    private <T> T castWithDeserialization(Object obj, Class<T> targetClass) {
         if (obj == null) return null;
 
         if (targetClass != null) {
@@ -75,6 +81,16 @@ public class JSONReader {
                     }
                 }
             }
+            if (targetClass.isEnum() && obj instanceof String) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    T enumValue = (T) Enum.valueOf((Class<Enum>) targetClass.asSubclass(Enum.class), (String) obj);
+                    return enumValue;
+                } catch (IllegalArgumentException e) {
+                    ErrorHandler.Exception(new RuntimeException("Invalid enum value for " + targetClass.getName(), e));
+                    return null;
+                }
+            }
         }
 
         try {
@@ -85,137 +101,107 @@ public class JSONReader {
         }
     }
 
-    public static <T> T get(String filePath, String key, Class<T> targetClass) {
-        Object rawValue = readJson(filePath, key);
+    public <T> T get(String key, Class<T> targetClass) {
+        if (!(root instanceof Map<?, ?> map)) return null;
+        Object rawValue = map.get(key);
         return castWithDeserialization(rawValue, targetClass);
     }
 
-    public static String getString(String filePath, String key) {
-        return get(filePath, key, String.class);
+    public String getString(String key) {
+        return get(key, String.class);
     }
 
-    public static boolean getBoolean(String filePath, String key) {
-        Object val = readJson(filePath, key);
+    public boolean getBoolean(String key) {
+        Object val = get(key, Object.class);
         if (val instanceof Boolean) return (Boolean) val;
         return Boolean.parseBoolean(String.valueOf(val));
     }
 
-    public static int getInt(String filePath, String key) {
-        Object val = readJson(filePath, key);
+    public int getInt(String key) {
+        Object val = get(key, Object.class);
         if (val instanceof Number) return ((Number) val).intValue();
         return Integer.parseInt(String.valueOf(val));
     }
 
-    public static byte getByte(String filePath, String key) {
-        Object val = readJson(filePath, key);
+    public long getLong(String key) {
+        Object val = get(key, Object.class);
+        if (val instanceof Number) return ((Number) val).longValue();
+        return Long.parseLong(String.valueOf(val));
+    }
+
+    public byte getByte(String key) {
+        Object val = get(key, Object.class);
         if (val instanceof Number) return ((Number) val).byteValue();
         return Byte.parseByte(String.valueOf(val));
     }
 
-    public static double getDouble(String filePath, String key) {
-        Object val = readJson(filePath, key);
+    public float getFloat(String key) {
+        Object val = get(key, Object.class);
+        if (val instanceof Number) return ((Number) val).floatValue();
+        return Float.parseFloat(String.valueOf(val));
+    }
+
+    public double getDouble(String key) {
+        Object val = get(key, Object.class);
         if (val instanceof Number) return ((Number) val).doubleValue();
         return Double.parseDouble(String.valueOf(val));
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Object> getList(String filePath, String key) {
-        Object val = readJson(filePath, key);
+    public List<Object> getList(String key) {
+        Object val = get(key, Object.class);
         return val instanceof List<?> ? (List<Object>) val : new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> getMap(String filePath, String key) {
-        Object val = readJson(filePath, key);
+    public Map<String, Object> getMap(String key) {
+        Object val = get(key, Object.class);
         return val instanceof Map<?, ?> ? (Map<String, Object>) val : new HashMap<>();
     }
 
-    public static boolean keyExists(String filePath, String key) {
-        File file = new File(filePath);
-        if (!file.exists()) return false;
+    public <T> T getPolymorphic(String key, Class<T> baseClass, Map<String, Class<? extends T>> typeMap) {
+        if (!(root instanceof Map<?, ?> map)) return null;
+        Object val = map.get(key);
+        if (!(val instanceof Map<?, ?> objMap)) return null;
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+        Object typeRaw = objMap.get("type");
+        if (!(typeRaw instanceof String type)) return null;
 
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append('\n');
+        Class<? extends T> targetClass = typeMap.get(type);
+        if (targetClass == null) return null;
+
+        try {
+            T instance = targetClass.getDeclaredConstructor().newInstance();
+            for (var field : targetClass.getDeclaredFields()) {
+                field.setAccessible(true);
+                Object rawValue = objMap.get(field.getName());
+                if (rawValue != null) {
+                    field.set(instance, castWithDeserialization(rawValue, field.getType()));
+                }
             }
-
-            json = sb.toString();
-            index = 0;
-            skipWhitespaceAndComments();
-            Map<String, Object> data = parseObject();
-            return data.containsKey(key);
-
+            return instance;
         } catch (Exception e) {
-            LoggingService.Logger.error("Could not verify key existence! " + e.getMessage());
-            ErrorHandler.Exception(e);
-            return false;
+            ErrorHandler.Exception(new RuntimeException("Failed to instantiate polymorphic type: " + type, e));
+            return null;
         }
     }
 
-    public static Set<String> getAllKeys(String filePath) {
-        Set<String> keys = new HashSet<>();
-        File file = new File(filePath);
-        if (!file.exists()) return keys;
-
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append('\n');
-            }
-
-            json = sb.toString();
-            index = 0;
-            skipWhitespaceAndComments();
-            Map<String, Object> data = parseObject();
-            keys.addAll(data.keySet());
-
-        } catch (Exception e) {
-            LoggingService.Logger.error("Could not retrieve the keys within the JSON file! " + e.getMessage());
-            ErrorHandler.Exception(e);
-        }
-        return keys;
+    public boolean keyExists(String key) {
+        if (!(root instanceof Map<?, ?> map)) return false;
+        return map.containsKey(key);
     }
 
-    public static Map<String, Object> readAll(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists()) return new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append('\n');
-            }
-
-            json = sb.toString();
-            index = 0;
-            skipWhitespaceAndComments();
-            return parseObject();
-
-        } catch (Exception e) {
-            LoggingService.Logger.error("Could not parse the JSON file! " + e.getMessage());
-            ErrorHandler.Exception(e);
-            return new HashMap<>();
-        }
+    public Set<String> getAllKeys() {
+        if (!(root instanceof Map<?, ?> map)) return Collections.emptySet();
+        return (Set<String>) map.keySet();
     }
 
-    public static Map<String, Object> parse(String input) {
-        json = input;
-        index = 0;
-        skipWhitespaceAndComments();
-        return parseObject();
+    public Map<String, Object> readAll() {
+        if (root instanceof Map<?, ?> map) return (Map<String, Object>) map;
+        return new HashMap<>();
     }
 
-    private static Map<String, Object> parseObject() {
+    private Map<String, Object> parseObject() {
         Map<String, Object> map = new HashMap<>();
         expect('{');
         skipWhitespaceAndComments();
@@ -249,7 +235,7 @@ public class JSONReader {
         return map;
     }
 
-    private static List<Object> parseArray() {
+    private List<Object> parseArray() {
         List<Object> list = new ArrayList<>();
         expect('[');
         skipWhitespaceAndComments();
@@ -279,7 +265,7 @@ public class JSONReader {
         return list;
     }
 
-    private static Object parseValue() {
+    private Object parseValue() {
         skipWhitespaceAndComments();
         char c = peek();
 
@@ -301,7 +287,7 @@ public class JSONReader {
         return parseNumberOrLiteral();
     }
 
-    private static String parseString() {
+    private String parseString() {
         expect('"');
         StringBuilder sb = new StringBuilder();
         while (true) {
@@ -329,7 +315,7 @@ public class JSONReader {
                                 String lowHex = json.substring(index + 2, index + 6);
                                 int lowCodePoint = Integer.parseInt(lowHex, 16);
                                 if (Character.isLowSurrogate((char) lowCodePoint)) {
-                                    sb.append(Character.toChars((Character.toCodePoint((char) codePoint, (char) lowCodePoint))));
+                                    sb.append(Character.toChars(Character.toCodePoint((char) codePoint, (char) lowCodePoint)));
                                     index += 6;
                                     break;
                                 }
@@ -348,7 +334,7 @@ public class JSONReader {
         return sb.toString();
     }
 
-    private static Object parseNumberOrLiteral() {
+    private Object parseNumberOrLiteral() {
         int start = index;
         boolean hasDecimal = false;
         boolean hasExponent = false;
@@ -381,13 +367,13 @@ public class JSONReader {
             if (hasDecimal || hasExponent) {
                 return Double.parseDouble(raw);
             }
-            return Integer.parseInt(raw);
+            return Long.parseLong(raw);
         } catch (NumberFormatException e) {
             return raw;
         }
     }
 
-    private static void skipWhitespaceAndComments() {
+    private void skipWhitespaceAndComments() {
         while (index < json.length()) {
             char c = json.charAt(index);
             if (Character.isWhitespace(c)) {
@@ -416,23 +402,23 @@ public class JSONReader {
         }
     }
 
-    private static char peek() {
+    private char peek() {
         if (index >= json.length()) ErrorHandler.Exception(new RuntimeException("Unexpected end of JSON"));
         return json.charAt(index);
     }
 
-    private static void expect(char expected) {
+    private void expect(char expected) {
         if (peek() != expected) {
             ErrorHandler.Exception(new RuntimeException("Expected '" + expected + "' at position " + index));
         }
         index++;
     }
 
-    private static boolean startsWith(String s) {
+    private boolean startsWith(String s) {
         return json.startsWith(s, index);
     }
 
-    public static void registerDeserializer(Class<?> type, Function<Object, ?> deserializer) {
+    public void registerDeserializer(Class<?> type, Function<Object, ?> deserializer) {
         deserializers.put(type, deserializer);
     }
 
@@ -441,18 +427,13 @@ public class JSONReader {
         String[] parts = ((String) obj).split(",");
         if (parts.length != 3) return null;
         try {
-            int r = Integer.parseInt(parts[0]);
-            int g = Integer.parseInt(parts[1]);
-            int b = Integer.parseInt(parts[2]);
+            int r = Integer.parseInt(parts[0].trim());
+            int g = Integer.parseInt(parts[1].trim());
+            int b = Integer.parseInt(parts[2].trim());
             return new Color(r, g, b);
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    private static Object deserializeEnum(Object obj) {
-        if (obj instanceof String s) return s;
-        return null;
     }
 
     private static LocalDate deserializeLocalDate(Object obj) {
