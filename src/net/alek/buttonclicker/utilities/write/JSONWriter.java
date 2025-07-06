@@ -7,6 +7,7 @@ import net.alek.buttonclicker.utilities.read.JSONReader;
 
 import java.awt.*;
 import java.io.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
@@ -37,7 +38,8 @@ public class JSONWriter {
             return "\"" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + "\"";
         });
 
-        registerTypeAdapter(BigInteger.class, (obj, ctx) -> "\"" + BigInteger. + "\"");
+        registerTypeAdapter(BigInteger.class, (obj, ctx) -> "\"" + obj.toString() + "\"");
+        registerTypeAdapter(BigDecimal.class, (obj, ctx) -> "\"" + obj.toString() + "\"");
     }
 
     public static void registerCustomSerializer(Class<?> clazz, CustomSerializer serializer) {

@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +34,8 @@ public class JSONReader {
         deserializers.put(LocalDate.class, JSONReader::deserializeLocalDate);
         deserializers.put(LocalDateTime.class, JSONReader::deserializeLocalDateTime);
         deserializers.put(ZonedDateTime.class, JSONReader::deserializeZonedDateTime);
+        deserializers.put(BigInteger.class, JSONReader::deserializeBigInteger);
+        deserializers.put(BigDecimal.class, JSONReader::deserializeBigDecimal);
 
         this.root = parseRoot();
     }
@@ -459,6 +463,24 @@ public class JSONReader {
         try {
             return ZonedDateTime.parse((String) obj, DateTimeFormatter.ISO_ZONED_DATE_TIME);
         } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static BigInteger deserializeBigInteger(Object obj) {
+        if (!(obj instanceof String)) return null;
+        try {
+            return new BigInteger((String) obj);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static BigDecimal deserializeBigDecimal(Object obj) {
+        if (!(obj instanceof String)) return null;
+        try {
+            return new BigDecimal((String) obj);
+        } catch (NumberFormatException e) {
             return null;
         }
     }
