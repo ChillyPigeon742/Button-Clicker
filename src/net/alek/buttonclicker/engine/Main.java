@@ -22,6 +22,7 @@ public class Main extends Igniter {
     public static final String VERSION = "0.7.0_INDEV";
 
     public static void main(String[] args){
+        ErrorHandler.setupCrashHandler();
         LoggingService.setupLogger();
 
         FlatLaf.registerCustomDefaultsSource("assets.buttonclicker.config");

@@ -89,4 +89,8 @@ public class ErrorHandler {
 
         handleException(name, cause, message, packageName, stackTrace);
     }
+
+    public static void setupCrashHandler(){
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> Exception(new RuntimeException("The application has crashed due to an unknown error!"))));
+    }
 }
