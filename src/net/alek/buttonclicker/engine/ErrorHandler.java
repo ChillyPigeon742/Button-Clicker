@@ -90,7 +90,14 @@ public class ErrorHandler {
         handleException(name, cause, message, packageName, stackTrace);
     }
 
+    static {
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            Exception((Exception) throwable);
+        });
+    }
+
     public static void setupCrashHandler(){
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> Exception(new RuntimeException("The application has crashed due to an unknown error!"))));
+        //TODO: actually add crash detection just realized this does it on shutdown
+        //Runtime.getRuntime().addShutdownHook(new Thread(() -> Exception(new RuntimeException("The application has crashed due to an unknown error!"))));
     }
 }

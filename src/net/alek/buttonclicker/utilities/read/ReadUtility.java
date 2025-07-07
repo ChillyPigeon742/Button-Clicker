@@ -12,10 +12,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.Objects;
 
 public class ReadUtility {
+
+    public static Path APPDATA_PATH = Paths.get(System.getenv("APPDATA"), "_ButtonClicker");
+    public static Path APPDATA_PATH = Paths.get(System.getenv("APPDATA"), "_ButtonClicker");
 
     public static Map<String, Object> save1 = new HashMap<>();
     public static Map<String, Object> save2 = new HashMap<>();
@@ -272,7 +277,7 @@ public class ReadUtility {
     }
 
     private static void loadSettings(){
-        settings.put("currentSave", JSONReader.getString("Data/settings.json", "currentSave"));
+        settings.put("currentSave", JSONReader.fromFile("Data/settings.json").getString("currentSave"));
 
         Object currentSaveKey = settings.get("currentSave");
         Map<String, Object> currentSave = getCurrentSave();
@@ -295,16 +300,16 @@ public class ReadUtility {
             RenderService.currentSaveText.setText("Current Save: " + saveName);
         }
 
-        AudioService.SoundManager.setMasterVolume(JSONReader.getInt("Data/settings.json", "master_volume"));
+        AudioService.SoundManager.setMasterVolume(JSONReader.fromFile("Data/settings.json").getInt("masterVolume"));
         RenderService.masterVolumeSlider.setValue(AudioService.SoundManager.masterVolumeUSER);
 
-        AudioService.SoundManager.setMusicVolume(JSONReader.getInt("Data/settings.json", "music_volume"));
+        AudioService.SoundManager.setMusicVolume(JSONReader.fromFile("Data/settings.json").getInt("musicVolume"));
         RenderService.musicVolumeSlider.setValue(AudioService.SoundManager.musicVolumeUSER);
 
-        AudioService.SoundManager.setSFXVolume(JSONReader.getInt("Data/settings.json", "sfx_volume"));
+        AudioService.SoundManager.setSFXVolume(JSONReader.fromFile("Data/settings.json").getInt("sfxVolume"));
         RenderService.sfxVolumeSlider.setValue(AudioService.SoundManager.sfxVolumeUSER);
 
-        AudioService.SoundManager.setMusicDelay((byte) JSONReader.getInt("Data/settings.json", "music_delay"));
+        AudioService.SoundManager.setMusicDelay(JSONReader.fromFile("Data/settings.json").getByte("musicDelay"));
         RenderService.musicDelaySpinner.setValue(AudioService.SoundManager.getMusicDelay());
         RenderService.musicDelaySpinnerText.setText(AudioService.SoundManager.getMusicDelay()+" Secs");
     }

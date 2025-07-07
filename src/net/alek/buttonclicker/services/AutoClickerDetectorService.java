@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class AutoClickerDetectorService {
+    private static final Deque<Double> recentScores = new ArrayDeque<>();
     private static final Queue<Long> clickTimes = new ConcurrentLinkedQueue<>();
     private static final Queue<Long> pressDurations = new ConcurrentLinkedQueue<>();
     private static final int MIN_CLICKS_FOR_DETECTION = 15;
@@ -20,6 +21,7 @@ public class AutoClickerDetectorService {
     private static final int DATA_CLEANUP_INTERVAL_MINUTES = 5;
     private static final long DETECTION_COOLDOWN_MS = 10_000;
     private static final int MAX_DETECTIONS_BEFORE_PUNISH = 3;
+    private static final int SCORE_HISTORY_SIZE = 10;
     private int detectionCount = 0;
     private long lastDetectionTime = 0;
 
@@ -74,7 +76,7 @@ public class AutoClickerDetectorService {
     }
 
     private void handleMouseRelease() {
-        long pressDuration = recordClickData();
+        recordClickData();
 
         if (shouldCheckForAutoClicker()) {
             long now = System.currentTimeMillis();
@@ -107,11 +109,12 @@ public class AutoClickerDetectorService {
         pressStartTime = -1;
     }
 
-    private long recordClickData() {
-        long pressDuration = System.nanoTime() - pressStartTime;
-        pressDurations.add(pressDuration);
-        clickTimes.add(System.nanoTime());
-        return pressDuration;
+    private void recordClickData() {
+        if (pressStartTime > 0) {
+            long pressDuration = System.nanoTime() - pressStartTime;
+            pressDurations.add(pressDuration);
+            clickTimes.add(System.nanoTime());
+        }
     }
 
     private boolean shouldCheckForAutoClicker() {
@@ -154,12 +157,8 @@ public class AutoClickerDetectorService {
     }
 
     private void resetDetectionData() {
-        synchronized (clickTimes) {
-            clickTimes.clear();
-        }
-        synchronized (pressDurations) {
-            pressDurations.clear();
-        }
+        clickTimes.clear();
+        pressDurations.clear();
     }
 
     private static DetectionResult detectAutoClicker() {
@@ -177,7 +176,9 @@ public class AutoClickerDetectorService {
         ClickMetrics metrics = calculateAllMetrics(windowClickTimes, windowPressDurations, intervals);
         double suspicionScore = calculateSuspicionScore(metrics);
 
-        boolean detected = suspicionScore > DETECTION_THRESHOLD;
+        double dynamicThreshold = getDynamicThreshold();
+        boolean detected = suspicionScore > dynamicThreshold;
+        addRecentScore(suspicionScore);
         return new DetectionResult(detected, buildDetectionMessage(detected, suspicionScore, metrics));
     }
 
@@ -240,6 +241,7 @@ public class AutoClickerDetectorService {
         for (int i = 0; i < weights.length; i++) {
             score += weights[i] * normalizedMetrics[i];
         }
+        score *= getVolatilityBoost();
         return score;
     }
 
@@ -258,6 +260,26 @@ public class AutoClickerDetectorService {
                         metrics.intervalEntropy, metrics.diRatio, metrics.acceleration) +
                 String.format("\nSkewness: %.2f | Kurtosis: %.2f",
                         metrics.skewness, metrics.kurtosis);
+    }
+
+    private static double getVolatilityBoost() {
+        if (recentScores.size() < 2) return 1.0;
+        double stddev = calculateStandardDeviationDouble(new ArrayList<>(recentScores));
+        return 1.0 + (stddev * 0.1);
+    }
+
+    private static void addRecentScore(double score) {
+        if (recentScores.size() >= SCORE_HISTORY_SIZE) {
+            recentScores.pollFirst();
+        }
+        recentScores.addLast(score);
+    }
+
+    private static double getDynamicThreshold() {
+        if (recentScores.isEmpty()) return DETECTION_THRESHOLD;
+        double avg = recentScores.stream().mapToDouble(Double::doubleValue).average().orElse(DETECTION_THRESHOLD);
+        double stdDev = calculateStandardDeviationDouble(new ArrayList<>(recentScores));
+        return avg + Math.max(0.75, stdDev * 0.5);
     }
 
     private static double calculateCPS(List<Long> clickTimes) {
@@ -388,6 +410,17 @@ public class AutoClickerDetectorService {
         }
         return Math.sqrt(sum / values.size());
     }
+
+    private static double calculateStandardDeviationDouble(List<Double> values) {
+        if (values.isEmpty()) return 0;
+        double mean = values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+        double sum = 0;
+        for (double value : values) {
+            sum += Math.pow(value - mean, 2);
+        }
+        return Math.sqrt(sum / values.size());
+    }
+
 
     private static double calculateMean(List<Long> values) {
         return values.isEmpty() ? 0 : values.stream().mapToLong(Long::longValue).average().orElse(0);

@@ -9,6 +9,7 @@ import net.alek.buttonclicker.utilities.read.ReadUtility;
 
 import javax.swing.*;
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -24,10 +25,12 @@ public class WriteUtility {
                 if(MenuManager.isMenuOpen("Game")){
                     LoggingService.Logger.info("Saving...");
 
+                    BigInteger foo = BigInteger.ZERO;
+                    foo = foo.add(BigInteger.ONE);
+
                     RenderService.titleImage.startSpinning();
                     RenderService.titleImage.setBounds(535, 110, 110, 110);
                     RenderService.titleImage.setVisible(true);
-
                     RenderService.autoSavingText.setVisible(true);
 
                     ATimer timer = new ATimer();
@@ -37,17 +40,9 @@ public class WriteUtility {
                             RenderService.titleImage.stopSpinning();
                             RenderService.titleImage.setBounds(10, 0, 100, 100);
                             RenderService.titleImage.setVisible(false);
-
                             RenderService.autoSavingText.setVisible(false);
                         }
-
-                        if (Objects.equals(ReadUtility.currentSave, "Saves/save1.bcs")) {
-                            writeSave(ReadUtility.save1, 1);
-                        } else if (Objects.equals(ReadUtility.currentSave, "Saves/save2.bcs")) {
-                            writeSave(ReadUtility.save2, 2);
-                        } else if (Objects.equals(ReadUtility.currentSave, "Saves/save3.bcs")) {
-                            writeSave(ReadUtility.save3, 3);
-                        }
+                        saveCurrentSave();
                     });
                     timer.start();
                 }
@@ -84,7 +79,7 @@ public class WriteUtility {
     }
 
     public static void saveCurrentSave(){
-        if (ReadUtility.currentSave == null) {
+        if (ReadUtility.getCurrentSave() == null) {
             LoggingService.Logger.error("No save has been selected to write to!");
         } else {
             writeSave(ReadUtility.getCurrentSave(), ReadUtility.getCurrentSaveNumber());
