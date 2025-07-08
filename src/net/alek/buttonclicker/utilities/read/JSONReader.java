@@ -22,7 +22,6 @@ public class JSONReader {
 
     private final String json;
     private final Object root;
-
     private final Map<Class<?>, Function<Object, ?>> deserializers = new ConcurrentHashMap<>();
     private int index;
 
@@ -30,14 +29,17 @@ public class JSONReader {
         this.json = json;
         this.index = 0;
 
+        registerDefaultDeserializers();
+        this.root = parseRoot();
+    }
+
+    private void registerDefaultDeserializers() {
         deserializers.put(Color.class, JSONReader::deserializeColor);
         deserializers.put(LocalDate.class, JSONReader::deserializeLocalDate);
         deserializers.put(LocalDateTime.class, JSONReader::deserializeLocalDateTime);
         deserializers.put(ZonedDateTime.class, JSONReader::deserializeZonedDateTime);
         deserializers.put(BigInteger.class, JSONReader::deserializeBigInteger);
         deserializers.put(BigDecimal.class, JSONReader::deserializeBigDecimal);
-
-        this.root = parseRoot();
     }
 
     public static JSONReader fromFile(String filePath) {
@@ -163,46 +165,83 @@ public class JSONReader {
         return val instanceof Map<?, ?> ? (Map<String, Object>) val : new HashMap<>();
     }
 
-    public <T> T getPolymorphic(String key, Class<T> baseClass, Map<String, Class<? extends T>> typeMap) {
-        if (!(root instanceof Map<?, ?> map)) return null;
-        Object val = map.get(key);
-        if (!(val instanceof Map<?, ?> objMap)) return null;
-
+    private Object deserializePolymorphicObject(Map<String, Object> objMap) {
         Object typeRaw = objMap.get("type");
-        if (!(typeRaw instanceof String type)) return null;
+        if (!(typeRaw instanceof String typeName)) return objMap;
 
-        Class<? extends T> targetClass = typeMap.get(type);
-        if (targetClass == null) return null;
+        Class<?> targetClass = findClass(typeName);
+        if (targetClass == null) return objMap;
 
         try {
-            T instance = targetClass.getDeclaredConstructor().newInstance();
+            Object instance = targetClass.getDeclaredConstructor().newInstance();
+
             for (var field : targetClass.getDeclaredFields()) {
                 field.setAccessible(true);
                 Object rawValue = objMap.get(field.getName());
                 if (rawValue != null) {
+                    if (rawValue instanceof Map<?, ?> nestedMap) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> nestedStringMap = (Map<String, Object>) nestedMap;
+                        rawValue = deserializePolymorphicObject(nestedStringMap);
+                    } else if (rawValue instanceof List<?>) {
+                        rawValue = deserializePolymorphicInList((List<Object>) rawValue);
+                    }
                     field.set(instance, castWithDeserialization(rawValue, field.getType()));
                 }
             }
+
             return instance;
         } catch (Exception e) {
-            ErrorHandler.Exception(new RuntimeException("Failed to instantiate polymorphic type: " + type, e));
-            return null;
+            ErrorHandler.Exception(new RuntimeException("Failed to instantiate polymorphic type: " + typeName, e));
+            return objMap;
         }
     }
 
-    public boolean keyExists(String key) {
-        if (!(root instanceof Map<?, ?> map)) return false;
-        return map.containsKey(key);
+    private Class<?> findClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            try {
+                String callerPackage = getClass().getPackage().getName();
+                return Class.forName(callerPackage + "." + className);
+            } catch (ClassNotFoundException e2) {
+                return searchAllLoadedClasses(className);
+            }
+        }
     }
 
-    public Set<String> getAllKeys() {
-        if (!(root instanceof Map<?, ?> map)) return Collections.emptySet();
-        return (Set<String>) map.keySet();
+    private Class<?> searchAllLoadedClasses(String className) {
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            if (classLoader != null) {
+                Package[] packages = Package.getPackages();
+                for (Package pkg : packages) {
+                    try {
+                        String fullName = pkg.getName() + "." + className;
+                        return Class.forName(fullName);
+                    } catch (ClassNotFoundException ignored) {}
+                }
+            }
+        } catch (Exception e) {
+            ErrorHandler.Exception(new RuntimeException("Error while searching for class: " + className, e));
+        }
+        return null;
     }
 
-    public Map<String, Object> readAll() {
-        if (root instanceof Map<?, ?> map) return (Map<String, Object>) map;
-        return new HashMap<>();
+    private List<Object> deserializePolymorphicInList(List<Object> list) {
+        List<Object> result = new ArrayList<>();
+        for (Object item : list) {
+            if (item instanceof Map<?, ?> mapItem) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> stringMapItem = (Map<String, Object>) mapItem;
+                result.add(deserializePolymorphicObject(stringMapItem));
+            } else if (item instanceof List<?>) {
+                result.add(deserializePolymorphicInList((List<Object>) item));
+            } else {
+                result.add(item);
+            }
+        }
+        return result;
     }
 
     private Map<String, Object> parseObject() {
@@ -222,6 +261,15 @@ public class JSONReader {
             expect(':');
             skipWhitespaceAndComments();
             Object value = parseValue();
+
+            if (value instanceof Map<?, ?> valueMap) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> stringMap = (Map<String, Object>) valueMap;
+                value = deserializePolymorphicObject(stringMap);
+            } else if (value instanceof List<?>) {
+                value = deserializePolymorphicInList((List<Object>) value);
+            }
+
             map.put(key, value);
 
             skipWhitespaceAndComments();
@@ -252,6 +300,15 @@ public class JSONReader {
             }
 
             Object value = parseValue();
+
+            if (value instanceof Map<?, ?> valueMap) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> stringMap = (Map<String, Object>) valueMap;
+                value = deserializePolymorphicObject(stringMap);
+            } else if (value instanceof List<?>) {
+                value = deserializePolymorphicInList((List<Object>) value);
+            }
+
             list.add(value);
 
             skipWhitespaceAndComments();
@@ -301,16 +358,33 @@ public class JSONReader {
                 if (index >= json.length()) ErrorHandler.Exception(new RuntimeException("Unexpected end of string"));
                 char next = json.charAt(index++);
                 switch (next) {
-                    case '"': sb.append('"'); break;
-                    case '\\': sb.append('\\'); break;
-                    case '/': sb.append('/'); break;
-                    case 'b': sb.append('\b'); break;
-                    case 'f': sb.append('\f'); break;
-                    case 'n': sb.append('\n'); break;
-                    case 'r': sb.append('\r'); break;
-                    case 't': sb.append('\t'); break;
+                    case '"':
+                        sb.append('"');
+                        break;
+                    case '\\':
+                        sb.append('\\');
+                        break;
+                    case '/':
+                        sb.append('/');
+                        break;
+                    case 'b':
+                        sb.append('\b');
+                        break;
+                    case 'f':
+                        sb.append('\f');
+                        break;
+                    case 'n':
+                        sb.append('\n');
+                        break;
+                    case 'r':
+                        sb.append('\r');
+                        break;
+                    case 't':
+                        sb.append('\t');
+                        break;
                     case 'u':
-                        if (index + 4 > json.length()) ErrorHandler.Exception(new RuntimeException("Incomplete unicode escape"));
+                        if (index + 4 > json.length())
+                            ErrorHandler.Exception(new RuntimeException("Incomplete unicode escape"));
                         String hex = json.substring(index, index + 4);
                         index += 4;
                         int codePoint = Integer.parseInt(hex, 16);
@@ -327,7 +401,9 @@ public class JSONReader {
                         }
                         sb.append((char) codePoint);
                         break;
-                    default: sb.append(next); break;
+                    default:
+                        sb.append(next);
+                        break;
                 }
             } else if (c == '"') {
                 break;

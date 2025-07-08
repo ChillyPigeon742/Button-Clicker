@@ -1,21 +1,28 @@
 package net.alek.buttonclicker.components;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ATimer {
-    private Timer timer;
-    private TimerTask task;
+    private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> future;
     private Runnable runnable;
+
     private long intervalTime;
-    private boolean isPaused;
     private boolean isLooping;
+
+    private long startTime;
     private long pauseTime;
     private long remainingTime;
 
+    private final AtomicBoolean isPaused = new AtomicBoolean(false);
+
     public ATimer() {
-        this.timer = new Timer();
-        this.isPaused = false;
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        });
         this.isLooping = false;
     }
 
@@ -23,62 +30,67 @@ public class ATimer {
         this.runnable = runnable;
     }
 
-    public void setDelay(long seconds) {
+    public void setInterval(long seconds) {
         this.intervalTime = seconds * 1000;
         this.remainingTime = this.intervalTime;
     }
 
     public Runnable getTask() {
-        return this.runnable;
+        return runnable;
     }
 
-    public long getIntervalTime() {
-        return this.intervalTime / 1000;
+    public long getInterval() {
+        return intervalTime / 1000;
     }
 
     public boolean isPaused() {
-        return this.isPaused;
+        return isPaused.get();
     }
 
     public boolean isLooping() {
-        return this.isLooping;
+        return isLooping;
     }
 
     public void start() {
         if (runnable == null) {
             throw new IllegalStateException("A Task For The Timer Was Not Set Yet!");
         }
+
         stop();
+        startTime = System.currentTimeMillis();
+        isPaused.set(false);
         scheduleTask(intervalTime);
     }
 
     public void stop() {
-        if (task != null) {
-            task.cancel();
+        if (future != null && !future.isCancelled()) {
+            future.cancel(false);
         }
-        timer.purge();
-        isPaused = false;
+        scheduler.shutdownNow();
+        scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        });
         remainingTime = intervalTime;
+        isPaused.set(false);
     }
 
     public void pause() {
-        if (!isPaused && task != null) {
-            task.cancel();
+        if (!isPaused.get() && future != null && !future.isCancelled()) {
             pauseTime = System.currentTimeMillis();
-            if (intervalTime != 0) {
-                remainingTime = intervalTime - (pauseTime % intervalTime);
-            } else {
-                remainingTime = 0;
-            }
-            timer.purge();
-            isPaused = true;
+            remainingTime = intervalTime - (pauseTime - startTime);
+
+            future.cancel(false);
+            isPaused.set(true);
         }
     }
 
     public void resume() {
-        if (isPaused) {
+        if (isPaused.get()) {
+            startTime = System.currentTimeMillis();
             scheduleTask(remainingTime);
-            isPaused = false;
+            isPaused.set(false);
         }
     }
 
@@ -87,20 +99,22 @@ public class ATimer {
         start();
     }
 
-    public void setLooping(boolean isLooping) {
-        this.isLooping = isLooping;
+    public void setLooping(boolean looping) {
+        this.isLooping = looping;
     }
 
-    private void scheduleTask(long delay) {
-        task = new TimerTask() {
-            @Override
-            public void run() {
+    private void scheduleTask(long delayMillis) {
+        future = scheduler.schedule(() -> {
+            try {
                 runnable.run();
-                if (isLooping) {
+            } finally {
+                if (isLooping && !isPaused.get()) {
+                    startTime = System.currentTimeMillis();
                     scheduleTask(intervalTime);
+                } else {
+                    scheduler.shutdown();
                 }
             }
-        };
-        timer.schedule(task, delay);
+        }, delayMillis, TimeUnit.MILLISECONDS);
     }
 }

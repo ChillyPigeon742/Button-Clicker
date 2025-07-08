@@ -1,20 +1,26 @@
-package net.alek.buttonclicker.utilities.write;
+package net.alek.buttonclicker.utilities.read.saves;
 
+import net.alek.buttonclicker.components.ATimer;
 import net.alek.buttonclicker.engine.ErrorHandler;
 import net.alek.buttonclicker.engine.MenuManager;
-import net.alek.buttonclicker.components.ATimer;
 import net.alek.buttonclicker.services.LoggingService;
 import net.alek.buttonclicker.services.RenderService;
 import net.alek.buttonclicker.utilities.read.ReadUtility;
 
 import javax.swing.*;
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
-public class WriteUtility {
+public class SaveWriter {
     public static Byte saveBeingCreated = null;
-    
+
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static ScheduledFuture<?> scheduledFuture;
 
@@ -30,7 +36,7 @@ public class WriteUtility {
                     RenderService.autoSavingText.setVisible(true);
 
                     ATimer timer = new ATimer();
-                    timer.setDelay(2);
+                    timer.setInterval(2);
                     timer.setTask(() -> {
                         if(MenuManager.isMenuOpen("Game")){
                             RenderService.titleImage.stopSpinning();
