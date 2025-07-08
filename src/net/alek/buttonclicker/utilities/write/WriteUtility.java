@@ -9,7 +9,6 @@ import net.alek.buttonclicker.utilities.read.ReadUtility;
 
 import javax.swing.*;
 import java.io.*;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -24,9 +23,6 @@ public class WriteUtility {
             scheduledFuture = scheduler.scheduleAtFixedRate(() -> SwingUtilities.invokeLater(() -> {
                 if(MenuManager.isMenuOpen("Game")){
                     LoggingService.Logger.info("Saving...");
-
-                    BigInteger foo = BigInteger.ZERO;
-                    foo = foo.add(BigInteger.ONE);
 
                     RenderService.titleImage.startSpinning();
                     RenderService.titleImage.setBounds(535, 110, 110, 110);

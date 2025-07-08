@@ -20,7 +20,8 @@ import java.util.Objects;
 public class ReadUtility {
 
     public static Path APPDATA_PATH = Paths.get(System.getenv("APPDATA"), "_ButtonClicker");
-    public static Path APPDATA_PATH = Paths.get(System.getenv("APPDATA"), "_ButtonClicker");
+    public static Path DATA_PATH = APPDATA_PATH.resolve("Data/");
+    public static Path LOGS_PATH = APPDATA_PATH.resolve("Logs/");
 
     public static Map<String, Object> save1 = new HashMap<>();
     public static Map<String, Object> save2 = new HashMap<>();
@@ -180,6 +181,12 @@ public class ReadUtility {
     }
 
     private static void loadSFXAudioData(){
+        String[] sfxNames = { "select", "click", "purchase", "declined" };
+        for (String sfx : sfxNames) {
+            AudioService.SFX.put(sfx, loadMedia("/assets/buttonclicker/audio/sfx/" + sfx + ".mp3"));
+        }
+
+
         AudioService.SFX.select = new Media(Objects.requireNonNull(
                 ReadUtility.class.getResource("/assets/buttonclicker/audio/sfx/select.mp3")).toExternalForm());
         AudioService.SFX.click = new Media(Objects.requireNonNull(
