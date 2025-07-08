@@ -1,6 +1,5 @@
 package net.alek.buttonclicker.utilities.write;
 
-import net.alek.buttonclicker.data.WriterContext;
 import net.alek.buttonclicker.engine.ErrorHandler;
 import net.alek.buttonclicker.services.LoggingService;
 import net.alek.buttonclicker.utilities.read.JSONReader;
@@ -13,51 +12,42 @@ import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 public class JSONWriter {
 
-    public interface CustomSerializer {
-        String serialize(Object obj, WriterContext ctx, boolean pretty, int indentLevel);
-    }
+    private final Map<String, Object> data;
+    private final File outputFile;
+    private boolean prettyPrint = true;
+    private String indentUnit = "\t";
 
-    private static final Map<Class<?>, BiFunction<Object, WriterContext, String>> typeAdapters = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, BiFunction<Object, JSONWriter, String>> typeAdapters = new ConcurrentHashMap<>();
     private static final Map<Class<?>, CustomSerializer> customSerializers = new ConcurrentHashMap<>();
-    private static String indentUnit = "\t";
 
     static {
-        registerTypeAdapter(Enum.class, (obj, ctx) -> "\"" + ((Enum<?>) obj).name() + "\"");
-
-        registerTypeAdapter(LocalDate.class, (obj, ctx) -> "\"" + ((LocalDate) obj).format(DateTimeFormatter.ISO_LOCAL_DATE) + "\"");
-        registerTypeAdapter(LocalDateTime.class, (obj, ctx) -> "\"" + ((LocalDateTime) obj).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "\"");
-        registerTypeAdapter(ZonedDateTime.class, (obj, ctx) -> "\"" + ((ZonedDateTime) obj).format(DateTimeFormatter.ISO_ZONED_DATE_TIME) + "\"");
-
-        registerTypeAdapter(Color.class, (obj, ctx) -> {
+        registerTypeAdapter(Enum.class, (obj, writer) -> "\"" + ((Enum<?>) obj).name() + "\"");
+        registerTypeAdapter(LocalDate.class, (obj, writer) -> "\"" + ((LocalDate) obj).format(DateTimeFormatter.ISO_LOCAL_DATE) + "\"");
+        registerTypeAdapter(LocalDateTime.class, (obj, writer) -> "\"" + ((LocalDateTime) obj).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "\"");
+        registerTypeAdapter(ZonedDateTime.class, (obj, writer) -> "\"" + ((ZonedDateTime) obj).format(DateTimeFormatter.ISO_ZONED_DATE_TIME) + "\"");
+        registerTypeAdapter(Color.class, (obj, writer) -> {
             Color c = (Color) obj;
             return "\"" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + "\"";
         });
-
-        registerTypeAdapter(BigInteger.class, (obj, ctx) -> "\"" + obj.toString() + "\"");
-        registerTypeAdapter(BigDecimal.class, (obj, ctx) -> "\"" + obj.toString() + "\"");
+        registerTypeAdapter(BigInteger.class, (obj, writer) -> "\"" + obj.toString() + "\"");
+        registerTypeAdapter(BigDecimal.class, (obj, writer) -> "\"" + obj.toString() + "\"");
     }
 
-    public static void registerCustomSerializer(Class<?> clazz, CustomSerializer serializer) {
-        customSerializers.put(clazz, serializer);
+    public interface CustomSerializer {
+        String serialize(Object obj, JSONWriter writer);
     }
 
-    public static void registerTypeAdapter(Class<?> type, BiFunction<Object, WriterContext, String> adapter) {
-        typeAdapters.put(type, adapter);
-    }
+    private JSONWriter(File file) {
+        this.outputFile = file;
+        this.data = new HashMap<>();
 
-    public static void setIndentUnit(String unit) {
-        indentUnit = unit;
-    }
-
-    public static synchronized void writeJson(String filePath, String key, Object value) {
-        Map<String, Object> data = new HashMap<>();
-        File file = new File(filePath);
-
+        // Load existing data if file exists
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
@@ -69,35 +59,111 @@ public class JSONWriter {
                 }
 
                 JSONReader readerInstance = new JSONReader(json.toString());
-                data = readerInstance.readAll();
+                Map<String, Object> existingData = readerInstance.getMap("");
+                this.data.putAll(existingData);
 
             } catch (IOException e) {
-                LoggingService.Logger.error("Could not write to the JSON file! " + e.getMessage());
+                LoggingService.Logger.error("Could not read JSON file! " + e.getMessage());
                 ErrorHandler.Exception(e);
             }
         }
+    }
 
-        data.put(key, value);
+    public static JSONWriter toFile(String filePath) {
+        return new JSONWriter(new File(filePath));
+    }
 
+    public static JSONWriter toFile(File file) {
+        return new JSONWriter(file);
+    }
+
+    public JSONWriter disablePrettyPrint() {
+        this.prettyPrint = false;
+        return this;
+    }
+
+    public JSONWriter indentWith(String indentUnit) {
+        this.indentUnit = indentUnit;
+        return this;
+    }
+
+    public static void registerCustomSerializer(Class<?> clazz, CustomSerializer serializer) {
+        customSerializers.put(clazz, serializer);
+    }
+
+    public static void registerTypeAdapter(Class<?> type, BiFunction<Object, JSONWriter, String> adapter) {
+        typeAdapters.put(type, adapter);
+    }
+
+    private void saveToFile() {
         try (BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-
-            writer.write(serialize(data, true, 0));
+                new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8))) {
+            writer.write(serialize(data, 0));
         } catch (IOException e) {
-            LoggingService.Logger.error("Could not serialize the data to the JSON file! " + e.getMessage());
+            LoggingService.Logger.error("Could not write to JSON file! " + e.getMessage());
             ErrorHandler.Exception(e);
         }
     }
 
-    public static String toJsonString(Object obj, boolean pretty) {
-        return serialize(obj, pretty, 0);
+    public JSONWriter writeInt(String key, int value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
     }
 
-    private static String serialize(Object obj, boolean pretty, int indentLevel) {
-        return serialize(obj, pretty, indentLevel, new HashSet<>());
+    public JSONWriter writeLong(String key, long value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
     }
 
-    private static String serialize(Object obj, boolean pretty, int indentLevel, Set<Object> seen) {
+    public JSONWriter writeFloat(String key, float value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    public JSONWriter writeDouble(String key, double value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    public JSONWriter writeBoolean(String key, boolean value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    public JSONWriter writeString(String key, String value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    public JSONWriter writeList(String key, List<?> value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    public JSONWriter writeMap(String key, Map<String, ?> value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    public JSONWriter writeObject(String key, Object value) {
+        data.put(key, value);
+        saveToFile();
+        return this;
+    }
+
+    private String serialize(Object obj, int indentLevel) {
+        return serialize(obj, indentLevel, new HashSet<>());
+    }
+
+    private String serialize(Object obj, int indentLevel, Set<Object> seen) {
         if (obj == null) {
             return "null";
         }
@@ -110,19 +176,20 @@ public class JSONWriter {
         if (addToSeen) seen.add(obj);
 
         StringBuilder sb = new StringBuilder();
-        WriterContext ctx = new WriterContext();
 
+        // Check custom serializers first
         for (var entry : customSerializers.entrySet()) {
             if (entry.getKey().isInstance(obj)) {
-                String result = entry.getValue().serialize(obj, ctx, pretty, indentLevel);
+                String result = entry.getValue().serialize(obj, this);
                 if (addToSeen) seen.remove(obj);
                 return result;
             }
         }
 
+        // Check type adapters
         for (var entry : typeAdapters.entrySet()) {
             if (entry.getKey().isInstance(obj)) {
-                String result = entry.getValue().apply(obj, ctx);
+                String result = entry.getValue().apply(obj, this);
                 if (addToSeen) seen.remove(obj);
                 return result;
             }
@@ -130,7 +197,7 @@ public class JSONWriter {
 
         if (obj instanceof Map<?, ?> map) {
             sb.append("{");
-            if (pretty) sb.append('\n');
+            if (prettyPrint) sb.append("\n");
             int count = 0;
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 Object key = entry.getKey();
@@ -142,44 +209,15 @@ public class JSONWriter {
 
                 if (count++ > 0) {
                     sb.append(",");
-                    if (pretty) sb.append('\n');
+                    if (prettyPrint) sb.append("\n");
                 }
 
-                if (pretty) sb.append(indent(indentLevel + 1));
-                sb.append("\"").append(escapeString(key.toString())).append("\": ");
-
-                if (value != null && !isPrimitiveOrWrapper(value)) {
-                    sb.append("{");
-                    if (pretty) sb.append('\n');
-
-                    if (pretty) sb.append(indent(indentLevel + 2));
-                    sb.append("\"type\": \"").append(escapeString(value.getClass().getSimpleName())).append("\"");
-
-                    for (var field : value.getClass().getDeclaredFields()) {
-                        field.setAccessible(true);
-                        try {
-                            Object fieldVal = field.get(value);
-                            if (fieldVal == null) continue;
-                            sb.append(",");
-                            if (pretty) sb.append('\n');
-                            if (pretty) sb.append(indent(indentLevel + 2));
-                            sb.append("\"").append(escapeString(field.getName())).append("\": ");
-                            sb.append(serialize(fieldVal, pretty, indentLevel + 2, seen));
-                        } catch (IllegalAccessException e) {
-                            ErrorHandler.Exception(e);
-                        }
-                    }
-
-                    if (pretty) {
-                        sb.append('\n').append(indent(indentLevel + 1));
-                    }
-                    sb.append("}");
-                } else {
-                    sb.append(serialize(value, pretty, indentLevel + 1, seen));
-                }
+                if (prettyPrint) sb.append(indent(indentLevel + 1));
+                sb.append("\"").append(escapeString(key.toString())).append("\":");
+                if (prettyPrint) sb.append(" ");
+                sb.append(serialize(value, indentLevel + 1, seen));
             }
-
-            if (pretty) sb.append('\n').append(indent(indentLevel));
+            if (prettyPrint) sb.append("\n").append(indent(indentLevel));
             sb.append("}");
             if (addToSeen) seen.remove(obj);
             return sb.toString();
@@ -187,17 +225,17 @@ public class JSONWriter {
 
         if (obj instanceof Collection<?> coll) {
             sb.append("[");
-            if (pretty) sb.append('\n');
+            if (prettyPrint) sb.append("\n");
             int count = 0;
             for (Object item : coll) {
                 if (count++ > 0) {
                     sb.append(",");
-                    if (pretty) sb.append('\n');
+                    if (prettyPrint) sb.append("\n");
                 }
-                if (pretty) sb.append(indent(indentLevel + 1));
-                sb.append(serialize(item, pretty, indentLevel + 1, seen));
+                if (prettyPrint) sb.append(indent(indentLevel + 1));
+                sb.append(serialize(item, indentLevel + 1, seen));
             }
-            if (pretty) sb.append('\n').append(indent(indentLevel));
+            if (prettyPrint) sb.append("\n").append(indent(indentLevel));
             sb.append("]");
             if (addToSeen) seen.remove(obj);
             return sb.toString();
@@ -213,9 +251,10 @@ public class JSONWriter {
             return obj.toString();
         }
 
+        // Handle arbitrary objects
         sb.append("{");
-        if (pretty) sb.append('\n');
-        if (pretty) sb.append(indent(indentLevel + 1));
+        if (prettyPrint) sb.append("\n");
+        if (prettyPrint) sb.append(indent(indentLevel + 1));
         sb.append("\"type\": \"").append(escapeString(obj.getClass().getSimpleName())).append("\"");
 
         for (var field : obj.getClass().getDeclaredFields()) {
@@ -224,28 +263,23 @@ public class JSONWriter {
                 Object fieldVal = field.get(obj);
                 if (fieldVal == null) continue;
                 sb.append(",");
-                if (pretty) sb.append('\n');
-                if (pretty) sb.append(indent(indentLevel + 1));
-                sb.append("\"").append(escapeString(field.getName())).append("\": ");
-                sb.append(serialize(fieldVal, pretty, indentLevel + 1, seen));
+                if (prettyPrint) sb.append("\n");
+                if (prettyPrint) sb.append(indent(indentLevel + 1));
+                sb.append("\"").append(escapeString(field.getName())).append("\":");
+                if (prettyPrint) sb.append(" ");
+                sb.append(serialize(fieldVal, indentLevel + 1, seen));
             } catch (IllegalAccessException e) {
                 ErrorHandler.Exception(e);
             }
         }
 
-        if (pretty) sb.append('\n').append(indent(indentLevel));
+        if (prettyPrint) sb.append("\n").append(indent(indentLevel));
         sb.append("}");
         if (addToSeen) seen.remove(obj);
         return sb.toString();
     }
 
-    private static boolean isPrimitiveOrWrapper(Object obj) {
-        return obj instanceof String ||
-                obj instanceof Number ||
-                obj instanceof Boolean;
-    }
-
-    private static String indent(int level) {
+    private String indent(int level) {
         return indentUnit.repeat(level);
     }
 

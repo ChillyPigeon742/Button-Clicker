@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +25,8 @@ public class JSONReader {
     private final Object root;
     private final Map<Class<?>, Function<Object, ?>> deserializers = new ConcurrentHashMap<>();
     private int index;
+    private final Set<Object> activeObjects = Collections.newSetFromMap(new IdentityHashMap<>());
+    private Class<?> currentTargetClass;
 
     public JSONReader(String json) {
         this.json = json;
@@ -34,12 +37,13 @@ public class JSONReader {
     }
 
     private void registerDefaultDeserializers() {
-        deserializers.put(Color.class, JSONReader::deserializeColor);
-        deserializers.put(LocalDate.class, JSONReader::deserializeLocalDate);
-        deserializers.put(LocalDateTime.class, JSONReader::deserializeLocalDateTime);
-        deserializers.put(ZonedDateTime.class, JSONReader::deserializeZonedDateTime);
-        deserializers.put(BigInteger.class, JSONReader::deserializeBigInteger);
-        deserializers.put(BigDecimal.class, JSONReader::deserializeBigDecimal);
+        deserializers.put(Enum.class, this::deserializeEnum);
+        deserializers.put(Color.class, this::deserializeColor);
+        deserializers.put(LocalDate.class, this::deserializeLocalDate);
+        deserializers.put(LocalDateTime.class, this::deserializeLocalDateTime);
+        deserializers.put(ZonedDateTime.class, this::deserializeZonedDateTime);
+        deserializers.put(BigInteger.class, this::deserializeBigInteger);
+        deserializers.put(BigDecimal.class, this::deserializeBigDecimal);
     }
 
     public static JSONReader fromFile(String filePath) {
@@ -65,8 +69,8 @@ public class JSONReader {
 
     private Object parseRoot() {
         skipWhitespaceAndComments();
-        if (peek() == '{') return parseObject();
-        if (peek() == '[') return parseArray();
+        if (peek() == '{') return parseObject(new HashSet<>());
+        if (peek() == '[') return parseArray(new HashSet<>());
 
         ErrorHandler.Exception(new RuntimeException("Invalid JSON root element"));
         return null;
@@ -77,32 +81,30 @@ public class JSONReader {
         if (obj == null) return null;
 
         if (targetClass != null) {
-            for (var entry : deserializers.entrySet()) {
-                if (entry.getKey().isAssignableFrom(targetClass)) {
-                    try {
-                        return (T) entry.getValue().apply(obj);
-                    } catch (Exception e) {
-                        ErrorHandler.Exception(new RuntimeException("Failed to deserialize to " + targetClass.getName(), e));
-                        return null;
+            Class<?> previousTargetClass = this.currentTargetClass;
+            this.currentTargetClass = targetClass;
+
+            try {
+                for (var entry : deserializers.entrySet()) {
+                    if (entry.getKey().isAssignableFrom(targetClass)) {
+                        try {
+                            return (T) entry.getValue().apply(obj);
+                        } catch (Exception e) {
+                            ErrorHandler.Exception(new RuntimeException("Failed to deserialize to " + targetClass.getName(), e));
+                            return null;
+                        }
                     }
                 }
-            }
-            if (targetClass.isEnum() && obj instanceof String) {
-                try {
-                    @SuppressWarnings("unchecked")
-                    T enumValue = (T) Enum.valueOf((Class<Enum>) targetClass.asSubclass(Enum.class), (String) obj);
-                    return enumValue;
-                } catch (IllegalArgumentException e) {
-                    ErrorHandler.Exception(new RuntimeException("Invalid enum value for " + targetClass.getName(), e));
-                    return null;
-                }
+            } finally {
+                this.currentTargetClass = previousTargetClass;
             }
         }
 
         try {
             return (T) obj;
         } catch (ClassCastException e) {
-            ErrorHandler.Exception(new RuntimeException("Failed to cast object to " + (targetClass == null ? "unknown" : targetClass.getName()), e));
+            ErrorHandler.Exception(new RuntimeException("Failed to cast object to " +
+                    (targetClass == null ? "unknown" : targetClass.getName()), e));
             return null;
         }
     }
@@ -153,19 +155,34 @@ public class JSONReader {
         return Double.parseDouble(String.valueOf(val));
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Object> getList(String key) {
+    public <T> List<T> getList(String key, Class<T> elementType) {
         Object val = get(key, Object.class);
-        return val instanceof List<?> ? (List<Object>) val : new ArrayList<>();
+        if (!(val instanceof List<?>)) return new ArrayList<>();
+
+        List<T> result = new ArrayList<>();
+        for (Object item : (List<?>) val) {
+            result.add(castWithDeserialization(item, elementType));
+        }
+        return result;
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getMap(String key) {
+    public <T> Map<String, T> getMap(String key, Class<T> valueType) {
         Object val = get(key, Object.class);
-        return val instanceof Map<?, ?> ? (Map<String, Object>) val : new HashMap<>();
+        if (!(val instanceof Map<?, ?>)) return new HashMap<>();
+
+        Map<String, T> result = new HashMap<>();
+        for (Map.Entry<?, ?> entry : ((Map<?, ?>) val).entrySet()) {
+            result.put(entry.getKey().toString(), castWithDeserialization(entry.getValue(), valueType));
+        }
+        return result;
     }
 
-    private Object deserializePolymorphicObject(Map<String, Object> objMap) {
+    private Object deserializePolymorphicObject(Map<String, Object> objMap, Set<Object> seen) {
+        if (seen.contains(objMap)) {
+            return "[cyclic_reference]";
+        }
+        seen.add(objMap);
+
         Object typeRaw = objMap.get("type");
         if (!(typeRaw instanceof String typeName)) return objMap;
 
@@ -182,9 +199,9 @@ public class JSONReader {
                     if (rawValue instanceof Map<?, ?> nestedMap) {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> nestedStringMap = (Map<String, Object>) nestedMap;
-                        rawValue = deserializePolymorphicObject(nestedStringMap);
+                        rawValue = deserializePolymorphicObject(nestedStringMap, seen);
                     } else if (rawValue instanceof List<?>) {
-                        rawValue = deserializePolymorphicInList((List<Object>) rawValue);
+                        rawValue = deserializePolymorphicInList((List<Object>) rawValue, seen);
                     }
                     field.set(instance, castWithDeserialization(rawValue, field.getType()));
                 }
@@ -194,6 +211,8 @@ public class JSONReader {
         } catch (Exception e) {
             ErrorHandler.Exception(new RuntimeException("Failed to instantiate polymorphic type: " + typeName, e));
             return objMap;
+        } finally {
+            seen.remove(objMap);
         }
     }
 
@@ -228,15 +247,15 @@ public class JSONReader {
         return null;
     }
 
-    private List<Object> deserializePolymorphicInList(List<Object> list) {
+    private List<Object> deserializePolymorphicInList(List<Object> list, Set<Object> seen) {
         List<Object> result = new ArrayList<>();
         for (Object item : list) {
             if (item instanceof Map<?, ?> mapItem) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> stringMapItem = (Map<String, Object>) mapItem;
-                result.add(deserializePolymorphicObject(stringMapItem));
+                result.add(deserializePolymorphicObject(stringMapItem, seen));
             } else if (item instanceof List<?>) {
-                result.add(deserializePolymorphicInList((List<Object>) item));
+                result.add(deserializePolymorphicInList((List<Object>) item, seen));
             } else {
                 result.add(item);
             }
@@ -244,95 +263,117 @@ public class JSONReader {
         return result;
     }
 
-    private Map<String, Object> parseObject() {
+    private Map<String, Object> parseObject(Set<Object> seen) {
         Map<String, Object> map = new HashMap<>();
         expect('{');
         skipWhitespaceAndComments();
 
-        while (true) {
-            skipWhitespaceAndComments();
-            if (peek() == '}') {
-                index++;
-                break;
+        if (activeObjects.contains(map)) {
+            throw new RuntimeException("Cyclic reference detected");
+        }
+        activeObjects.add(map);
+
+        try {
+            while (true) {
+                skipWhitespaceAndComments();
+                if (peek() == '}') {
+                    index++;
+                    break;
+                }
+
+                String key = parseString();
+                if (key == null) {
+                    throw new RuntimeException("Null keys not allowed in JSON");
+                }
+
+                skipWhitespaceAndComments();
+                expect(':');
+                skipWhitespaceAndComments();
+                Object value = parseValue(seen);
+
+                if (value instanceof Map<?, ?> valueMap) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> stringMap = (Map<String, Object>) valueMap;
+                    value = deserializePolymorphicObject(stringMap, seen);
+                } else if (value instanceof List<?>) {
+                    value = deserializePolymorphicInList((List<Object>) value, seen);
+                }
+
+                map.put(key, value);
+
+                skipWhitespaceAndComments();
+                char c = peek();
+                if (c == ',') {
+                    index++;
+                } else if (c == '}') {
+                    index++;
+                    break;
+                } else {
+                    ErrorHandler.Exception(new RuntimeException("Expected ',' or '}' at position " + index));
+                }
             }
-
-            String key = parseString();
-            skipWhitespaceAndComments();
-            expect(':');
-            skipWhitespaceAndComments();
-            Object value = parseValue();
-
-            if (value instanceof Map<?, ?> valueMap) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> stringMap = (Map<String, Object>) valueMap;
-                value = deserializePolymorphicObject(stringMap);
-            } else if (value instanceof List<?>) {
-                value = deserializePolymorphicInList((List<Object>) value);
-            }
-
-            map.put(key, value);
-
-            skipWhitespaceAndComments();
-            char c = peek();
-            if (c == ',') {
-                index++;
-            } else if (c == '}') {
-                index++;
-                break;
-            } else {
-                ErrorHandler.Exception(new RuntimeException("Expected ',' or '}' at position " + index));
-            }
+        } finally {
+            activeObjects.remove(map);
         }
 
         return map;
     }
 
-    private List<Object> parseArray() {
+    private List<Object> parseArray(Set<Object> seen) {
         List<Object> list = new ArrayList<>();
         expect('[');
         skipWhitespaceAndComments();
 
-        while (true) {
-            skipWhitespaceAndComments();
-            if (peek() == ']') {
-                index++;
-                break;
+        if (activeObjects.contains(list)) {
+            throw new RuntimeException("Cyclic reference detected");
+        }
+        activeObjects.add(list);
+
+        try {
+            while (true) {
+                skipWhitespaceAndComments();
+                if (peek() == ']') {
+                    index++;
+                    break;
+                }
+
+                Object value = parseValue(seen);
+
+                if (value instanceof Map<?, ?> valueMap) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> stringMap = (Map<String, Object>) valueMap;
+                    value = deserializePolymorphicObject(stringMap, seen);
+                } else if (value instanceof List<?>) {
+                    value = deserializePolymorphicInList((List<Object>) value, seen);
+                }
+
+                list.add(value);
+
+                skipWhitespaceAndComments();
+                char c = peek();
+                if (c == ',') {
+                    index++;
+                } else if (c == ']') {
+                    index++;
+                    break;
+                } else {
+                    ErrorHandler.Exception(new RuntimeException("Expected ',' or ']' at position " + index));
+                }
             }
-
-            Object value = parseValue();
-
-            if (value instanceof Map<?, ?> valueMap) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> stringMap = (Map<String, Object>) valueMap;
-                value = deserializePolymorphicObject(stringMap);
-            } else if (value instanceof List<?>) {
-                value = deserializePolymorphicInList((List<Object>) value);
-            }
-
-            list.add(value);
-
-            skipWhitespaceAndComments();
-            char c = peek();
-            if (c == ',') {
-                index++;
-            } else if (c == ']') {
-                index++;
-                break;
-            } else {
-                ErrorHandler.Exception(new RuntimeException("Expected ',' or ']' at position " + index));
-            }
+        } finally {
+            activeObjects.remove(list);
         }
 
         return list;
     }
 
-    private Object parseValue() {
+    private Object parseValue(Set<Object> seen) {
         skipWhitespaceAndComments();
         char c = peek();
 
         if (c == '"') return parseString();
-        if (c == '{') return parseObject();
-        if (c == '[') return parseArray();
+        if (c == '{') return parseObject(seen);
+        if (c == '[') return parseArray(seen);
         if (startsWith("true")) {
             index += 4;
             return true;
@@ -358,30 +399,14 @@ public class JSONReader {
                 if (index >= json.length()) ErrorHandler.Exception(new RuntimeException("Unexpected end of string"));
                 char next = json.charAt(index++);
                 switch (next) {
-                    case '"':
-                        sb.append('"');
-                        break;
-                    case '\\':
-                        sb.append('\\');
-                        break;
-                    case '/':
-                        sb.append('/');
-                        break;
-                    case 'b':
-                        sb.append('\b');
-                        break;
-                    case 'f':
-                        sb.append('\f');
-                        break;
-                    case 'n':
-                        sb.append('\n');
-                        break;
-                    case 'r':
-                        sb.append('\r');
-                        break;
-                    case 't':
-                        sb.append('\t');
-                        break;
+                    case '"': sb.append('"'); break;
+                    case '\\': sb.append('\\'); break;
+                    case '/': sb.append('/'); break;
+                    case 'b': sb.append('\b'); break;
+                    case 'f': sb.append('\f'); break;
+                    case 'n': sb.append('\n'); break;
+                    case 'r': sb.append('\r'); break;
+                    case 't': sb.append('\t'); break;
                     case 'u':
                         if (index + 4 > json.length())
                             ErrorHandler.Exception(new RuntimeException("Incomplete unicode escape"));
@@ -401,9 +426,7 @@ public class JSONReader {
                         }
                         sb.append((char) codePoint);
                         break;
-                    default:
-                        sb.append(next);
-                        break;
+                    default: sb.append(next); break;
                 }
             } else if (c == '"') {
                 break;
@@ -502,7 +525,26 @@ public class JSONReader {
         deserializers.put(type, deserializer);
     }
 
-    private static Color deserializeColor(Object obj) {
+    private Object deserializeEnum(Object obj) {
+        if (!(obj instanceof String)) {
+            return null;
+        }
+
+        if (currentTargetClass != null && currentTargetClass.isEnum()) {
+            try {
+                Method valueOf = currentTargetClass.getMethod("valueOf", String.class);
+                return valueOf.invoke(null, obj);
+            } catch (Exception e) {
+                ErrorHandler.Exception(new RuntimeException(
+                        "Failed to deserialize enum value '" + obj + "' for " + currentTargetClass.getName(), e));
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private Color deserializeColor(Object obj) {
         if (!(obj instanceof String)) return null;
         String[] parts = ((String) obj).split(",");
         if (parts.length != 3) return null;
@@ -516,7 +558,7 @@ public class JSONReader {
         }
     }
 
-    private static LocalDate deserializeLocalDate(Object obj) {
+    private LocalDate deserializeLocalDate(Object obj) {
         if (!(obj instanceof String)) return null;
         try {
             return LocalDate.parse((String) obj, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -525,7 +567,7 @@ public class JSONReader {
         }
     }
 
-    private static LocalDateTime deserializeLocalDateTime(Object obj) {
+    private LocalDateTime deserializeLocalDateTime(Object obj) {
         if (!(obj instanceof String)) return null;
         try {
             return LocalDateTime.parse((String) obj, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -534,7 +576,7 @@ public class JSONReader {
         }
     }
 
-    private static ZonedDateTime deserializeZonedDateTime(Object obj) {
+    private ZonedDateTime deserializeZonedDateTime(Object obj) {
         if (!(obj instanceof String)) return null;
         try {
             return ZonedDateTime.parse((String) obj, DateTimeFormatter.ISO_ZONED_DATE_TIME);
@@ -543,7 +585,7 @@ public class JSONReader {
         }
     }
 
-    private static BigInteger deserializeBigInteger(Object obj) {
+    private BigInteger deserializeBigInteger(Object obj) {
         if (!(obj instanceof String)) return null;
         try {
             return new BigInteger((String) obj);
@@ -552,7 +594,7 @@ public class JSONReader {
         }
     }
 
-    private static BigDecimal deserializeBigDecimal(Object obj) {
+    private BigDecimal deserializeBigDecimal(Object obj) {
         if (!(obj instanceof String)) return null;
         try {
             return new BigDecimal((String) obj);
