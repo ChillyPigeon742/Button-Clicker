@@ -5,11 +5,12 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javafx.embed.swing.JFXPanel;
 
+import net.alek.buttonclicker.data.AppData;
 import net.alek.buttonclicker.data.CommandDefinitions;
+import net.alek.buttonclicker.data.event.type.Event;
 import net.alek.buttonclicker.services.AutoClickerDetectorService;
 import net.alek.buttonclicker.services.LoggingService;
 import net.alek.buttonclicker.utilities.read.ReadUtility;
-import net.alek.buttonclicker.utilities.write.WriteUtility;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.services.RenderService;
 
@@ -17,9 +18,7 @@ import javax.swing.*;
 
 public class Main {
 
-    public static EventBus eventBus = new EventBus();
-    public static CommandDefinitions commandDefinitions = new CommandDefinitions();
-    public static final String VERSION = "0.7.0_INDEV";
+    public static AppData appData = new AppData(new CommandDefinitions(), "0.7.0_INDEV");
 
     public static void main(String[] args){
         ErrorHandler.setupCrashHandler();
@@ -35,13 +34,14 @@ public class Main {
         RenderService.forwardButton.putClientProperty("JButton.buttonType", "roundRect");
 
         LoggingService.Logger.info("Starting Engine...");
-        LoggingService.Logger.info("Button Clicker "+VERSION);
+        LoggingService.Logger.info("Button Clicker "+appData.version());
         LoggingService.Logger.info("Initializing Engine Pipelines...");
 
         new JFXPanel();
 
         ReadUtility.loadGame();
-        new AudioService();
+        AudioService.chooseMusic();
+
         SwingUtilities.invokeLater(() -> {
             new RenderService();
 
@@ -53,7 +53,7 @@ public class Main {
     public static void closeApp(int exitCode){
         LoggingService.Logger.warn("Closing app...");
         AutoClickerDetectorService.shutdown();
-        Main.eventBus.shutdown();
+        Event.shutdown();
         System.exit(exitCode);
     }
 }

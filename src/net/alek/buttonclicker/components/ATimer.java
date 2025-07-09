@@ -1,5 +1,7 @@
 package net.alek.buttonclicker.components;
 
+import net.alek.buttonclicker.engine.ErrorHandler;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,7 +55,7 @@ public class ATimer {
 
     public void start() {
         if (runnable == null) {
-            throw new IllegalStateException("A Task For The Timer Was Not Set Yet!");
+            ErrorHandler.Exception(new IllegalStateException("A Task For The Timer Was Not Set Yet!"));
         }
 
         stop();

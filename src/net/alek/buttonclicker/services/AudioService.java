@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Random;
 
 public class AudioService {
-    public AudioService(){
+    public static void chooseMusic(){
         Random random = new Random();
         int number = random.nextInt(1,3);
 

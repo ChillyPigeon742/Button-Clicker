@@ -1,5 +1,6 @@
 package net.alek.buttonclicker.engine;
 
+import net.alek.buttonclicker.data.event.type.DeliveryMode;
 import net.alek.buttonclicker.data.event.type.Event;
 
 import java.util.*;
@@ -12,35 +13,54 @@ public class EventBus {
 
     private record EventKey(Event event, Class<? extends Record> payloadType) {}
 
-    private final Map<EventKey, List<Consumer<?>>> subscribers = new ConcurrentHashMap<>();
+    private static class Subscriber<T extends Record> {
+        final DeliveryMode mode;
+        final Consumer<T> handler;
 
-    public <T extends Record> void subscribe(Event event, Consumer<T> handler) {
-        Class<T> payloadType = (Class<T>) event.getPayloadType();
+        Subscriber(DeliveryMode mode, Consumer<T> handler) {
+            this.mode = mode;
+            this.handler = handler;
+        }
+    }
+
+    private final Map<EventKey, List<Subscriber<?>>> subscribers = new ConcurrentHashMap<>();
+
+    public <T extends Record> void subscribe(Event event, DeliveryMode mode, Consumer<T> handler) {
+        Class<T> payloadType = event.getPayloadType();
+
+        if (payloadType == null && handler != null) {
+            throw new IllegalArgumentException("Event " + event + " does not support payloads.");
+        }
+
         EventKey key = new EventKey(event, payloadType);
         subscribers
                 .computeIfAbsent(key, k -> new CopyOnWriteArrayList<>())
-                .add(handler);
+                .add(new Subscriber<>(mode, handler));
     }
 
-    public void publish(Event event, Record payload) {
+    public <T extends Record> void publish(Event event, T payload) {
         if (event == null) throw new IllegalArgumentException("Event cannot be null");
 
-        Class<? extends Record> payloadType = event.getPayloadType();
+        Class<T> payloadType = event.getPayloadType();
         if (payload != null && !payloadType.isInstance(payload)) {
             throw new IllegalArgumentException("Payload type mismatch for event " + event);
         }
 
         EventKey key = new EventKey(event, payloadType);
-        List<Consumer<?>> handlers = subscribers.get(key);
+        List<Subscriber<?>> handlers = subscribers.get(key);
 
         if (handlers != null) {
-            for (Consumer<?> handler : handlers) {
-                executor.submit(() -> {
-                    @SuppressWarnings("unchecked")
-                    Consumer<Record> typedHandler = (Consumer<Record>) handler;
-                    typedHandler.accept(payload);
-                });
+            for (Subscriber<?> subscriber : handlers) {
+                deliver((Subscriber<T>) subscriber, payload);
             }
+        }
+    }
+
+    private <T extends Record> void deliver(Subscriber<T> subscriber, T payload) {
+        if (subscriber.mode == DeliveryMode.ASYNC) {
+            executor.submit(() -> subscriber.handler.accept(payload));
+        } else {
+            subscriber.handler.accept(payload);
         }
     }
 

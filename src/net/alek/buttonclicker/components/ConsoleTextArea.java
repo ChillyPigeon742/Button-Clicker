@@ -58,7 +58,7 @@ public class ConsoleTextArea extends JTextArea {
                 }
             }
         } catch (BadLocationException e) {
-            ErrorHandler.BadLocationException();
+            ErrorHandler.Exception(e);
         }
         return -1;
     }
@@ -132,7 +132,7 @@ public class ConsoleTextArea extends JTextArea {
                 g2d.drawString(attributedString.getIterator(), xOffset, y);
             }
         } catch (BadLocationException e) {
-            ErrorHandler.BadLocationException();
+            ErrorHandler.Exception(e);
         }
     }
 }

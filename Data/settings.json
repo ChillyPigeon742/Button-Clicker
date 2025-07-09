@@ -1,7 +1,10 @@
 {
-	"current_save":null,
-	"master_volume":100,
-	"music_volume":0,
-	"sfx_volume":100,
-	"music_delay":0
+	"version": 1,
+	"settings": {
+		"currentSave": null,
+		"masterVolume": 100,
+		"musicVolume": 100,
+		"sfxVolume": 100,
+		"musicDelay": 20
+	}
 }

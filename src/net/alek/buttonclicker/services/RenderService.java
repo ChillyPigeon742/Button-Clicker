@@ -15,6 +15,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -1197,5 +1198,25 @@ public class RenderService {
 
             MenuManager.resetWindow = false;
         }
+    }
+
+    public static BufferedImage generateMissingTexture(int size) {
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+
+        int tileSize = size / 4;
+        Color purple = new Color(128, 0, 128);
+        Color black = Color.BLACK;
+
+        for (int y = 0; y < size; y += tileSize) {
+            for (int x = 0; x < size; x += tileSize) {
+                boolean isPurple = ((x + y) / tileSize) % 2 == 0;
+                g.setColor(isPurple ? purple : black);
+                g.fillRect(x, y, tileSize, tileSize);
+            }
+        }
+
+        g.dispose();
+        return img;
     }
 }
