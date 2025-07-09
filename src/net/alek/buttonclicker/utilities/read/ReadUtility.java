@@ -5,6 +5,7 @@ import net.alek.buttonclicker.engine.ErrorHandler;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.services.LoggingService;
 import net.alek.buttonclicker.services.RenderService;
+import net.alek.buttonclicker.utilities.read.json.JSONReader;
 import net.alek.buttonclicker.utilities.write.WriteUtility;
 
 import javax.imageio.ImageIO;

@@ -1,4 +1,4 @@
-package net.alek.buttonclicker.utilities.read.saves;
+package net.alek.buttonclicker.utilities.write.saves;
 
 import net.alek.buttonclicker.components.ATimer;
 import net.alek.buttonclicker.engine.ErrorHandler;
