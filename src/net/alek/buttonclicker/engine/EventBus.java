@@ -27,11 +27,6 @@ public class EventBus {
 
     public <T extends Record> void subscribe(Event event, DeliveryMode mode, Consumer<T> handler) {
         Class<T> payloadType = event.getPayloadType();
-
-        if (payloadType == null && handler != null) {
-            throw new IllegalArgumentException("Event " + event + " does not support payloads.");
-        }
-
         EventKey key = new EventKey(event, payloadType);
         subscribers
                 .computeIfAbsent(key, k -> new CopyOnWriteArrayList<>())
