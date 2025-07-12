@@ -6,7 +6,7 @@
 
     <groupId>net.alek</groupId>
     <artifactId>ButtonClicker</artifactId>
-    <version>0.7.0_INDEV</version>
+    <version>0.8.0_INDEV</version>
     <name>Button Clicker</name>
 
     <dependencies>
@@ -50,7 +50,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>net.alek.buttonclicker.engine/net.alek.buttonclicker.engine.Main</mainClass>
+                            <mainClass>net.alek.buttonclicker.core/net.alek.buttonclicker.core.Main</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

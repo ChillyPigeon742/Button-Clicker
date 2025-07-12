@@ -1,7 +1,8 @@
 package net.alek.buttonclicker.services;
 
-import net.alek.buttonclicker.components.ATimer;
-import net.alek.buttonclicker.utilities.read.ReadUtility;
+import net.alek.buttonclicker.ui.components.ATimer;
+import net.alek.buttonclicker.ui.RenderService;
+import net.alek.buttonclicker.read.ReadUtility;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;

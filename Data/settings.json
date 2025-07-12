@@ -1,10 +1,13 @@
 {
-	"version": 1,
-	"settings": {
+	"version": 0.8.0,
+	"userSettings": {
 		"currentSave": null,
 		"masterVolume": 100,
 		"musicVolume": 100,
 		"sfxVolume": 100,
 		"musicDelay": 20
+	},
+	"debugSettings": {
+		//TODO: debug settings
 	}
 }

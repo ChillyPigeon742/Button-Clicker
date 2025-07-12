@@ -2,14 +2,16 @@ package net.alek.buttonclicker.services;
 
 import javafx.scene.media.MediaPlayer;
 
-import net.alek.buttonclicker.engine.*;
+import net.alek.buttonclicker.core.*;
 
-import net.alek.buttonclicker.components.ATimer;
+import net.alek.buttonclicker.ui.components.ATimer;
 
-import net.alek.buttonclicker.data.CommandDefinitions;
-import net.alek.buttonclicker.utilities.notify.MessageUtility;
-import net.alek.buttonclicker.utilities.read.ReadUtility;
-import net.alek.buttonclicker.utilities.write.WriteUtility;
+import net.alek.buttonclicker.command.CommandDefinitions;
+import net.alek.buttonclicker.ui.MenuManager;
+import net.alek.buttonclicker.ui.RenderService;
+import net.alek.buttonclicker.ui.MessageUtility;
+import net.alek.buttonclicker.read.ReadUtility;
+import net.alek.buttonclicker.write.WriteUtility;
 
 import java.awt.*;
 import java.awt.event.*;

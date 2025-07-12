@@ -1,0 +1,36 @@
+package net.alek.buttonclicker.event.type;
+
+import net.alek.buttonclicker.event.EventBus;
+
+import java.util.function.Consumer;
+
+public enum Event {
+    START_APP(null),
+    LOAD_GAME(null),
+    UNLOAD_GAME(null),
+    CLOSE_APP(null);
+
+    private final Class<? extends Record> payloadType;
+    private static final EventBus BUS = new EventBus();
+
+    Event(Class<? extends Record> payloadType) {
+        this.payloadType = payloadType;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Record> Class<T> getPayloadType() {
+        return (Class<T>) payloadType;
+    }
+
+    public <T extends Record> void subscribe(DeliveryMode mode, Consumer<T> handler) {
+        BUS.subscribe(this, mode, handler);
+    }
+
+    public <T extends Record> void publish(T payload) {
+        BUS.publish(this, payload);
+    }
+
+    public static void shutdown() {
+        BUS.shutdown();
+    }
+}

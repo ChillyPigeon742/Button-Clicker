@@ -1,0 +1,45 @@
+package net.alek.buttonclicker.assets;
+
+import net.alek.buttonclicker.data.asset.Fonts;
+import net.alek.buttonclicker.event.type.DeliveryMode;
+import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.read.ReadUtility;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.Objects;
+
+public class FontLoader {
+    private static Fonts fonts;
+
+    static {
+        Event.LOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> loadFonts());
+        Event.UNLOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> unloadFonts());
+    }
+
+    private static void loadFonts() {
+        Font nunito = loadFont("Nunito.ttf");
+        Font indieFlower = loadFont("IndieFlower.ttf");
+        Font consolas = loadFont("Consolas.ttf");
+
+        fonts = new Fonts(nunito, indieFlower, consolas);
+    }
+
+    private static void unloadFonts() {
+        fonts = null;
+    }
+
+    private static Font loadFont(String fontFileName) {
+        try {
+            return Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(
+                            ReadUtility.class.getResourceAsStream("/assets/buttonclicker/fonts/" + fontFileName)))
+                    .deriveFont(12f);
+        } catch (FontFormatException | IOException | NullPointerException e) {
+            return new Font("SansSerif", Font.PLAIN, 12);
+        }
+    }
+
+    public static Fonts getFonts(){
+        return fonts;
+    }
+}

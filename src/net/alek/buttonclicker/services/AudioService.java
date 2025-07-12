@@ -3,8 +3,8 @@ package net.alek.buttonclicker.services;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-import net.alek.buttonclicker.engine.MenuManager;
-import net.alek.buttonclicker.components.ATimer;
+import net.alek.buttonclicker.ui.MenuManager;
+import net.alek.buttonclicker.ui.components.ATimer;
 
 import java.util.Objects;
 import java.util.Random;
