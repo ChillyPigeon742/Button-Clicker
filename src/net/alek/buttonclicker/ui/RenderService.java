@@ -2,9 +2,9 @@ package net.alek.buttonclicker.ui;
 
 import com.formdev.flatlaf.FlatClientProperties;
 
+import net.alek.buttonclicker.core.Spark;
 import net.alek.buttonclicker.ui.components.*;
 import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.core.Main;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.services.InputService;
 import net.alek.buttonclicker.services.LoggingService;
@@ -471,7 +471,7 @@ public class RenderService {
         buttonClickerVersionText.setForeground(Color.WHITE);
         buttonClickerVersionText.setFont(new Font("Nunito",Font.BOLD,20));
         buttonClickerVersionText.setBorder(null);
-        buttonClickerVersionText.setText("Button Clicker "+ Main.VERSION);
+        buttonClickerVersionText.setText("Button Clicker "+ Spark.VERSION);
 
         currentSaveText.setVisible(false);
         currentSaveText.setBounds(0, 610, 345, 30);
@@ -701,7 +701,7 @@ public class RenderService {
 
         backToButton.setVisible(false);
         backToButton.setBounds(-10, 600, 667, 38);
-        backToButton.setText("Back To Main Menu");
+        backToButton.setText("Back To Spark Menu");
         backToButton.setFont(new Font("Nunito", Font.BOLD, 30));
         backToButton.setForeground(Color.WHITE);
         backToButton.setBackground(Color.BLACK);
@@ -1137,7 +1137,7 @@ public class RenderService {
 
         LoggingService.Logger.info("Render Pipeline Initialized!");
 
-        MenuManager.openMenu("Main");
+        MenuManager.openMenu("Spark");
     }
 
     public static void startProgress(JProgressBar progressBar, int delay) {

@@ -16,7 +16,11 @@ public class LoggingService {
     private static PrintStream fileStream;
     private static final Object lock = new Object();
 
-    public static void setupLogger() {
+    static {
+        setupLogger();
+    }
+
+    private static void setupLogger() {
         try {
             fileStream = new PrintStream(new FileOutputStream(log, true), true);
             terminalStream = System.out;

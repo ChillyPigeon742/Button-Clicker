@@ -18,7 +18,7 @@ public class CommandDefinitions {
         sb.append("                                  HELP\n");
         sb.append("***************************************************************************\n\n");
 
-        sb.append("Main Commands:\n\n");
+        sb.append("Spark Commands:\n\n");
 
         sb.append("  help   - Shows a list of available commands\n");
         sb.append("           Arguments: none\n");
@@ -107,9 +107,5 @@ public class CommandDefinitions {
 
     public static void clr(){
         clear();
-    }
-
-    public static void test(){
-        LoggingService.Logger.info("\n\n                                     HELP\n***************************************************************************\n\nMain Commands:\n\n      help - Shows a list of available commands, arguments needed for the commands, and syntax\n            Arguments: none\n            Syntax: help\n\n      echo - Says a specified message in the console\n            Arguments: String message, String messageType, boolean toLog\n            Syntax: echo Button Clicker error true OR echo Button Clicker info false\n\n      clear - Clears the console\n             Arguments: none\n             Syntax: clear\n\nAlternative Commands:\n\n      hlp - Routes back to help\n           Arguments: none\n           Syntax: hlp\n\n      h - Routes back to help\n         Arguments: none\n         Syntax: h\n\n      say - Routes back to echo\n           Arguments: String message, String messageType, boolean toLog\n           Syntax: say Button Clicker error true OR say Button Clicker info false\n\n      clr - Routes back to clear\n           Arguments: none\n           Syntax: clr\n\n\n                   NOTE: Commands/Arguments are CASE SENSITIVE\n\n***************************************************************************\n");
     }
 }

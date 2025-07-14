@@ -13,6 +13,12 @@ import java.awt.*;
 import java.util.Arrays;
 
 public class ErrorHandler {
+    static {
+        
+
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> Exception(throwable));
+    }
+
     public static String getCallerInfo() {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         for (StackTraceElement element : stackTrace) {
@@ -31,7 +37,7 @@ public class ErrorHandler {
         LoggingService.Logger.error(name+"/"+caller+"/The Program has Suffered an "+name+"!");
 
         LoggingService.Logger.error("Locking Engine...");
-        MenuManager.closeMenu("Main");
+        MenuManager.closeMenu("Spark");
         MenuManager.closeMenu("Save Manager");
         MenuManager.closeMenu("Choose A Side");
         MenuManager.closeMenu("Enter A Save Name");
@@ -91,14 +97,13 @@ public class ErrorHandler {
         handleException(name, cause, message, packageName, stackTrace);
     }
 
-    static {
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            Exception((Exception) throwable);
-        });
-    }
+    public static void Exception(Throwable t) {
+        String name = t.getClass().getSimpleName();
+        String packageName = t.getClass().getName();
+        String cause = (t.getCause() != null) ? t.getCause().toString() : "No cause";
+        String message = t.getMessage();
+        String stackTrace = Arrays.toString(t.getStackTrace());
 
-    public static void setupCrashHandler(){
-        //TODO: actually add crash detection just realized this does it on shutdown
-        //Runtime.getRuntime().addShutdownHook(new Thread(() -> Exception(new RuntimeException("The application has crashed due to an unknown error!"))));
+        handleException(name, cause, message, packageName, stackTrace);
     }
 }

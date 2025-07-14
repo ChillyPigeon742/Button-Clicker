@@ -8,7 +8,7 @@ public class MenuManager{
     public static boolean resetWindow = false;
     
     public static void openMenu(String menuID){
-        if(Objects.equals(menuID, "Main")){
+        if(Objects.equals(menuID, "Spark")){
             RenderService.buttonClickerVersionText.setVisible(true);
             RenderService.currentSaveText.setVisible(true);
             RenderService.startGameButton.setVisible(true);
@@ -88,7 +88,7 @@ public class MenuManager{
     }
 
     public static void closeMenu(String menuID){
-        if(Objects.equals(menuID, "Main")){
+        if(Objects.equals(menuID, "Spark")){
             RenderService.buttonClickerVersionText.setVisible(false);
             RenderService.currentSaveText.setVisible(false);
             RenderService.startGameButton.setVisible(false);
@@ -169,7 +169,7 @@ public class MenuManager{
     }
 
     public static boolean isMenuOpen(String menuID){
-        if(Objects.equals(menuID, "Main")){
+        if(Objects.equals(menuID, "Spark")){
             if(RenderService.saveManagerButton.isVisible()){
                 return true;
             }else{
@@ -230,7 +230,7 @@ public class MenuManager{
                 return false;
             }
         }else if(Objects.equals(menuID, "Pause")){
-            if(Objects.equals(RenderService.quitButton.getText(), "Return To Main Menu")){
+            if(Objects.equals(RenderService.quitButton.getText(), "Return To Spark Menu")){
                 return true;
             }else{
                 return false;

@@ -1,6 +1,7 @@
 {
-	"version": 0.8.0,
+	"version": "0.8.0",
 	"engine": null,
+	"currentSave": null,
 	"saves": {
 		"save1": null,
 		"save2": null,

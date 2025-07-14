@@ -57,7 +57,7 @@ public class InputService{
                     WriteUtility.save3();
                 }
 
-                MenuManager.closeMenu("Main");
+                MenuManager.closeMenu("Spark");
                 MenuManager.openMenu("Loading");
 
                 RenderService.loadingBar.setValue(0);
@@ -186,10 +186,10 @@ public class InputService{
 
                 LoggingService.Logger.info("Done!");
             }else if(Objects.equals(RenderService.startGameButton.getText(), "Resume Game")){
-                if(MenuManager.isMenuOpen("Main")){
+                if(MenuManager.isMenuOpen("Spark")){
                     LoggingService.Logger.info("Loading Game...");
 
-                    MenuManager.closeMenu("Main");
+                    MenuManager.closeMenu("Spark");
                     MenuManager.openMenu("Loading");
 
                     RenderService.loadingBar.setValue(0);
@@ -350,11 +350,11 @@ public class InputService{
         if(source== RenderService.saveManagerButton){
             AudioService.SFX.playSFX("select");
 
-            MenuManager.closeMenu("Main");
+            MenuManager.closeMenu("Spark");
             MenuManager.openMenu("Save Manager");
 
             RenderService.backToButton.setVisible(true);
-            RenderService.backToButton.setText("Back To Main Menu");
+            RenderService.backToButton.setText("Back To Spark Menu");
             RenderService.titleText.setText("Save Manager");
             
             ReadUtility.loadSave1();
@@ -439,7 +439,7 @@ public class InputService{
                     System.exit(0);
                 });
                 timer.start();
-            }else if(Objects.equals(RenderService.quitButton.getText(), "Return To Main Menu")){
+            }else if(Objects.equals(RenderService.quitButton.getText(), "Return To Spark Menu")){
                 RenderService.quitButton.setText("Saving...");
                 LoggingService.Logger.info("Saving...");
 
@@ -455,7 +455,7 @@ public class InputService{
                     }
 
                     MenuManager.closeMenu("Pause");
-                    MenuManager.openMenu("Main");
+                    MenuManager.openMenu("Spark");
 
                     RenderService.startGameButton.setBounds(177,150,305,102);
                     RenderService.settingsButton.setBounds(177,348,305,102);
@@ -482,11 +482,11 @@ public class InputService{
         }
 
         if(source== RenderService.backToButton) {
-            if (Objects.equals(RenderService.backToButton.getText(), "Back To Main Menu")) {
+            if (Objects.equals(RenderService.backToButton.getText(), "Back To Spark Menu")) {
                 MenuManager.closeMenu("Save Manager");
                 MenuManager.closeMenu("Settings");
                 MenuManager.closeMenu("Debug");
-                MenuManager.openMenu("Main");
+                MenuManager.openMenu("Spark");
 
                 RenderService.titleText.setFont(new Font("Nunito", Font.BOLD, 70));
                 RenderService.titleText.setText("Button Clicker");
@@ -539,7 +539,7 @@ public class InputService{
                 MenuManager.closeMenu("Choose A Side");
                 MenuManager.openMenu("Save Manager");
 
-                RenderService.backToButton.setText("Back To Main Menu");
+                RenderService.backToButton.setText("Back To Spark Menu");
                 RenderService.titleText.setText("Save Manager");
 
                 RenderService.forwardButton.setVisible(false);
@@ -634,7 +634,7 @@ public class InputService{
                 ReadUtility.loadSave2();
                 ReadUtility.loadSave3();
 
-                RenderService.backToButton.setText("Back To Main Menu");
+                RenderService.backToButton.setText("Back To Spark Menu");
                 RenderService.titleText.setText("Save Manager");
 
                 LoggingService.Logger.info("Done!");
@@ -653,7 +653,7 @@ public class InputService{
                 if(MenuManager.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu){
                     RenderService.backToButton.setText("Back To Pause Menu");
                 }else{
-                    RenderService.backToButton.setText("Back To Main Menu");
+                    RenderService.backToButton.setText("Back To Spark Menu");
                 }
                 RenderService.backToButton.setBounds(-10, 600, 667, 38);
 
@@ -949,8 +949,8 @@ public class InputService{
         }
 
         if(source== RenderService.settingsButton){
-            if(MenuManager.isMenuOpen("Main")){
-                RenderService.backToButton.setText("Back To Main Menu");
+            if(MenuManager.isMenuOpen("Spark")){
+                RenderService.backToButton.setText("Back To Spark Menu");
             }else if(MenuManager.isMenuOpen("Pause")){
                 RenderService.backToButton.setText("Back To Pause Menu");
                 MenuManager.StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu = true;
@@ -958,7 +958,7 @@ public class InputService{
 
             AudioService.SFX.playSFX("select");
 
-            MenuManager.closeMenu("Main");
+            MenuManager.closeMenu("Spark");
             MenuManager.openMenu("Settings");
 
             RenderService.backToButton.setVisible(true);
@@ -985,7 +985,7 @@ public class InputService{
         if(source== RenderService.debugButton){
             AudioService.SFX.playSFX("select");
 
-            MenuManager.closeMenu("Main");
+            MenuManager.closeMenu("Spark");
             MenuManager.openMenu("Debug");
 
             RenderService.backToButton.setVisible(true);
@@ -1320,7 +1320,7 @@ public class InputService{
 
             RenderService.settingsButton.setBounds(177,298,305,102);
 
-            RenderService.quitButton.setText("Return To Main Menu");
+            RenderService.quitButton.setText("Return To Spark Menu");
             RenderService.quitButton.setFont(new Font("Nunito", Font.BOLD, 29));
             RenderService.quitButton.setBounds(177,397,305,102);
 
@@ -1483,7 +1483,7 @@ public class InputService{
                             commandArgs[i] = convertArgument(commandArgs[i], paramTypes[i]);
                         }
 
-                        method.invoke(Main.commandDefinitions, commandArgs);
+                        method.invoke(Spark.commandDefinitions, commandArgs);
 
                     } catch (NoSuchMethodException ex) {
                         AudioService.SFX.playSFX("declined");
@@ -1535,7 +1535,7 @@ public class InputService{
             }
 
             if (e.getButton() == MouseEvent.BUTTON3) {
-                if(MenuManager.isMenuOpen("Main")){
+                if(MenuManager.isMenuOpen("Spark")){
                     RenderService.debugButton.setVisible(true);
                 }
             }

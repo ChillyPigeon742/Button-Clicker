@@ -22,11 +22,16 @@
             <version>21.0.2</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
             <version>3.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.180</version>
         </dependency>
     </dependencies>
 
@@ -50,7 +55,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>net.alek.buttonclicker.core/net.alek.buttonclicker.core.Main</mainClass>
+                            <mainClass>net.alek.buttonclicker.core/net.alek.buttonclicker.core.Spark</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

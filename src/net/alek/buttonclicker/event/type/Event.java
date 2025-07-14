@@ -1,14 +1,16 @@
 package net.alek.buttonclicker.event.type;
 
 import net.alek.buttonclicker.event.EventBus;
+import net.alek.buttonclicker.event.payload.CloseAppPayload;
 
 import java.util.function.Consumer;
 
 public enum Event {
     START_APP(null),
+    INIT_GUI(null),
     LOAD_GAME(null),
     UNLOAD_GAME(null),
-    CLOSE_APP(null);
+    CLOSE_APP(CloseAppPayload.class);
 
     private final Class<? extends Record> payloadType;
     private static final EventBus BUS = new EventBus();

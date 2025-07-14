@@ -6,34 +6,17 @@ import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.read.json.JSONReader;
 
 import java.awt.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class ReadUtility {
 
-    public static Path APPDATA_PATH = Paths.get(System.getenv("APPDATA"), "_ButtonClicker");
-    public static Path DATA_PATH = APPDATA_PATH.resolve("Data/");
-    public static Path LOGS_PATH = APPDATA_PATH.resolve("Logs/");
-
     public static void loadGame(){
         LoggingService.Logger.info("Loading Game...");
-
-        LoggingService.Logger.info("Initializing Settings Data");
-        initializeSettingsData();
 
         LoggingService.Logger.info("Loading Settings...");
         loadSettings();
 
         LoggingService.Logger.info("Loading Complete!");
-    }
-
-    private static void initializeSettingsData(){
-        save1.put("currentSave", null);
-        save1.put("masterVolume", null);
-        save1.put("musicVolume", null);
-        save1.put("sfxVolume", null);
-        save1.put("musicDelay", null);
     }
 
     private static void loadSettings(){
@@ -73,6 +56,4 @@ public class ReadUtility {
         RenderService.musicDelaySpinner.setValue(AudioService.SoundManager.getMusicDelay());
         RenderService.musicDelaySpinnerText.setText(AudioService.SoundManager.getMusicDelay()+" Secs");
     }
-
-
 }
