@@ -1,6 +1,6 @@
 package net.alek.buttonclicker.command;
 
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.RenderService;
 
 import java.awt.*;
@@ -87,9 +87,9 @@ public class CommandDefinitions {
             }
         }else{
             if(Objects.equals(messageType, "error")){
-                LoggingService.Logger.error(message);
+                Logger.Log.error(message);
             }else if(Objects.equals(messageType, "info")){
-                LoggingService.Logger.info(message);
+                Logger.Log.info(message);
             }
         }
     }

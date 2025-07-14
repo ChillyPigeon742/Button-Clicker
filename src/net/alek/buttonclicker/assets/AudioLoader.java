@@ -1,13 +1,13 @@
 package net.alek.buttonclicker.assets;
 
 import javafx.scene.media.Media;
+import net.alek.buttonclicker.core.log.LogType;
 import net.alek.buttonclicker.data.asset.Audio;
 import net.alek.buttonclicker.data.asset.Music;
 import net.alek.buttonclicker.data.asset.SFX;
+import net.alek.buttonclicker.event.payload.LogPayload;
 import net.alek.buttonclicker.event.type.DeliveryMode;
 import net.alek.buttonclicker.event.type.Event;
-import net.alek.buttonclicker.services.LoggingService;
-import net.alek.buttonclicker.read.ReadUtility;
 
 public class AudioLoader {
     private static SFX sfx;
@@ -37,10 +37,10 @@ public class AudioLoader {
 
     private static Media loadMedia(String path, Media fallback) {
         try {
-            var resource = ReadUtility.class.getResource(path);
+            var resource = AudioLoader.class.getResource(path);
             if (resource != null) return new Media(resource.toExternalForm());
             else {
-                LoggingService.Logger.error("Audio not found: " + path);
+                Event.LOG.publish(new LogPayload(LogType.ERROR, "Audio not found: " + path));
                 return fallback;
             }
         } catch (Exception e) {

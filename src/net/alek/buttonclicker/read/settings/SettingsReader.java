@@ -1,23 +1,13 @@
-package net.alek.buttonclicker.read;
+package net.alek.buttonclicker.read.settings;
 
-import net.alek.buttonclicker.services.AudioService;
-import net.alek.buttonclicker.services.LoggingService;
-import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.read.json.JSONReader;
+import net.alek.buttonclicker.services.AudioService;
+import net.alek.buttonclicker.ui.RenderService;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Map;
 
-public class ReadUtility {
-
-    public static void loadGame(){
-        LoggingService.Logger.info("Loading Game...");
-
-        LoggingService.Logger.info("Loading Settings...");
-        loadSettings();
-
-        LoggingService.Logger.info("Loading Complete!");
-    }
+public class SettingsReader {
 
     private static void loadSettings(){
         settings.put("currentSave", JSONReader.fromFile("Data/settings.json").readString("currentSave"));

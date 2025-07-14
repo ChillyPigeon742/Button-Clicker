@@ -1,5 +1,6 @@
 package net.alek.buttonclicker.services;
 
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.components.ATimer;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.read.ReadUtility;
@@ -85,7 +86,7 @@ public class AutoClickerDetectorService {
             if (now - lastDetectionTime > DETECTION_COOLDOWN_MS) {
                 detectionExecutor.submit(() -> {
                     DetectionResult result = detectAutoClicker();
-                    LoggingService.Logger.debug(result.message);
+                    Logger.Log.debug(result.message);
 
                     if (result.detected) {
                         lastDetectionTime = System.currentTimeMillis();

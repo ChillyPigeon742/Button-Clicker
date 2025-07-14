@@ -2,12 +2,15 @@ package net.alek.buttonclicker.event.type;
 
 import net.alek.buttonclicker.event.EventBus;
 import net.alek.buttonclicker.event.payload.CloseAppPayload;
+import net.alek.buttonclicker.event.payload.LogPayload;
 
 import java.util.function.Consumer;
 
 public enum Event {
     START_APP(null),
+    LOG(LogPayload.class),
     INIT_GUI(null),
+    GUI_READY(null),
     LOAD_GAME(null),
     UNLOAD_GAME(null),
     CLOSE_APP(CloseAppPayload.class);

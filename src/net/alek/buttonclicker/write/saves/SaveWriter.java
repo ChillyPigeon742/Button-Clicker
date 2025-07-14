@@ -3,7 +3,7 @@ package net.alek.buttonclicker.write.saves;
 import net.alek.buttonclicker.ui.components.ATimer;
 import net.alek.buttonclicker.core.ErrorHandler;
 import net.alek.buttonclicker.ui.MenuManager;
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.read.ReadUtility;
 
@@ -28,7 +28,7 @@ public class SaveWriter {
         if (scheduledFuture == null || scheduledFuture.isCancelled()) {
             scheduledFuture = scheduler.scheduleAtFixedRate(() -> SwingUtilities.invokeLater(() -> {
                 if(MenuManager.isMenuOpen("Game")){
-                    LoggingService.Logger.info("Saving...");
+                    Logger.Log.info("Saving...");
 
                     RenderService.titleImage.startSpinning();
                     RenderService.titleImage.setBounds(535, 110, 110, 110);
@@ -69,7 +69,7 @@ public class SaveWriter {
     }
 
     public static void writeSave(Map<String, Object> saveData, int saveNumber){
-        LoggingService.Logger.info("Writing map to save file "+saveNumber);
+        Logger.Log.info("Writing map to save file "+saveNumber);
         String filePath = "Saves/save" + saveNumber + ".bcs";
 
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath))) {
@@ -77,12 +77,12 @@ public class SaveWriter {
         } catch (IOException e) {
             ErrorHandler.Exception(e);
         }
-        LoggingService.Logger.info("Finished writing successfully!");
+        Logger.Log.info("Finished writing successfully!");
     }
 
     public static void saveCurrentSave(){
         if (ReadUtility.getCurrentSave() == null) {
-            LoggingService.Logger.error("No save has been selected to write to!");
+            Logger.Log.error("No save has been selected to write to!");
         } else {
             writeSave(ReadUtility.getCurrentSave(), ReadUtility.getCurrentSaveNumber());
         }

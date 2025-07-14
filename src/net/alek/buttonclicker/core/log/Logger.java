@@ -1,10 +1,15 @@
-package net.alek.buttonclicker.services;
+package net.alek.buttonclicker.core.log;
+
+import net.alek.buttonclicker.core.ErrorHandler;
+import net.alek.buttonclicker.event.payload.LogPayload;
+import net.alek.buttonclicker.event.type.DeliveryMode;
+import net.alek.buttonclicker.event.type.Event;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class LoggingService {
+public class Logger {
     public static File log = new File("Data/BC-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log");
 
     private static final String RESET = "\u001B[0m";
@@ -17,6 +22,7 @@ public class LoggingService {
     private static final Object lock = new Object();
 
     static {
+        Event.LOG.subscribe(DeliveryMode.ASYNC, (LogPayload p) -> logWriter(p.message(), p.logType()));
         setupLogger();
     }
 
@@ -35,16 +41,19 @@ public class LoggingService {
         }
     }
 
-    public static String getCallerInfo() {
+    private static String getCallerInfo() {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-        StackTraceElement element = stackTrace[3];
-        String className = element.getClassName();
-        String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
-        int lineNumber = element.getLineNumber();
-        return simpleClassName + ":" + lineNumber;
+        for (StackTraceElement element : stackTrace) {
+            String className = element.getClassName();
+            if (!className.equals(Logger.class.getName())) {
+                String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+                return simpleClassName + ":" + element.getLineNumber();
+            }
+        }
+        return "UnknownCaller";
     }
 
-    private static void logWriter(String toWrite, String type) {
+    private static void logWriter(String toWrite, LogType type) {
         synchronized (lock) {
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             String caller = getCallerInfo();
@@ -55,32 +64,14 @@ public class LoggingService {
 
             String coloredMessage;
             switch (type) {
-                case "ERROR" -> coloredMessage = RED + logMessage + RESET;
-                case "WARN" -> coloredMessage = YELLOW + logMessage + RESET;
-                case "DEBUG" -> coloredMessage = GREEN + logMessage + RESET;
+                case ERROR -> coloredMessage = RED + logMessage + RESET;
+                case WARN -> coloredMessage = YELLOW + logMessage + RESET;
+                case DEBUG -> coloredMessage = GREEN + logMessage + RESET;
                 default -> coloredMessage = logMessage;
             }
 
             terminalStream.println(coloredMessage);
             terminalStream.flush();
-        }
-    }
-
-    public static class Logger {
-        public static void info(String message) {
-            logWriter(message, "INFO");
-        }
-
-        public static void debug(String message) {
-            logWriter(message, "DEBUG");
-        }
-
-        public static void warn(String message) {
-            logWriter(message, "WARN");
-        }
-
-        public static void error(String message) {
-            logWriter(message, "ERROR");
         }
     }
 

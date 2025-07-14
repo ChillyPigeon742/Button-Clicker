@@ -4,7 +4,7 @@ import net.alek.buttonclicker.data.asset.Images;
 import net.alek.buttonclicker.event.type.DeliveryMode;
 import net.alek.buttonclicker.event.type.Event;
 import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.read.ReadUtility;
 
@@ -64,7 +64,7 @@ public class ImageLoader {
             URL url = ReadUtility.class.getResource(IMAGE_PATH + fileName);
             if (url != null) return new ImageIcon(url);
         } catch (Exception e) {
-            LoggingService.Logger.error("Failed to load icon: " + fileName);
+            Logger.Log.error("Failed to load icon: " + fileName);
             ErrorHandler.Exception(e);
         }
         return fallback != null ? fallback : new ImageIcon();
@@ -75,7 +75,7 @@ public class ImageLoader {
             URL url = ReadUtility.class.getResource(IMAGE_PATH + fileName);
             if (url != null) return ImageIO.read(url);
         } catch (IOException e) {
-            LoggingService.Logger.error("Failed to load image: " + fileName);
+            Logger.Log.error("Failed to load image: " + fileName);
             ErrorHandler.Exception(e);
         }
         return fallback != null ? fallback : RenderService.generateMissingTexture(64);

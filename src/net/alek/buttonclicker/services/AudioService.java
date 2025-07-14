@@ -3,6 +3,7 @@ package net.alek.buttonclicker.services;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.MenuManager;
 import net.alek.buttonclicker.ui.components.ATimer;
 
@@ -20,7 +21,7 @@ public class AudioService {
             AudioService.Music.playMusic("menu2");
         }
 
-        LoggingService.Logger.info("Audio Pipeline Initialized!");
+        Logger.Log.info("Audio Pipeline Initialized!");
     }
 
     public static class SFX{

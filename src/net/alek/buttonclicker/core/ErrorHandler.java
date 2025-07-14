@@ -2,11 +2,13 @@ package net.alek.buttonclicker.core;
 
 import com.formdev.flatlaf.FlatLaf;
 
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.assets.ImageLoader;
+import net.alek.buttonclicker.core.log.Logger;
+import net.alek.buttonclicker.event.type.Event;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.ui.MenuManager;
-import net.alek.buttonclicker.read.ReadUtility;
+import net.alek.buttonclicker.util.GUIUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,12 +16,10 @@ import java.util.Arrays;
 
 public class ErrorHandler {
     static {
-        
-
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> Exception(throwable));
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> Throwable(throwable));
     }
 
-    public static String getCallerInfo() {
+    private static String getCallerInfo() {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         for (StackTraceElement element : stackTrace) {
             String className = element.getClassName();
@@ -34,9 +34,9 @@ public class ErrorHandler {
     private static void handleException(String name, String cause, String message, String packageName, String stackTrace){
         String caller = getCallerInfo();
 
-        LoggingService.Logger.error(name+"/"+caller+"/The Program has Suffered an "+name+"!");
+        Logger.Log.error(name+"/"+caller+"/The Program has Suffered an "+name+"!");
 
-        LoggingService.Logger.error("Locking Engine...");
+        Logger.Log.error("Locking Engine...");
         MenuManager.closeMenu("Spark");
         MenuManager.closeMenu("Save Manager");
         MenuManager.closeMenu("Choose A Side");
@@ -59,21 +59,15 @@ public class ErrorHandler {
 
         RenderService.frame.getContentPane().setBackground(Color.WHITE);
 
-        LoggingService.Logger.error("Unloading Resources...");
-        RenderService.frame.setIconImage(ReadUtility.missingIcon.getImage());
-        ReadUtility.unloadGame();
+        Logger.Log.error("Unloading Resources...");
+        GUIUtils.setWindowIcon(ImageLoader.getImages().missingIcon().getImage());
+        Event.UNLOAD_GAME.publish(null);
 
-        LoggingService.Logger.error("Unloading Themes...");
+        Logger.Log.error("Unloading Themes...");
         FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
+        GUIUtils.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
-        SwingUtilities.updateComponentTreeUI(JFrame.getFrames()[0]);
-
-        LoggingService.Logger.error("Stopping Services...");
+        Logger.Log.error("Stopping Services...");
         AudioService.Music.stopMusic();
 
         RenderService.crashText.setVisible(true);
@@ -97,7 +91,7 @@ public class ErrorHandler {
         handleException(name, cause, message, packageName, stackTrace);
     }
 
-    public static void Exception(Throwable t) {
+    public static void Throwable(Throwable t) {
         String name = t.getClass().getSimpleName();
         String packageName = t.getClass().getName();
         String cause = (t.getCause() != null) ? t.getCause().toString() : "No cause";

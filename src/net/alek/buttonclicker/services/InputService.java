@@ -4,6 +4,7 @@ import javafx.scene.media.MediaPlayer;
 
 import net.alek.buttonclicker.core.*;
 
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.components.ATimer;
 
 import net.alek.buttonclicker.command.CommandDefinitions;
@@ -41,7 +42,7 @@ public class InputService{
                 });
                 timer.start();
             }else if(Objects.equals(RenderService.startGameButton.getText(), "Start Game")){
-                LoggingService.Logger.info("Loading Game...");
+                Logger.Log.info("Loading Game...");
 
                 if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
                     ReadUtility.loadSave1();
@@ -184,10 +185,10 @@ public class InputService{
 
                 AudioService.Music.playMusic("loading");
 
-                LoggingService.Logger.info("Done!");
+                Logger.Log.info("Done!");
             }else if(Objects.equals(RenderService.startGameButton.getText(), "Resume Game")){
                 if(MenuManager.isMenuOpen("Spark")){
-                    LoggingService.Logger.info("Loading Game...");
+                    Logger.Log.info("Loading Game...");
 
                     MenuManager.closeMenu("Spark");
                     MenuManager.openMenu("Loading");
@@ -316,9 +317,9 @@ public class InputService{
 
                     AudioService.Music.playMusic("loading");
 
-                    LoggingService.Logger.info("Done!");
+                    Logger.Log.info("Done!");
                 }else if(MenuManager.isMenuOpen("Pause")){
-                    LoggingService.Logger.info("Resuming...");
+                    Logger.Log.info("Resuming...");
 
                     MenuManager.closeMenu("Pause");
 
@@ -342,7 +343,7 @@ public class InputService{
 
                     MenuManager.openMenu("Game");
 
-                    LoggingService.Logger.info("Done!");
+                    Logger.Log.info("Done!");
                 }
             }
         }
@@ -413,7 +414,7 @@ public class InputService{
             AudioService.SFX.playSFX("select");
             if(Objects.equals(RenderService.quitButton.getText(), "Save & Quit")){
                 RenderService.quitButton.setText("Saving...");
-                LoggingService.Logger.info("Saving...");
+                Logger.Log.info("Saving...");
 
                 if(Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")){
                     WriteUtility.save1();
@@ -431,7 +432,7 @@ public class InputService{
                 timer.start();
             }else if(Objects.equals(RenderService.quitButton.getText(), "Quit")){
                 RenderService.quitButton.setText("Quitting...");
-                LoggingService.Logger.info("Quitting...");
+                Logger.Log.info("Quitting...");
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
@@ -441,7 +442,7 @@ public class InputService{
                 timer.start();
             }else if(Objects.equals(RenderService.quitButton.getText(), "Return To Spark Menu")){
                 RenderService.quitButton.setText("Saving...");
-                LoggingService.Logger.info("Saving...");
+                Logger.Log.info("Saving...");
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
@@ -475,7 +476,7 @@ public class InputService{
                         AudioService.Music.playMusic("menu2");
                     }
 
-                    LoggingService.Logger.info("Done!");
+                    Logger.Log.info("Done!");
                 });
                 timer.start();
             }
@@ -580,7 +581,7 @@ public class InputService{
 
                     WriteUtility.saveBeingCreated = 0;
                 } else {
-                    LoggingService.Logger.info("Creating Save...");
+                    Logger.Log.info("Creating Save...");
 
                     if (WriteUtility.saveBeingCreated == 1) {
                         WriteUtility.createSave("Saves/save1.bcs");
@@ -621,7 +622,7 @@ public class InputService{
                         WriteUtility.saveBeingCreated = 0;
                     }
 
-                    LoggingService.Logger.info("Done!");
+                    Logger.Log.info("Done!");
                 }
 
                 RenderService.saveNameField.setText("");
@@ -629,7 +630,7 @@ public class InputService{
                 MenuManager.closeMenu("Enter A Save Name");
                 MenuManager.openMenu("Save Manager");
 
-                LoggingService.Logger.info("Loading Saves...");
+                Logger.Log.info("Loading Saves...");
                 ReadUtility.loadSave1();
                 ReadUtility.loadSave2();
                 ReadUtility.loadSave3();
@@ -637,7 +638,7 @@ public class InputService{
                 RenderService.backToButton.setText("Back To Spark Menu");
                 RenderService.titleText.setText("Save Manager");
 
-                LoggingService.Logger.info("Done!");
+                Logger.Log.info("Done!");
             }else if(Objects.equals(RenderService.backToButton.getText(), "Back To Settings")) {
                 MenuManager.closeMenu("Wiki");
                 MenuManager.closeMenu("Credits");
@@ -707,7 +708,7 @@ public class InputService{
                 JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "Saves/save1.bcs");
                 WriteUtility.currentSave = "Saves/save1.bcs";
 
-                LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
+                Logger.Log.info("Current Save: "+ WriteUtility.currentSave);
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
@@ -735,7 +736,7 @@ public class InputService{
                 JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "Saves/save2.bcs");
                 WriteUtility.currentSave = "Saves/save2.bcs";
 
-                LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
+                Logger.Log.info("Current Save: "+ WriteUtility.currentSave);
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
@@ -763,7 +764,7 @@ public class InputService{
                 JSONUtility.writeAStringToJsonFile("Data/settings.json", "current_save", "Saves/save3.bcs");
                 WriteUtility.currentSave = "Saves/save3.bcs";
 
-                LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
+                Logger.Log.info("Current Save: "+ WriteUtility.currentSave);
 
                 ATimer timer = new ATimer();
                 timer.setDelay(2);
@@ -876,7 +877,7 @@ public class InputService{
                             WriteUtility.deleteSave("Saves/save1.bcs");
                         }
 
-                        LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
+                        Logger.Log.info("Current Save: "+ WriteUtility.currentSave);
 
                         ReadUtility.loadSave1();
                         ReadUtility.loadSave2();
@@ -906,7 +907,7 @@ public class InputService{
                             WriteUtility.deleteSave("Saves/save2.bcs");
                         }
 
-                        LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
+                        Logger.Log.info("Current Save: "+ WriteUtility.currentSave);
 
                         ReadUtility.loadSave1();
                         ReadUtility.loadSave2();
@@ -936,7 +937,7 @@ public class InputService{
                             WriteUtility.deleteSave("Saves/save3.bcs");
                         }
 
-                        LoggingService.Logger.info("Current Save: "+ WriteUtility.currentSave);
+                        Logger.Log.info("Current Save: "+ WriteUtility.currentSave);
 
                         ReadUtility.loadSave1();
                         ReadUtility.loadSave2();
@@ -968,7 +969,7 @@ public class InputService{
         }
 
         if(source== RenderService.bugReportButton){
-            LoggingService.Logger.info("Opening Github...");
+            Logger.Log.info("Opening Github...");
             AudioService.SFX.playSFX("select");
 
             try {
@@ -979,7 +980,7 @@ public class InputService{
                 ErrorHandler.URISyntaxException();
             }
 
-            LoggingService.Logger.info("Done!");
+            Logger.Log.info("Done!");
         }
 
         if(source== RenderService.debugButton){
@@ -1052,7 +1053,7 @@ public class InputService{
 
             AudioService.Music.pauseMusic();
 
-            LoggingService.Logger.info("the cake is a lie");
+            Logger.Log.info("the cake is a lie");
         }
 
         if(source== RenderService.backwardButton){
@@ -1300,7 +1301,7 @@ public class InputService{
         }
 
         if(source== RenderService.pauseButton){
-            LoggingService.Logger.info("Pausing...");
+            Logger.Log.info("Pausing...");
             AudioService.SFX.playSFX("select");
 
             MenuManager.closeMenu("Game");
@@ -1329,7 +1330,7 @@ public class InputService{
             AudioService.Music.pauseMusic();
             AudioService.Music.playMusic("pause");
 
-            LoggingService.Logger.info("Done!");
+            Logger.Log.info("Done!");
         }
 
         if(source== RenderService.showConsoleButton){

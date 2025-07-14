@@ -1,99 +1,83 @@
 package net.alek.buttonclicker.data.settings;
 
 public class SettingsFile {
-    private int version;
-    private SettingsData settings;
+    private String version;
+    private UserSettingsData userSettings;
+    private DebugSettingsData debugSettings;
 
-    public SettingsFile(int version, SettingsData settings) {
+    public SettingsFile(String version, UserSettingsData userSettings, DebugSettingsData debugSettings) {
         this.version = version;
-        this.settings = settings;
+        this.userSettings = userSettings;
+        this.debugSettings = debugSettings;
     }
 
-    public int getVersion() {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public SettingsData getSettings() {
-        return settings;
+    public UserSettingsData getUserSettings() {
+        return userSettings;
     }
 
-    public void setSettings(SettingsData settings) {
-        this.settings = settings;
+    public void setUserSettings(UserSettingsData userSettings) {
+        this.userSettings = userSettings;
     }
 
-    //-----------------SAVE DATA MUTATION BEGINS HERE
-
-    public String getCurrentSave() {
-        return settings.currentSave();
+    public DebugSettingsData getDebugSettings() {
+        return debugSettings;
     }
 
-    public void setCurrentSave(String filePath) {
-        settings = new SettingsData(
-                filePath,
-                settings.masterVolume(),
-                settings.sfxVolume(),
-                settings.musicVolume(),
-                settings.musicDelay()
-        );
+    public void setDebugSettings(DebugSettingsData debugSettings) {
+        this.debugSettings = debugSettings;
     }
+
+    // ----------------- USER SETTING DATA MUTATION -----------------
 
     public byte getMasterVolume() {
-        return settings.masterVolume();
+        return userSettings.masterVolume();
     }
 
     public void setMasterVolume(byte masterVolume) {
-        settings = new SettingsData(
-                settings.currentSave(),
-                masterVolume,
-                settings.sfxVolume(),
-                settings.musicVolume(),
-                settings.musicDelay()
-        );
+        userSettings = updatedUserSettings(masterVolume, null, null, null);
     }
 
     public byte getSFXVolume() {
-        return settings.sfxVolume();
+        return userSettings.sfxVolume();
     }
 
     public void setSFXVolume(byte sfxVolume) {
-        settings = new SettingsData(
-                settings.currentSave(),
-                settings.masterVolume(),
-                sfxVolume,
-                settings.musicVolume(),
-                settings.musicDelay()
-        );
+        userSettings = updatedUserSettings(null, sfxVolume, null, null);
     }
 
     public byte getMusicVolume() {
-        return settings.musicVolume();
+        return userSettings.musicVolume();
     }
 
     public void setMusicVolume(byte musicVolume) {
-        settings = new SettingsData(
-                settings.currentSave(),
-                settings.masterVolume(),
-                settings.sfxVolume(),
-                musicVolume,
-                settings.musicDelay()
-        );
+        userSettings = updatedUserSettings(null, null, musicVolume, null);
     }
 
     public byte getMusicDelay() {
-        return settings.musicDelay();
+        return userSettings.musicDelay();
     }
 
     public void setMusicDelay(byte musicDelay) {
-        settings = new SettingsData(
-                settings.currentSave(),
-                settings.masterVolume(),
-                settings.sfxVolume(),
-                settings.musicVolume(),
-                musicDelay
+        userSettings = updatedUserSettings(null, null, null, musicDelay);
+    }
+
+    private UserSettingsData updatedUserSettings(Byte master, Byte sfx, Byte music, Byte delay) {
+        return new UserSettingsData(
+                master != null ? master : userSettings.masterVolume(),
+                sfx != null ? sfx : userSettings.sfxVolume(),
+                music != null ? music : userSettings.musicVolume(),
+                delay != null ? delay : userSettings.musicDelay()
         );
     }
+
+    // ----------------- DEBUG SETTING DATA MUTATION -----------------
+    // TODO: debug settings
 }

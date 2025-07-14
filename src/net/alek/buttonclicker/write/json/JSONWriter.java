@@ -1,7 +1,7 @@
 package net.alek.buttonclicker.write.json;
 
 import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.read.json.JSONReader;
 
 import java.io.*;
@@ -33,7 +33,7 @@ public class JSONWriter {
                 this.data.putAll(existingData);
 
             } catch (IOException e) {
-                LoggingService.Logger.error("Could not read JSON file! " + e.getMessage());
+                Logger.Log.error("Could not read JSON file! " + e.getMessage());
                 ErrorHandler.Exception(e);
             }
         }
@@ -63,7 +63,7 @@ public class JSONWriter {
                 new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8))) {
             writer.write(serializer.serialize(data));
         } catch (IOException e) {
-            LoggingService.Logger.error("Could not write to JSON file! " + e.getMessage());
+            Logger.Log.error("Could not write to JSON file! " + e.getMessage());
             ErrorHandler.Exception(e);
         }
     }

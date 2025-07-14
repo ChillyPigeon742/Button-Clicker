@@ -7,7 +7,7 @@ import net.alek.buttonclicker.ui.components.*;
 import net.alek.buttonclicker.core.ErrorHandler;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.services.InputService;
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.core.log.Logger;
 
 import net.alek.buttonclicker.read.ReadUtility;
 import net.alek.buttonclicker.write.WriteUtility;
@@ -1026,11 +1026,11 @@ public class RenderService {
             public void windowClosing(WindowEvent e) {
                 if(!MenuManager.isMenuOpen("Loading")){
                     if(Objects.equals(WriteUtility.currentSave, "null")){
-                        LoggingService.Logger.info("Quitting...");
+                        Logger.Log.info("Quitting...");
 
                         System.exit(0);
                     }else if(!Objects.equals(WriteUtility.currentSave, "null")){
-                        LoggingService.Logger.info("Quitting & Saving...");
+                        Logger.Log.info("Quitting & Saving...");
 
                         if (Objects.equals(WriteUtility.currentSave, "Saves/save1.bcs")) {
                             WriteUtility.save1();
@@ -1135,7 +1135,7 @@ public class RenderService {
         contentPane.add(crashButton, 0);
         contentPane.add(consoleSettingsButton, 0);
 
-        LoggingService.Logger.info("Render Pipeline Initialized!");
+        Logger.Log.info("Render Pipeline Initialized!");
 
         MenuManager.openMenu("Spark");
     }

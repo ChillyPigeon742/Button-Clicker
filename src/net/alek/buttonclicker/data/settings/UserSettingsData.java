@@ -1,7 +1,6 @@
 package net.alek.buttonclicker.data.settings;
 
-public record SettingsData(
-        String currentSave,
+public record UserSettingsData(
         byte masterVolume,
         byte sfxVolume,
         byte musicVolume,

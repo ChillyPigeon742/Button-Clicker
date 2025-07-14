@@ -1,7 +1,7 @@
 package net.alek.buttonclicker.read.json;
 
 import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.services.LoggingService;
+import net.alek.buttonclicker.core.log.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +38,7 @@ public class JSONReader {
             return new JSONReader(sb.toString());
 
         } catch (Exception e) {
-            LoggingService.Logger.error("Could not read JSON file! " + e.getMessage());
+            Logger.Log.error("Could not read JSON file! " + e.getMessage());
             ErrorHandler.Exception(e);
             return null;
         }
