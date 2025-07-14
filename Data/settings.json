@@ -4,7 +4,9 @@
         "masterVolume": 100,
         "musicVolume": 100,
         "sfxVolume": 100,
-        "musicDelay": 20
+        "musicDelay": 20,
+        "autoSaveEnabled": true,
+        "autoSaveInterval": 60
     },
     "debugSettings": {
 		//TODO: debug settings
