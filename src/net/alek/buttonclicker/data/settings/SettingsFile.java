@@ -35,46 +35,68 @@ public class SettingsFile {
         this.debugSettings = debugSettings;
     }
 
-    // ----------------- USER SETTING DATA MUTATION -----------------
+    // ----------------- USER SETTING DATA GETTERS -----------------
 
     public byte getMasterVolume() {
         return userSettings.masterVolume();
-    }
-
-    public void setMasterVolume(byte masterVolume) {
-        userSettings = updatedUserSettings(masterVolume, null, null, null);
     }
 
     public byte getSFXVolume() {
         return userSettings.sfxVolume();
     }
 
-    public void setSFXVolume(byte sfxVolume) {
-        userSettings = updatedUserSettings(null, sfxVolume, null, null);
-    }
-
     public byte getMusicVolume() {
         return userSettings.musicVolume();
-    }
-
-    public void setMusicVolume(byte musicVolume) {
-        userSettings = updatedUserSettings(null, null, musicVolume, null);
     }
 
     public byte getMusicDelay() {
         return userSettings.musicDelay();
     }
 
-    public void setMusicDelay(byte musicDelay) {
-        userSettings = updatedUserSettings(null, null, null, musicDelay);
+    public boolean isAutoSaveEnabled() {
+        return userSettings.autoSaveEnabled();
     }
 
-    private UserSettingsData updatedUserSettings(Byte master, Byte sfx, Byte music, Byte delay) {
+    public byte getAutoSaveInterval() {
+        return userSettings.autoSaveInterval();
+    }
+
+    // ----------------- USER SETTING DATA SETTERS -----------------
+
+    public void setMasterVolume(byte masterVolume) {
+        userSettings = updatedUserSettings(masterVolume, null, null, null, null, null);
+    }
+
+    public void setSFXVolume(byte sfxVolume) {
+        userSettings = updatedUserSettings(null, sfxVolume, null, null, null, null);
+    }
+
+    public void setMusicVolume(byte musicVolume) {
+        userSettings = updatedUserSettings(null, null, musicVolume, null, null, null);
+    }
+
+    public void setMusicDelay(byte musicDelay) {
+        userSettings = updatedUserSettings(null, null, null, musicDelay, null, null);
+    }
+
+    public void setAutoSaveEnabled(boolean autoSaveEnabled) {
+        userSettings = updatedUserSettings(null, null, null, null, autoSaveEnabled, null);
+    }
+
+    public void setAutoSaveInterval(byte autoSaveInterval) {
+        userSettings = updatedUserSettings(null, null, null, null, null, autoSaveInterval);
+    }
+
+    private UserSettingsData updatedUserSettings(
+            Byte master, Byte sfx, Byte music, Byte delay, Boolean autoSave, Byte autoInterval
+    ) {
         return new UserSettingsData(
                 master != null ? master : userSettings.masterVolume(),
                 sfx != null ? sfx : userSettings.sfxVolume(),
                 music != null ? music : userSettings.musicVolume(),
-                delay != null ? delay : userSettings.musicDelay()
+                delay != null ? delay : userSettings.musicDelay(),
+                autoSave != null ? autoSave : userSettings.autoSaveEnabled(),
+                autoInterval != null ? autoInterval : userSettings.autoSaveInterval()
         );
     }
 

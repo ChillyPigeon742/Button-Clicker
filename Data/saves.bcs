@@ -1,10 +1,10 @@
 {
-	"version": "0.8.0",
-	"engine": null,
-	"currentSave": null,
-	"saves": {
-		"save1": null,
-		"save2": null,
-		"save3": null
-	}
+    "version": "0.8.0",
+    "engine": null,
+    "currentSave": null,
+    "saves": {
+        "save1": null,
+        "save2": null,
+        "save3": null
+    }
 }
