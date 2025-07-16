@@ -2,9 +2,9 @@ package net.alek.buttonclicker.core;
 
 import com.formdev.flatlaf.FlatLaf;
 
-import net.alek.buttonclicker.assets.ImageLoader;
+import net.alek.buttonclicker.read.assets.ImageLoader;
 import net.alek.buttonclicker.core.log.Logger;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.ui.MenuManager;

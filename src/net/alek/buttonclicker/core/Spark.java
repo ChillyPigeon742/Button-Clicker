@@ -1,8 +1,7 @@
 package net.alek.buttonclicker.core;
 
 import net.alek.buttonclicker.data.model.AppData;
-import net.alek.buttonclicker.command.CommandDefinitions;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.type.Event;
 
 import java.io.IOException;
 import java.lang.module.ModuleReader;
@@ -26,7 +25,6 @@ public class Spark {
                 appDataPath,
                 appDataPath.resolve("Data"),
                 appDataPath.resolve("Logs"),
-                new CommandDefinitions(),
                 "0.8.0_INDEV"
         );
         Event.START_APP.publish(null);
@@ -38,13 +36,13 @@ public class Spark {
         final String moduleName = "ButtonClicker";
 
         ModuleLayer bootLayer = ModuleLayer.boot();
-
         Optional<ModuleReference> modRefOpt = bootLayer.configuration()
                 .findModule(moduleName)
                 .map(ResolvedModule::reference);
 
         if (modRefOpt.isEmpty()) {
             System.err.println("Module reference not found for: " + moduleName);
+            System.exit(moduleName.hashCode());
             return;
         }
 
@@ -62,13 +60,13 @@ public class Spark {
                             Class.forName(className, true, finalClassLoader);
                         } catch (ClassNotFoundException | NoClassDefFoundError e) {
                             System.err.printf("Failed to load class: %s%n", className);
-                            e.printStackTrace();
+                            System.err.println(e.getCause().toString());
                             System.exit(className.hashCode());
                         }
                     });
         } catch (IOException e) {
             System.err.printf("Failed to open ModuleReader for module: %s%n", moduleName);
-            e.printStackTrace();
+            System.err.println(e.getCause().toString());
             System.exit(moduleName.hashCode());
         }
     }

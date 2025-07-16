@@ -1,8 +1,8 @@
-package net.alek.buttonclicker.event.type;
+package net.alek.buttonclicker.transfer.event.type;
 
-import net.alek.buttonclicker.event.EventBus;
-import net.alek.buttonclicker.event.payload.CloseAppPayload;
-import net.alek.buttonclicker.event.payload.LogPayload;
+import net.alek.buttonclicker.transfer.event.EventBus;
+import net.alek.buttonclicker.transfer.event.payload.CloseAppPayload;
+import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 
 import java.util.function.Consumer;
 
@@ -27,7 +27,7 @@ public enum Event {
         return (Class<T>) payloadType;
     }
 
-    public <T extends Record> void subscribe(DeliveryMode mode, Consumer<T> handler) {
+    public <T extends Record> void subscribe(SubscribeMethod mode, Consumer<T> handler) {
         BUS.subscribe(this, mode, handler);
     }
 

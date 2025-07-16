@@ -1,8 +1,8 @@
-package net.alek.buttonclicker.assets;
+package net.alek.buttonclicker.read.assets;
 
 import net.alek.buttonclicker.data.asset.Images;
-import net.alek.buttonclicker.event.type.DeliveryMode;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.core.ErrorHandler;
 import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.ui.RenderService;
@@ -19,8 +19,8 @@ public class ImageLoader {
     private static Images images;
 
     static {
-        Event.LOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> loadAll());
-        Event.UNLOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> unloadAll());
+        Event.LOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> loadAll());
+        Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> unloadAll());
     }
 
     public static Images getImages() {

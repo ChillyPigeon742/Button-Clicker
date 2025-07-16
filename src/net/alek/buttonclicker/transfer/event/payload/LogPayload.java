@@ -1,4 +1,4 @@
-package net.alek.buttonclicker.event.payload;
+package net.alek.buttonclicker.transfer.event.payload;
 
 import net.alek.buttonclicker.core.log.LogType;
 

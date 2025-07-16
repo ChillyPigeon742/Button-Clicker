@@ -1,7 +1,8 @@
 package net.alek.buttonclicker.read.json;
 
-import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.core.log.Logger;
+import net.alek.buttonclicker.core.log.LogType;
+import net.alek.buttonclicker.transfer.event.payload.LogPayload;
+import net.alek.buttonclicker.transfer.event.type.Event;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,16 +12,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class JSONReader {
-    private final String json;
     private final Object root;
     private final JSONParser parser;
     private final JSONDeserializer deserializer;
 
     public JSONReader(String json) {
-        this.json = json;
         this.deserializer = new JSONDeserializer();
         this.parser = new JSONParser(json, deserializer);
         this.root = parser.getRoot();
+    }
+
+    public JSONReader(Object subMap, JSONReader parent) {
+        this.root = subMap;
+        this.deserializer = parent.deserializer;
+        this.parser = parent.parser;
     }
 
     public static JSONReader fromFile(String filePath) {
@@ -38,10 +43,18 @@ public class JSONReader {
             return new JSONReader(sb.toString());
 
         } catch (Exception e) {
-            Logger.Log.error("Could not read JSON file! " + e.getMessage());
-            ErrorHandler.Exception(e);
+            Event.LOG.publish(new LogPayload(LogType.WARN, "Could not read JSON file! " + e.getMessage()));
             return null;
         }
+    }
+
+    public JSONReader getObject(String key) {
+        if (!(root instanceof Map<?, ?> map)) return null;
+        Object val = map.get(key);
+        if (val instanceof Map<?, ?> innerMap) {
+            return new JSONReader(innerMap, this);
+        }
+        return null;
     }
 
     public <T> T read(String key, Class<T> targetClass) {

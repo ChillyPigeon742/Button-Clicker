@@ -1,8 +1,8 @@
 package net.alek.buttonclicker.core.log;
 
-import net.alek.buttonclicker.event.payload.LogPayload;
-import net.alek.buttonclicker.event.type.DeliveryMode;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.payload.LogPayload;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.event.type.Event;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -21,7 +21,7 @@ public class Logger {
     private static final Object lock = new Object();
 
     static {
-        Event.LOG.subscribe(DeliveryMode.ASYNC, (LogPayload p) -> logWriter(p.message(), p.logType()));
+        Event.LOG.subscribe(SubscribeMethod.ASYNC, (LogPayload p) -> logWriter(p.message(), p.logType()));
         setupLogger();
     }
 

@@ -2,8 +2,8 @@ package net.alek.buttonclicker.core;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLaf;
-import net.alek.buttonclicker.event.type.DeliveryMode;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.services.AutoClickerDetectorService;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.util.GUIUtils;
@@ -12,7 +12,7 @@ import javax.swing.*;
 
 public class Glow {
     static {
-        Event.INIT_GUI.subscribe(DeliveryMode.SYNC, ignored -> initializeGUI());
+        Event.INIT_GUI.subscribe(SubscribeMethod.SYNC, ignored -> initializeGUI());
     }
 
     public static void initializeGUI(){

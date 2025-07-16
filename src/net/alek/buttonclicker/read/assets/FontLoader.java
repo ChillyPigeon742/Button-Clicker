@@ -1,8 +1,8 @@
-package net.alek.buttonclicker.assets;
+package net.alek.buttonclicker.read.assets;
 
 import net.alek.buttonclicker.data.asset.Fonts;
-import net.alek.buttonclicker.event.type.DeliveryMode;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.read.ReadUtility;
 
 import java.awt.*;
@@ -13,8 +13,8 @@ public class FontLoader {
     private static Fonts fonts;
 
     static {
-        Event.LOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> loadFonts());
-        Event.UNLOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> unloadFonts());
+        Event.LOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> loadFonts());
+        Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> unloadFonts());
     }
 
     private static void loadFonts() {

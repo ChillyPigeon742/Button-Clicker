@@ -1,11 +1,11 @@
 module ButtonClicker {
-    requires com.formdev.flatlaf;
-    requires java.datatransfer;
     requires java.desktop;
+    requires com.formdev.flatlaf;
     requires javafx.media;
     requires javafx.swing;
+    requires jdk.httpserver;
 
-    exports net.alek.buttonclicker.assets;
+    exports net.alek.buttonclicker.audio;
     exports net.alek.buttonclicker.command;
     exports net.alek.buttonclicker.core;
     exports net.alek.buttonclicker.core.log;
@@ -13,13 +13,15 @@ module ButtonClicker {
     exports net.alek.buttonclicker.data.model;
     exports net.alek.buttonclicker.data.save;
     exports net.alek.buttonclicker.data.settings;
-    exports net.alek.buttonclicker.event;
-    exports net.alek.buttonclicker.event.payload;
-    exports net.alek.buttonclicker.event.type;
+    exports net.alek.buttonclicker.transfer.event;
+    exports net.alek.buttonclicker.transfer.event.payload;
+    exports net.alek.buttonclicker.transfer.event.type;
+    exports net.alek.buttonclicker.read.assets;
     exports net.alek.buttonclicker.read.json;
     exports net.alek.buttonclicker.read.saves;
     exports net.alek.buttonclicker.read.settings;
     exports net.alek.buttonclicker.services;
+    exports net.alek.buttonclicker.singletons;
     exports net.alek.buttonclicker.ui;
     exports net.alek.buttonclicker.ui.components;
     exports net.alek.buttonclicker.util;

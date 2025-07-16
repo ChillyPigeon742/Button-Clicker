@@ -1,22 +1,20 @@
-package net.alek.buttonclicker.assets;
+package net.alek.buttonclicker.read.assets;
 
 import javafx.scene.media.Media;
 import net.alek.buttonclicker.core.log.LogType;
 import net.alek.buttonclicker.data.asset.Audio;
 import net.alek.buttonclicker.data.asset.Music;
 import net.alek.buttonclicker.data.asset.SFX;
-import net.alek.buttonclicker.event.payload.LogPayload;
-import net.alek.buttonclicker.event.type.DeliveryMode;
-import net.alek.buttonclicker.event.type.Event;
+import net.alek.buttonclicker.transfer.event.payload.LogPayload;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.event.type.Event;
 
 public class AudioLoader {
-    private static SFX sfx;
-    private static Music music;
     private static Audio audio;
 
     static {
-        Event.LOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> loadAudioData());
-        Event.UNLOAD_GAME.subscribe(DeliveryMode.SYNC, ignored -> unloadAudioData());
+        Event.LOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> loadAudioData());
+        Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> unloadAudioData());
     }
 
     public static Audio getAudio() {
@@ -24,14 +22,10 @@ public class AudioLoader {
     }
 
     private static void loadAudioData() {
-        sfx = loadSFXAudioData();
-        music = loadMusicAudioData();
-        audio = new Audio(sfx, music);
+        audio = new Audio(loadSFXAudioData(), loadMusicAudioData());
     }
 
     private static void unloadAudioData() {
-        sfx = null;
-        music = null;
         audio = null;
     }
 

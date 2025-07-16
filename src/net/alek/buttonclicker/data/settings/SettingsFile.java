@@ -1,14 +1,22 @@
 package net.alek.buttonclicker.data.settings;
 
+import java.nio.file.Path;
+
 public class SettingsFile {
+    private final Path filePath;
     private String version;
     private UserSettingsData userSettings;
     private DebugSettingsData debugSettings;
 
-    public SettingsFile(String version, UserSettingsData userSettings, DebugSettingsData debugSettings) {
+    public SettingsFile(Path filePath, String version, UserSettingsData userSettings, DebugSettingsData debugSettings) {
+        this.filePath = filePath;
         this.version = version;
         this.userSettings = userSettings;
         this.debugSettings = debugSettings;
+    }
+
+    public Path getFilePath(){
+        return filePath;
     }
 
     public String getVersion() {
