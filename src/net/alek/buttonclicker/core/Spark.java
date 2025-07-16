@@ -1,13 +1,16 @@
 package net.alek.buttonclicker.core;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
 import net.alek.buttonclicker.data.model.AppData;
 import net.alek.buttonclicker.command.CommandDefinitions;
 import net.alek.buttonclicker.event.type.Event;
 
+import java.io.IOException;
+import java.lang.module.ModuleReader;
+import java.lang.module.ModuleReference;
+import java.lang.module.ResolvedModule;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class Spark {
     private static AppData appData;
@@ -29,19 +32,44 @@ public class Spark {
         Event.START_APP.publish(null);
     }
 
-    private static void eagerClassload() {
-        try (ScanResult scanResult = new ClassGraph()
-                .acceptPackages("net.alek.buttonclicker")
-                .enableClassInfo()
-                .scan()) {
+    public static void eagerClassload() {
+        final String basePackage = "net.alek.buttonclicker";
+        final String basePath = basePackage.replace('.', '/');
+        final String moduleName = "ButtonClicker";
 
-            scanResult.getAllClasses().forEach(classInfo -> {
-                try {
-                    Class.forName(classInfo.getName());
-                } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                    System.exit(-1);
-                }
-            });
+        ModuleLayer bootLayer = ModuleLayer.boot();
+
+        Optional<ModuleReference> modRefOpt = bootLayer.configuration()
+                .findModule(moduleName)
+                .map(ResolvedModule::reference);
+
+        if (modRefOpt.isEmpty()) {
+            System.err.println("Module reference not found for: " + moduleName);
+            return;
+        }
+
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader == null) classLoader = ClassLoader.getSystemClassLoader();
+
+        try (ModuleReader reader = modRefOpt.get().open()) {
+            ClassLoader finalClassLoader = classLoader;
+            reader.list()
+                    .filter(name -> name.endsWith(".class") && name.startsWith(basePath))
+                    .map(name -> name.substring(0, name.length() - 6).replace('/', '.'))
+                    .parallel()
+                    .forEach(className -> {
+                        try {
+                            Class.forName(className, true, finalClassLoader);
+                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                            System.err.printf("Failed to load class: %s%n", className);
+                            e.printStackTrace();
+                            System.exit(className.hashCode());
+                        }
+                    });
+        } catch (IOException e) {
+            System.err.printf("Failed to open ModuleReader for module: %s%n", moduleName);
+            e.printStackTrace();
+            System.exit(moduleName.hashCode());
         }
     }
 

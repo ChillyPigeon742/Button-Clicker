@@ -1,6 +1,5 @@
 package net.alek.buttonclicker.core.log;
 
-import net.alek.buttonclicker.core.ErrorHandler;
 import net.alek.buttonclicker.event.payload.LogPayload;
 import net.alek.buttonclicker.event.type.DeliveryMode;
 import net.alek.buttonclicker.event.type.Event;
