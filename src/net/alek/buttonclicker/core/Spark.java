@@ -3,13 +3,11 @@ package net.alek.buttonclicker.core;
 import net.alek.buttonclicker.data.model.AppData;
 import net.alek.buttonclicker.transfer.event.type.Event;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.module.ModuleReader;
 import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -57,41 +55,60 @@ public class Spark {
         Path dataDir = appData.DATA_PATH();
         Path logDir = appData.LOGS_PATH();
 
-        try {
-            Files.createDirectories(appDataDir);
-            Files.createDirectories(dataDir);
-            Files.createDirectories(logDir);
-        } catch (IOException e) {
-            System.err.println("Failed to create app data directories: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
+        if (Files.notExists(appDataDir)) {
+            try {
+                Files.createDirectories(appDataDir);
+            } catch (IOException e) {
+                System.err.println("Failed to create app data directory: " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+
+        if (Files.notExists(dataDir)) {
+            try {
+                Files.createDirectories(dataDir);
+            } catch (IOException e) {
+                System.err.println("Failed to create data directory: " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+
+        if (Files.notExists(logDir)) {
+            try {
+                Files.createDirectories(logDir);
+            } catch (IOException e) {
+                System.err.println("Failed to create logs directory: " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
+            }
         }
 
         String defaultsPath = "/assets/buttonclicker/config/default/";
-        try {
-            File settings = new File(Objects.requireNonNull(
-                    Spark.class.getResource(defaultsPath + "settings.json")).toURI());
-            File saves = new File(Objects.requireNonNull(
-                    Spark.class.getResource(defaultsPath + "saves.bcs")).toURI());
 
-            if (!settings.exists() || !saves.exists()) {
-                Path targetSettings = dataDir.resolve("settings.json");
-                Path targetSaves = dataDir.resolve("saves.bcs");
-
-                try (var inSettings = Spark.class.getResourceAsStream(defaultsPath + "settings.json");
-                     var inSaves = Spark.class.getResourceAsStream(defaultsPath + "saves.bcs")) {
-
-                    Objects.requireNonNull(inSettings, "Default settings.json resource not found");
-                    Objects.requireNonNull(inSaves, "Default saves.bcs resource not found");
-
-                    Files.copy(inSettings, targetSettings, StandardCopyOption.REPLACE_EXISTING);
-                    Files.copy(inSaves, targetSaves, StandardCopyOption.REPLACE_EXISTING);
-                }
+        Path targetSettings = dataDir.resolve("settings.json");
+        if (Files.notExists(targetSettings)) {
+            try (var inSettings = Spark.class.getResourceAsStream(defaultsPath + "settings.json")) {
+                Objects.requireNonNull(inSettings, "Default settings.json resource not found");
+                Files.copy(inSettings, targetSettings, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException | NullPointerException e) {
+                System.err.println("Failed to copy default settings.json: " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
             }
-        } catch (URISyntaxException | IOException e) {
-            System.err.println("Failed to create default files: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
+        }
+
+        Path targetSaves = dataDir.resolve("saves.bcs");
+        if (Files.notExists(targetSaves)) {
+            try (var inSaves = Spark.class.getResourceAsStream(defaultsPath + "saves.bcs")) {
+                Objects.requireNonNull(inSaves, "Default saves.bcs resource not found");
+                Files.copy(inSaves, targetSaves, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException | NullPointerException e) {
+                System.err.println("Failed to copy default saves.bcs: " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
+            }
         }
     }
 
