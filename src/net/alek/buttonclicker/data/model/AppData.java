@@ -4,8 +4,8 @@ import java.nio.file.Path;
 
 public record AppData(
         boolean debugMode,
+        String version,
         Path APPDATA_PATH,
         Path DATA_PATH,
-        Path LOGS_PATH,
-        String version
+        Path LOGS_PATH
 ) {}
