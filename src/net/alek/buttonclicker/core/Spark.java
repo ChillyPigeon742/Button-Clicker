@@ -2,6 +2,7 @@ package net.alek.buttonclicker.core;
 
 import net.alek.buttonclicker.data.model.AppData;
 import net.alek.buttonclicker.transfer.event.type.Event;
+import net.alek.buttonclicker.transfer.request.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +46,10 @@ public class Spark {
                 appDataPath.resolve("Data"),
                 appDataPath.resolve("Logs")
         );
+        Request.GET_APPDATA.handle(() -> appData);
+
         setupAppDataFolder();
         eagerClassload();
-
         Event.START_APP.publish(null);
     }
 

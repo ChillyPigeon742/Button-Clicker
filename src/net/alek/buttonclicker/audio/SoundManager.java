@@ -17,7 +17,7 @@ public class SoundManager {
     private byte musicDelay;
     private final ATimer musicDelayTimer = new ATimer();
 
-    public void loadTrack(int type, Media track){
+    public static void loadTrack(int type, Media track){
         if(type==1){
             sfxAudioPlayer = new MediaPlayer(track);
             refreshVolume();
@@ -83,7 +83,7 @@ public class SoundManager {
         return masterVolume;
     }
 
-    public MediaPlayer getMusicAudioPlayer(){
+    public static MediaPlayer getMusicAudioPlayer(){
         return musicAudioPlayer;
     }
 
@@ -95,7 +95,7 @@ public class SoundManager {
         return sfxAudioPlayer;
     }
 
-    public ATimer getMusicDelayTimer(){
+    public static ATimer getMusicDelayTimer(){
         return musicDelayTimer;
     }
 
