@@ -5,7 +5,6 @@ import com.formdev.flatlaf.FlatLaf;
 import net.alek.buttonclicker.read.assets.ImageLoader;
 import net.alek.buttonclicker.core.log.Logger;
 import net.alek.buttonclicker.transfer.event.type.Event;
-import net.alek.buttonclicker.services.AudioService;
 import net.alek.buttonclicker.ui.RenderService;
 import net.alek.buttonclicker.ui.MenuManager;
 import net.alek.buttonclicker.util.GUIUtils;
@@ -16,7 +15,7 @@ import java.util.Arrays;
 
 public class ErrorHandler {
     static {
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> Throwable(throwable));
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> Exception(throwable));
     }
 
     private static String getCallerInfo() {
@@ -81,17 +80,7 @@ public class ErrorHandler {
         RenderService.showConsoleButton.setFocusable(false);
     }
 
-    public static void Exception(Exception e) {
-        String name = e.getClass().getSimpleName();
-        String packageName = e.getClass().getName();
-        String cause = (e.getCause() != null) ? e.getCause().toString() : "No cause";
-        String message = e.getMessage();
-        String stackTrace = Arrays.toString(e.getStackTrace());
-
-        handleException(name, cause, message, packageName, stackTrace);
-    }
-
-    public static void Throwable(Throwable t) {
+    public static void Exception(Throwable t) {
         String name = t.getClass().getSimpleName();
         String packageName = t.getClass().getName();
         String cause = (t.getCause() != null) ? t.getCause().toString() : "No cause";

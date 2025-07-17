@@ -4,12 +4,13 @@ import net.alek.buttonclicker.data.model.AppData;
 import net.alek.buttonclicker.transfer.event.type.Event;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.module.ModuleReader;
 import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.Properties;
 
 public class Spark {
     private static AppData appData;
@@ -18,14 +19,31 @@ public class Spark {
         eagerClassload();
 
         boolean debug = args.length > 0 && "-debug".equals(args[0]);
-        Path appDataPath = Paths.get(System.getenv("APPDATA"), "_ButtonClicker");
+        Path appDataPath = Path.of(System.getenv("APPDATA"), "_ButtonClicker");
+        String version;
+
+        InputStream in = Spark.class.getResourceAsStream("/buttonclicker/config/Maven.properties");
+        if (in == null) {
+            System.err.println("Resource not found: Maven.properties");
+            version = "null";
+        } else {
+            try (InputStream autoCloseIn = in) {
+                Properties props = new Properties();
+                props.load(autoCloseIn);
+                version = props.getProperty("app.version");
+            } catch (IOException e) {
+                System.err.println("Failed to read version tag!");
+                System.err.println(e.getMessage() != null ? e.getMessage() : e.toString());
+                version = "null";
+            }
+        }
 
         appData = new AppData(
                 debug,
                 appDataPath,
                 appDataPath.resolve("Data"),
                 appDataPath.resolve("Logs"),
-                "0.8.0_INDEV"
+                version
         );
         Event.START_APP.publish(null);
     }

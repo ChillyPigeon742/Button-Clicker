@@ -11,7 +11,7 @@ public class RequestBus {
     public <R> void handle(Request request, Supplier<R> handler) {
         handlers.put(request, handler);
     }
-    
+
     public <R> CompletableFuture<R> requestAsync(Request request) {
         Supplier<?> handler = handlers.get(request);
         if (handler == null) {
