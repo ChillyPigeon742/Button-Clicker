@@ -17,8 +17,6 @@ public class SoundManager {
     private byte musicDelay;
     private final ATimer musicDelayTimer = new ATimer();
 
-    public
-
     public void loadTrack(int type, Media track){
         if(type==1){
             sfxAudioPlayer = new MediaPlayer(track);
