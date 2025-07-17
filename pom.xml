@@ -12,9 +12,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <app.version>${project.version}</app.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+
+        <app.version>${project.version}</app.version>
     </properties>
 
     <dependencies>
@@ -57,7 +58,6 @@
         </resources>
 
         <plugins>
-
             <!-- JavaFX Plugin -->
             <plugin>
                 <groupId>org.openjfx</groupId>

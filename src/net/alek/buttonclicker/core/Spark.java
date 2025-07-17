@@ -17,6 +17,7 @@ import java.util.Properties;
 
 public class Spark {
     private static AppData appData;
+    private static final String DEFAULTS_PATH = "/assets/buttonclicker/config/default/";
 
     public static void main(String[] args){
         boolean debug = args.length > 0 && "-debug".equals(args[0]);
@@ -54,58 +55,35 @@ public class Spark {
         Path appDataDir = appData.APPDATA_PATH();
         Path dataDir = appData.DATA_PATH();
         Path logDir = appData.LOGS_PATH();
+        createDir(appDataDir);
+        createDir(dataDir);
+        createDir(logDir);
 
-        if (Files.notExists(appDataDir)) {
+        createFile(dataDir.resolve("settings.json"));
+        createFile(dataDir.resolve("saves.bcs"));
+    }
+
+    private static void createDir(Path directory){
+        String folderName = String.valueOf(directory.getFileName());
+        if (Files.notExists(directory)) {
             try {
-                Files.createDirectories(appDataDir);
+                Files.createDirectories(directory);
             } catch (IOException e) {
-                System.err.println("Failed to create app data directory: " + e.getMessage());
+                System.err.println("Failed to create " + folderName + " directory: " + e.getMessage());
                 e.printStackTrace();
                 System.exit(1);
             }
         }
+    }
 
-        if (Files.notExists(dataDir)) {
-            try {
-                Files.createDirectories(dataDir);
-            } catch (IOException e) {
-                System.err.println("Failed to create data directory: " + e.getMessage());
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-
-        if (Files.notExists(logDir)) {
-            try {
-                Files.createDirectories(logDir);
-            } catch (IOException e) {
-                System.err.println("Failed to create logs directory: " + e.getMessage());
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-
-        String defaultsPath = "/assets/buttonclicker/config/default/";
-
-        Path targetSettings = dataDir.resolve("settings.json");
-        if (Files.notExists(targetSettings)) {
-            try (var inSettings = Spark.class.getResourceAsStream(defaultsPath + "settings.json")) {
-                Objects.requireNonNull(inSettings, "Default settings.json resource not found");
-                Files.copy(inSettings, targetSettings, StandardCopyOption.REPLACE_EXISTING);
+    private static void createFile(Path filePath){
+        String fileName = String.valueOf(filePath.getFileName());
+        if (Files.notExists(filePath)) {
+            try (var inSettings = Spark.class.getResourceAsStream( DEFAULTS_PATH + fileName)) {
+                Objects.requireNonNull(inSettings, "Default " + fileName +" resource not found");
+                Files.copy(inSettings, filePath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException | NullPointerException e) {
-                System.err.println("Failed to copy default settings.json: " + e.getMessage());
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-
-        Path targetSaves = dataDir.resolve("saves.bcs");
-        if (Files.notExists(targetSaves)) {
-            try (var inSaves = Spark.class.getResourceAsStream(defaultsPath + "saves.bcs")) {
-                Objects.requireNonNull(inSaves, "Default saves.bcs resource not found");
-                Files.copy(inSaves, targetSaves, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException | NullPointerException e) {
-                System.err.println("Failed to copy default saves.bcs: " + e.getMessage());
+                System.err.println("Failed to copy default " + fileName + ": " + e.getMessage());
                 e.printStackTrace();
                 System.exit(1);
             }
@@ -142,13 +120,13 @@ public class Spark {
                             Class.forName(className, true, finalClassLoader);
                         } catch (ClassNotFoundException | NoClassDefFoundError e) {
                             System.err.printf("Failed to load class: %s%n", className);
-                            System.err.println(e.getCause().toString());
+                            e.printStackTrace();
                             System.exit(className.hashCode());
                         }
                     });
         } catch (IOException e) {
             System.err.printf("Failed to open ModuleReader for module: %s%n", moduleName);
-            System.err.println(e.getCause().toString());
+            e.printStackTrace();
             System.exit(moduleName.hashCode());
         }
     }
