@@ -1,8 +1,11 @@
 package net.alek.buttonclicker.core.log;
 
+import net.alek.buttonclicker.core.ErrorHandler;
+import net.alek.buttonclicker.data.model.AppData;
 import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
+import net.alek.buttonclicker.transfer.request.Request;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -53,6 +56,12 @@ public class Logger {
     }
 
     private static void logWriter(String toWrite, LogType type) {
+        if (type == LogType.DEBUG){
+            AppData appData = (AppData) Request.GET_APPDATA.request().await().get();
+            boolean debug = appData.debugMode();
+            if (debug) return;
+        }
+
         synchronized (lock) {
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             String caller = getCallerInfo();

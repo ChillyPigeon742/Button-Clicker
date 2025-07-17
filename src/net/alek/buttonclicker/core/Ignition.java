@@ -7,6 +7,7 @@ import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.services.AutoClickerDetectorService;
+import net.alek.buttonclicker.transfer.request.Request;
 
 public class Ignition {
     static {
@@ -28,6 +29,7 @@ public class Ignition {
         Event.LOG.publish(new LogPayload(LogType.WARN, "Closing app..."));
         AutoClickerDetectorService.shutdown();
         Event.shutdown();
+        Request.shutdown();
         System.exit(exitCode);
     }
 }

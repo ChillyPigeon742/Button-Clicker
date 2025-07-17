@@ -9,7 +9,11 @@ import java.util.function.Consumer;
 
 public class EventBus {
 
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
+    private static final ExecutorService executor = Executors.newCachedThreadPool(r -> {
+        Thread t = new Thread(r);
+        t.setDaemon(true);
+        return t;
+    });
     private record EventKey(Event event, Class<? extends Record> payloadType) {}
 
     private static class Subscriber<T extends Record> {
