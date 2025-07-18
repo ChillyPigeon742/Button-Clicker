@@ -1,12 +1,13 @@
 package net.alek.buttonclicker.read.assets;
 
+import net.alek.buttonclicker.core.log.LogType;
 import net.alek.buttonclicker.data.asset.Images;
+import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.core.log.Logger;
+import net.alek.buttonclicker.transfer.request.Request;
 import net.alek.buttonclicker.ui.RenderService;
-import net.alek.buttonclicker.read.ReadUtility;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,6 +20,7 @@ public class ImageLoader {
     private static Images images;
 
     static {
+        Request.GET_IMAGES.handle(ImageLoader::getImages);
         Event.LOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> loadAll());
         Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> unloadAll());
     }
@@ -61,10 +63,10 @@ public class ImageLoader {
 
     private static ImageIcon loadIcon(String fileName, ImageIcon fallback) {
         try {
-            URL url = ReadUtility.class.getResource(IMAGE_PATH + fileName);
+            URL url = FontLoader.class.getResource(IMAGE_PATH + fileName);
             if (url != null) return new ImageIcon(url);
         } catch (Exception e) {
-            Logger.Log.error("Failed to load icon: " + fileName);
+            Event.LOG.publish(new LogPayload(LogType.ERROR, "Failed to load icon: " + fileName));
             ErrorHandler.Exception(e);
         }
         return fallback != null ? fallback : new ImageIcon();
@@ -72,10 +74,10 @@ public class ImageLoader {
 
     private static BufferedImage loadImage(String fileName, BufferedImage fallback) {
         try {
-            URL url = ReadUtility.class.getResource(IMAGE_PATH + fileName);
+            URL url = FontLoader.class.getResource(IMAGE_PATH + fileName);
             if (url != null) return ImageIO.read(url);
         } catch (IOException e) {
-            Logger.Log.error("Failed to load image: " + fileName);
+            Event.LOG.publish(new LogPayload(LogType.ERROR, "Failed to load image: " + fileName));
             ErrorHandler.Exception(e);
         }
         return fallback != null ? fallback : RenderService.generateMissingTexture(64);

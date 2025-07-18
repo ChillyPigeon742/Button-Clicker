@@ -8,11 +8,13 @@ import net.alek.buttonclicker.data.asset.SFX;
 import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
+import net.alek.buttonclicker.transfer.request.Request;
 
 public class AudioLoader {
     private static Audio audio;
 
     static {
+        Request.GET_AUDIO.handle(AudioLoader::getAudio);
         Event.LOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> loadAudioData());
         Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> unloadAudioData());
     }

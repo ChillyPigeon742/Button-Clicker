@@ -1,13 +1,21 @@
 package net.alek.buttonclicker.transfer.request;
 
+import net.alek.buttonclicker.data.asset.Audio;
+import net.alek.buttonclicker.data.asset.Fonts;
+import net.alek.buttonclicker.data.asset.Images;
 import net.alek.buttonclicker.data.model.AppData;
+import net.alek.buttonclicker.transfer.request.payload.SoundManagerClassPayload;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public enum Request {
-    GET_APPDATA(AppData.class);
+    GET_APPDATA(AppData.class),
+    GET_AUDIO(Audio.class),
+    GET_FONTS(Fonts.class),
+    GET_IMAGES(Images.class),
+    GET_SOUND_MANAGER(SoundManagerClassPayload.class);
 
     private final Class<? extends Record> responseClass;
     private static final RequestBus BUS = new RequestBus();
@@ -89,7 +97,7 @@ public enum Request {
             }
         }
     }
-    
+
     public static class RequestSync<R extends Record> {
         private final R data;
         private final Throwable error;

@@ -14,5 +14,5 @@ public enum Track {
     GAME1,
     GAME2,
     PAUSE,
-    SHOP
+    SHOP;
 }

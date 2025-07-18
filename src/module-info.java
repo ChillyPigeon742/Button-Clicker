@@ -22,6 +22,7 @@ module ButtonClicker {
     exports net.alek.buttonclicker.transfer.event.payload;
     exports net.alek.buttonclicker.transfer.event.type;
     exports net.alek.buttonclicker.transfer.request;
+    exports net.alek.buttonclicker.transfer.request.payload;
     exports net.alek.buttonclicker.ui;
     exports net.alek.buttonclicker.ui.components;
     exports net.alek.buttonclicker.util;

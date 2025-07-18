@@ -1,105 +1,72 @@
 package net.alek.buttonclicker.audio;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import net.alek.buttonclicker.ui.components.ATimer;
+import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.payload.SoundManagerClassPayload;
 
 public class SoundManager {
-    private MediaPlayer musicAudioPlayer;
-    private MediaPlayer sMusicAudioPlayer;
-    private MediaPlayer sfxAudioPlayer;
-    private double masterVolume;
-    private double musicVolume;
-    private double sfxVolume;
-    private byte masterVolumeUSER;
-    private byte musicVolumeUSER;
-    private byte sfxVolumeUSER;
-    private byte musicDelay;
-    private final ATimer musicDelayTimer = new ATimer();
+    private static final SoundManager INSTANCE = new SoundManager();
 
-    public static void loadTrack(int type, Media track){
-        if(type==1){
-            sfxAudioPlayer = new MediaPlayer(track);
-            refreshVolume();
-        }else if(type==2){
-            musicAudioPlayer = new MediaPlayer(track);
-            refreshVolume();
-        }else if(type==3){
-            sMusicAudioPlayer = new MediaPlayer(track);
-            refreshVolume();
-        }
+    private static Music music;
+    private static SFX sfx;
+
+    private double masterVolume;
+    private byte masterUserVolume;
+    private byte musicUserVolume;
+    private byte sfxUserVolume;
+
+    static {
+        Request.GET_SOUND_MANAGER.handle(() -> new SoundManagerClassPayload(INSTANCE));
     }
 
-    public void refreshVolume() {
-        if (sfxAudioPlayer != null && sfxAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
-            sfxAudioPlayer.setVolume(sfxVolume);
-        }
-        if (musicAudioPlayer != null && musicAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
-            musicAudioPlayer.setVolume(musicVolume);
-        }
-        if (sMusicAudioPlayer != null && sMusicAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
-            sMusicAudioPlayer.setVolume(musicVolume);
-        }
+    public static SoundManager getInstance() {
+        return INSTANCE;
+    }
+
+    private SoundManager() {}
+
+    public void init() {
+        music = new Music();
+        sfx = new SFX();
     }
 
     public void setMasterVolume(byte value) {
+        masterUserVolume = value;
         masterVolume = value / 100.0;
-        musicVolume = masterVolume * musicVolume;
-        sfxVolume = masterVolume * sfxVolume;
-
-        masterVolumeUSER = value;
-
-        refreshVolume();
+        updateVolumes();
     }
 
     public void setMusicVolume(byte value) {
-        musicVolume = masterVolume * (value / 100.0);
-        musicVolumeUSER = value;
-
-        refreshVolume();
+        musicUserVolume = value;
+        updateVolumes();
     }
 
     public void setSFXVolume(byte value) {
-        sfxVolume = masterVolume * (value / 100.0);
-        sfxVolumeUSER = value;
-
-        refreshVolume();
+        sfxUserVolume = value;
+        updateVolumes();
     }
 
-    public void setMusicDelay(byte value) {
-        musicDelay = value;
-        musicDelayTimer.setInterval(musicDelay);
+    private void updateVolumes() {
+        music.setMusicVolume(masterVolume * (musicUserVolume / 100.0));
+        sfx.setSFXVolume(masterVolume * (sfxUserVolume / 100.0));
     }
 
-    public Double getSFXVolume() {
-        return sfxVolume;
-    }
-
-    public Double getMusicVolume() {
-        return musicVolume;
-    }
-
-    public Double getMasterVolume() {
+    public double getMasterVolume() {
         return masterVolume;
     }
 
-    public static MediaPlayer getMusicAudioPlayer(){
-        return musicAudioPlayer;
+    public byte getMusicUserVolume() {
+        return musicUserVolume;
     }
 
-    public MediaPlayer getSMusicAudioPlayer(){
-        return sMusicAudioPlayer;
+    public byte getSFXUserVolume() {
+        return sfxUserVolume;
     }
 
-    public MediaPlayer getSFXAudioPlayer(){
-        return sfxAudioPlayer;
+    public Music getMusic() {
+        return music;
     }
 
-    public static ATimer getMusicDelayTimer(){
-        return musicDelayTimer;
-    }
-
-    public Byte getMusicDelay(){
-        return musicDelay;
+    public SFX getSFX() {
+        return sfx;
     }
 }

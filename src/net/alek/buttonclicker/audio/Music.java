@@ -1,150 +1,162 @@
 package net.alek.buttonclicker.audio;
 
+import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import net.alek.buttonclicker.data.asset.Audio;
+import net.alek.buttonclicker.transfer.request.Request;
 import net.alek.buttonclicker.ui.MenuManager;
+import net.alek.buttonclicker.ui.components.ATimer;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Music {
-    private static boolean finishedPlaying = false;
+    private MediaPlayer musicAudioPlayer;
+    private MediaPlayer sMusicAudioPlayer;
+    private final ATimer musicDelayTimer = new ATimer();
+
+    private final Map<Track, TrackInfo> trackMap = new HashMap<>();
+
+    private double musicVolume;
+    private byte musicDelay;
+    private boolean finishedPlaying = false;
+    
+    public Music(){
+        Audio audio = (Audio) Request.GET_AUDIO.request().await().get();
+        net.alek.buttonclicker.data.asset.Music music = audio.music();
+
+        trackMap.put(Track.MENU1, new TrackInfo(music.menu1(), false, Track.MENU2, false));
+        trackMap.put(Track.MENU2, new TrackInfo(music.menu2(), false, Track.MENU1, false));
+        trackMap.put(Track.LOADING, new TrackInfo(music.loading(), false, null, false));
+        trackMap.put(Track.GAME1, new TrackInfo(music.game1(), false, Track.GAME2, false));
+        trackMap.put(Track.GAME2, new TrackInfo(music.game2(), false, Track.GAME1, false));
+        trackMap.put(Track.PAUSE, new TrackInfo(music.pause(), true, Track.PAUSE, true));
+        trackMap.put(Track.SHOP, new TrackInfo(music.shop(), true, Track.SHOP, true));
+    }
 
     public void chooseMusic(){
         int number = new Random().nextInt(1, 3);
         playMusic(number == 1 ? Track.MENU1 : Track.MENU2);
     }
 
-    public static void playMusic(Track track){
-        if(Objects.equals(trackName, "menu1")){
-            stopMusic();
-            finishedPlaying = false;
+    public void playMusic(Track track) {
+        TrackInfo info = trackMap.get(track);
+        if (info == null) return;
 
-            SoundManager.loadTrack(2, menu1);
-            SoundManager.getMusicAudioPlayer().setOnEndOfMedia(() -> {
-                finishedPlaying = true;
+        stopMusic();
+        finishedPlaying = info.nextTrack == null;
 
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> playMusic("menu2"));
-                SoundManager.getMusicDelayTimer().start();
-            });
+        loadTrack(info.isSecondaryPlayer ? MusicPlayerType.S_MUSIC_PLAYER : MusicPlayerType.MUSIC_PLAYER, info.media);
+        MediaPlayer player = info.isSecondaryPlayer ? sMusicAudioPlayer : musicAudioPlayer;
 
-            SoundManager.getMusicAudioPlayer().play();
-        }else if(Objects.equals(trackName, "menu2")){
-            stopMusic();
-            finishedPlaying = false;
-
-            SoundManager.loadTrack(2, menu2);
-            SoundManager.getMusicAudioPlayer().setOnEndOfMedia(() -> {
-                finishedPlaying = true;
-
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> playMusic("menu1"));
-                SoundManager.getMusicDelayTimer().start();
-            });
-            SoundManager.getMusicAudioPlayer().play();
-        }else if(Objects.equals(trackName, "loading")){
-            stopMusic();
+        player.setOnEndOfMedia(() -> {
             finishedPlaying = true;
+            musicDelayTimer.setInterval(musicDelay);
 
-            SoundManager.loadTrack(3, loading);
-            SoundManager.getSMusicAudioPlayer().setOnEndOfMedia(() -> {
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> {
-                    Random random = new Random();
-                    int number = random.nextInt(1,3);
-
-                    if(number==1){
-                        playMusic("game1");
-                    }else if(number==2) {
-                        playMusic("game2");
+            musicDelayTimer.setTask(() -> {
+                if (info.conditionalLoop) {
+                    if (!MenuManager.isMenuOpen("Game")) {
+                        playMusic(info.nextTrack);
                     }
-                });
-                SoundManager.getMusicDelayTimer().start();
+                } else if (info.nextTrack != null) {
+                    playMusic(info.nextTrack);
+                }
             });
 
-            SoundManager.getSMusicAudioPlayer().play();
-        }else if(Objects.equals(trackName, "game1")){
-            stopMusic();
-            finishedPlaying = false;
+            musicDelayTimer.start();
+        });
 
-            SoundManager.loadTrack(2, game1);
-            SoundManager.getMusicAudioPlayer().setOnEndOfMedia(() -> {
-                finishedPlaying = true;
-
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> playMusic("game2"));
-                SoundManager.getMusicDelayTimer().start();
-            });
-
-            SoundManager.getMusicAudioPlayer().play();
-
-        }else if(Objects.equals(trackName, "game2")){
-            stopMusic();
-            finishedPlaying = false;
-
-            SoundManager.loadTrack(2, game2);
-            SoundManager.getMusicAudioPlayer().setOnEndOfMedia(() -> {
-                finishedPlaying = true;
-
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> playMusic("game1"));
-                SoundManager.getMusicDelayTimer().start();
-            });
-
-            SoundManager.getMusicAudioPlayer().play();
-        }else if(Objects.equals(trackName, "pause")){
-            SoundManager.loadTrack(3, pause);
-            SoundManager.getSMusicAudioPlayer().setOnEndOfMedia(() -> {
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> {
-                    if(!MenuManager.isMenuOpen("Game")){
-                        playMusic("pause");
-                    }
-                });
-                SoundManager.getMusicDelayTimer().start();
-            });
-
-            SoundManager.getSMusicAudioPlayer().play();
-        }else if(Objects.equals(trackName, "shop")){
-            SoundManager.loadTrack(3, shop);
-            SoundManager.getSMusicAudioPlayer().setOnEndOfMedia(() -> {
-                SoundManager.getMusicDelayTimer().setInterval(SoundManager.musicDelay);
-                SoundManager.getMusicDelayTimer().setTask(() -> {
-                    if(!MenuManager.isMenuOpen("Game")){
-                        playMusic("shop");
-                    }
-                });
-                SoundManager.getMusicDelayTimer().start();
-            });
-
-            SoundManager.getSMusicAudioPlayer().play();
-        }
+        player.play();
     }
 
-    public static void resumeMusic(){
-        if(SoundManager.getMusicAudioPlayer().getStatus()== MediaPlayer.Status.PAUSED){
-            SoundManager.getMusicAudioPlayer().play();
+    public void resumeMusic(){
+        if(getMusicAudioPlayer().getStatus()== MediaPlayer.Status.PAUSED){
+            getMusicAudioPlayer().play();
         }
         if(isFinishedPlaying()){
-            SoundManager.getMusicDelayTimer().resume();
+            getMusicDelayTimer().resume();
         }
     }
 
-    public static void pauseMusic(){
-        if(SoundManager.getMusicAudioPlayer().getStatus()==MediaPlayer.Status.PLAYING){
-            SoundManager.getMusicAudioPlayer().pause();
-        }
-        if(isFinishedPlaying()){
-            SoundManager.getMusicDelayTimer().pause();
+    public void pauseMusic(){
+        if(getMusicAudioPlayer().getStatus()==MediaPlayer.Status.PLAYING){
+            getMusicAudioPlayer().pause();
+        }else if(isFinishedPlaying()){
+            getMusicDelayTimer().pause();
         }
     }
 
-    public static void stopMusic(){
-        SoundManager.getMusicAudioPlayer().stop();
-        SoundManager.getMusicDelayTimer().stop();
+    public void stopMusic(){
+        getMusicAudioPlayer().stop();
+        getMusicDelayTimer().stop();
     }
 
-    public static boolean isFinishedPlaying(){
+    public void loadTrack(MusicPlayerType type, Media track){
+        if(type==MusicPlayerType.MUSIC_PLAYER){
+            musicAudioPlayer = new MediaPlayer(track);
+            refreshVolume();
+        }else if(type==MusicPlayerType.S_MUSIC_PLAYER){
+            sMusicAudioPlayer = new MediaPlayer(track);
+            refreshVolume();
+        }
+    }
+
+    public void refreshVolume() {
+        if (musicAudioPlayer != null && musicAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
+            musicAudioPlayer.setVolume(musicVolume);
+        }
+        if (sMusicAudioPlayer != null && sMusicAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
+            sMusicAudioPlayer.setVolume(musicVolume);
+        }
+    }
+
+    public void setMusicVolume(double value) {
+        musicVolume = value;
+        refreshVolume();
+    }
+    
+    public void setMusicDelay(byte value) {
+        musicDelay = value;
+        musicDelayTimer.setInterval(musicDelay);
+    }
+
+    public double getMusicVolume() {
+        return musicVolume;
+    }
+
+    public MediaPlayer getMusicAudioPlayer(){
+        return musicAudioPlayer;
+    }
+
+    public MediaPlayer getSMusicAudioPlayer(){
+        return sMusicAudioPlayer;
+    }
+
+
+    public ATimer getMusicDelayTimer(){
+        return musicDelayTimer;
+    }
+
+    public byte getMusicDelay(){
+        return musicDelay;
+    }
+
+    public boolean isFinishedPlaying(){
         return finishedPlaying;
+    }
+
+    private static class TrackInfo {
+        Media media;
+        boolean isSecondaryPlayer;
+        Track nextTrack;
+        boolean conditionalLoop;
+
+        TrackInfo(Media media, boolean isSecondaryPlayer, Track nextTrack, boolean conditionalLoop) {
+            this.media = media;
+            this.isSecondaryPlayer = isSecondaryPlayer;
+            this.nextTrack = nextTrack;
+            this.conditionalLoop = conditionalLoop;
+        }
     }
 }

@@ -14,9 +14,7 @@ public class ATimer {
     private boolean isLooping;
 
     private long startTime;
-    private long pauseTime;
     private long remainingTime;
-
     private final AtomicBoolean isPaused = new AtomicBoolean(false);
 
     public ATimer() {
@@ -80,7 +78,7 @@ public class ATimer {
 
     public void pause() {
         if (!isPaused.get() && future != null && !future.isCancelled()) {
-            pauseTime = System.currentTimeMillis();
+            long pauseTime = System.currentTimeMillis();
             remainingTime = intervalTime - (pauseTime - startTime);
 
             future.cancel(false);

@@ -3,7 +3,7 @@ package net.alek.buttonclicker.read.assets;
 import net.alek.buttonclicker.data.asset.Fonts;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
-import net.alek.buttonclicker.read.ReadUtility;
+import net.alek.buttonclicker.transfer.request.Request;
 
 import java.awt.*;
 import java.io.IOException;
@@ -13,6 +13,7 @@ public class FontLoader {
     private static Fonts fonts;
 
     static {
+        Request.GET_FONTS.handle(FontLoader::getFonts);
         Event.LOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> loadFonts());
         Event.UNLOAD_GAME.subscribe(SubscribeMethod.SYNC, ignored -> unloadFonts());
     }
@@ -32,7 +33,7 @@ public class FontLoader {
     private static Font loadFont(String fontFileName) {
         try {
             return Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(
-                            ReadUtility.class.getResourceAsStream("/assets/buttonclicker/fonts/" + fontFileName)))
+                            FontLoader.class.getResourceAsStream("/assets/buttonclicker/fonts/" + fontFileName)))
                     .deriveFont(12f);
         } catch (FontFormatException | IOException | NullPointerException e) {
             return new Font("SansSerif", Font.PLAIN, 12);

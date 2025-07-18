@@ -46,7 +46,7 @@ public class Spark {
                 appDataPath.resolve("Data"),
                 appDataPath.resolve("Logs")
         );
-        Request.GET_APPDATA.handle(() -> appData);
+        Request.GET_APPDATA.handle(Spark::getAppData);
 
         setupAppDataFolder();
         eagerClassload();

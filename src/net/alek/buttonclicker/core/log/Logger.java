@@ -59,7 +59,7 @@ public class Logger {
         if (type == LogType.DEBUG){
             AppData appData = (AppData) Request.GET_APPDATA.request().await().get();
             boolean debug = appData.debugMode();
-            if (debug) return;
+            if (!debug) return;
         }
 
         synchronized (lock) {
