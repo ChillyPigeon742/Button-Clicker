@@ -1,18 +1,33 @@
 package net.alek.buttonclicker.data.settings;
 
+import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.payload.SettingsFilePayload;
+
 import java.nio.file.Path;
 
 public class SettingsFile {
-    private final Path filePath;
+    private static final SettingsFile instance = new SettingsFile();
+
+    private Path filePath;
     private String version;
     private UserSettingsData userSettings;
     private DebugSettingsData debugSettings;
 
-    public SettingsFile(Path filePath, String version, UserSettingsData userSettings, DebugSettingsData debugSettings) {
+    static {
+        Request.GET_SETTINGS_FILE.handle(SettingsFile::getInstance);
+    }
+
+    private SettingsFile(){}
+
+    public void resetFile(Path filePath, String version, UserSettingsData userSettings, DebugSettingsData debugSettings) {
         this.filePath = filePath;
         this.version = version;
         this.userSettings = userSettings;
         this.debugSettings = debugSettings;
+    }
+
+    private static SettingsFilePayload getInstance(){
+        return new SettingsFilePayload(instance);
     }
 
     public Path getFilePath(){

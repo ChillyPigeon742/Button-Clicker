@@ -1,11 +1,12 @@
-package net.alek.buttonclicker.audio;
+package net.alek.buttonclicker.singletons;
 
+import net.alek.buttonclicker.audio.Music;
+import net.alek.buttonclicker.audio.SFX;
 import net.alek.buttonclicker.transfer.request.Request;
 import net.alek.buttonclicker.transfer.request.payload.SoundManagerClassPayload;
 
-public class SoundManager {
-    private static final SoundManager INSTANCE = new SoundManager();
-
+public class Audio {
+    private static final Audio INSTANCE = new Audio();
     private static Music music;
     private static SFX sfx;
 
@@ -18,11 +19,11 @@ public class SoundManager {
         Request.GET_SOUND_MANAGER.handle(() -> new SoundManagerClassPayload(INSTANCE));
     }
 
-    public static SoundManager getInstance() {
+    public static Audio getInstance() {
         return INSTANCE;
     }
 
-    private SoundManager() {}
+    private Audio() {}
 
     public void init() {
         music = new Music();

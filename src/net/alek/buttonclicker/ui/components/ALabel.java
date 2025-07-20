@@ -6,18 +6,29 @@ import java.awt.*;
 public class ALabel extends JLabel {
     private final Timer timer;
     private boolean isSpinning;
+    private double rotationSpeed = 0.05;
     private double angle = 0;
+    private short fps = 60;
 
     public ALabel() {
-        timer = new Timer(16, e -> {
-            angle += 0.05;
+        setDoubleBuffered(true);
+        timer = new Timer(1000 / fps, e -> {
+            angle += rotationSpeed;
+            angle %= 2 * Math.PI;
             repaint();
         });
     }
 
+    private void updateTimerDelay() {
+        int delay = 1000 / fps;
+        timer.setDelay(delay);
+    }
+
     public void startSpinning() {
-        timer.start();
-        isSpinning = true;
+        if (!timer.isRunning()) {
+            timer.start();
+            isSpinning = true;
+        }
     }
 
     public void stopSpinning() {
@@ -27,14 +38,48 @@ public class ALabel extends JLabel {
         repaint();
     }
 
+    public void toggleSpinning(){
+        if (!timer.isRunning()) {
+            startSpinning();
+        }else{
+            stopSpinning();
+        }
+    }
+
+    public void setRotationSpeed(double rotationSpeed) {
+        this.rotationSpeed = rotationSpeed;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle % (2 * Math.PI);
+        repaint();
+    }
+
+    public void setFPS(short fps) {
+        this.fps = fps;
+        updateTimerDelay();
+    }
+
     public boolean isSpinning(){
         return isSpinning;
     }
 
+    public double getRotationSpeed() {
+        return rotationSpeed;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public short getFPS() {
+        return fps;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
-        if (getIcon() != null) {
-            ImageIcon icon = (ImageIcon) getIcon();
+        Icon rawIcon = getIcon();
+        if (rawIcon instanceof ImageIcon icon) {
             Image image = icon.getImage();
 
             int imageWidth = image.getWidth(null);

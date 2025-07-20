@@ -4,6 +4,7 @@ import net.alek.buttonclicker.data.asset.Audio;
 import net.alek.buttonclicker.data.asset.Fonts;
 import net.alek.buttonclicker.data.asset.Images;
 import net.alek.buttonclicker.data.model.AppData;
+import net.alek.buttonclicker.transfer.request.payload.SettingsFilePayload;
 import net.alek.buttonclicker.transfer.request.payload.SoundManagerClassPayload;
 
 import java.util.concurrent.CompletableFuture;
@@ -15,7 +16,8 @@ public enum Request {
     GET_AUDIO(Audio.class),
     GET_FONTS(Fonts.class),
     GET_IMAGES(Images.class),
-    GET_SOUND_MANAGER(SoundManagerClassPayload.class);
+    GET_SOUND_MANAGER(SoundManagerClassPayload.class),
+    GET_SETTINGS_FILE(SettingsFilePayload.class);
 
     private final Class<? extends Record> responseClass;
     private static final RequestBus BUS = new RequestBus();

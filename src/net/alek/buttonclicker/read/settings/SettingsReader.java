@@ -2,26 +2,29 @@ package net.alek.buttonclicker.read.settings;
 
 import net.alek.buttonclicker.data.settings.SettingsFile;
 import net.alek.buttonclicker.read.json.JSONReader;
+import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.payload.SettingsFilePayload;
 import net.alek.buttonclicker.ui.RenderService;
 
 import java.awt.*;
 import java.util.Map;
 
 public class SettingsReader {
-    private final JSONReader jsonReader;
-    private final SettingsFile settingsFile;
+    private static final JSONReader jsonReader;
+    private static final SettingsFile settingsFile;
 
-    public SettingsReader(SettingsFile settingsFile) {
-        this.settingsFile = settingsFile;
-        this.jsonReader = JSONReader.fromFile(String.valueOf(getSettingsFile().getFilePath()));
+    static {
+        SettingsFilePayload payload = (SettingsFilePayload) Request.GET_SETTINGS_FILE.request().await().get();
+        settingsFile = payload.settingsFile();
+        jsonReader = JSONReader.fromFile(getSettingsFile().getFilePath());
     }
 
-    public SettingsFile getSettingsFile() {
-        return this.settingsFile;
+    public static SettingsFile getSettingsFile() {
+        return settingsFile;
     }
 
     public JSONReader getJsonReader() {
-        return this.jsonReader;
+        return jsonReader;
     }
 
     public SettingsFile reload(){

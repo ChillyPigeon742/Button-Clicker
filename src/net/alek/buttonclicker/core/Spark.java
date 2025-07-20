@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.lang.module.ModuleReader;
 import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -20,7 +21,7 @@ public class Spark {
     private static AppData appData;
     private static final String DEFAULTS_PATH = "/assets/buttonclicker/config/default/";
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         boolean debug = args.length > 0 && "-debug".equals(args[0]);
         Path appDataPath = Path.of(System.getenv("APPDATA"), "_ButtonClicker");
         String version = "null";

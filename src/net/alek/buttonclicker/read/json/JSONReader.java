@@ -5,10 +5,9 @@ import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.Event;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class JSONReader {
@@ -28,20 +27,16 @@ public class JSONReader {
         this.parser = parent.parser;
     }
 
-    public static JSONReader fromFile(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists()) return null;
+    public static JSONReader fromFile(Path filePath) {
+        if (!Files.exists(filePath)) return null;
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-
+        try (BufferedReader reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8)) {
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
             }
             return new JSONReader(sb.toString());
-
         } catch (Exception e) {
             Event.LOG.publish(new LogPayload(LogType.WARN, "Could not read JSON file! " + e.getMessage()));
             return null;

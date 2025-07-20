@@ -1,5 +1,5 @@
 package net.alek.buttonclicker.transfer.request.payload;
 
-import net.alek.buttonclicker.audio.SoundManager;
+import net.alek.buttonclicker.singletons.Audio;
 
-public record SoundManagerClassPayload(SoundManager soundManager) {}
+public record SoundManagerClassPayload(Audio audio) {}
