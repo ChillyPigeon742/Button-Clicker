@@ -19,14 +19,6 @@ public class Unsigned extends Number implements Comparable<Unsigned> {
         setValue(initialValue);
     }
 
-    public long getValue() {
-        return value;
-    }
-
-    public void setValue(long val) {
-        value = val & maxValue;
-    }
-
     public int getBits() {
         return bits;
     }
@@ -74,6 +66,46 @@ public class Unsigned extends Number implements Comparable<Unsigned> {
         value &= maxValue;
     }
 
+    public void setValue(byte val) {
+        value = val & maxValue;
+    }
+
+    public void setValue(short val) {
+        value = val & maxValue;
+    }
+
+    public void setValue(int val) {
+        value = val & maxValue;
+    }
+
+    public void setValue(long val) {
+        value = val & maxValue;
+    }
+
+    /**
+     * Sets the internal unsigned value from a double input.
+     * <p>
+     * The double is first cast to a long, then masked based on the configured bit width.
+     * Precision loss is expected. This class isn't designed for precise floating-point interpretation.
+     *
+     * @param val the double value to set
+     */
+    public void setValue(double val) {
+        value = (long) val & maxValue;
+    }
+
+    /**
+     * Sets the internal unsigned value from a float input.
+     * <p>
+     * The float is first cast to a long, then masked based on the configured bit width.
+     * Precision loss is expected. This class isn't designed for precise floating-point interpretation.
+     *
+     * @param val the float value to set
+     */
+    public void setValue(float val) {
+        value = (long) val & maxValue;
+    }
+
     public byte toByte() {
         return (byte) (value & 0xFF);
     }
@@ -90,12 +122,31 @@ public class Unsigned extends Number implements Comparable<Unsigned> {
         return value;
     }
 
-    public float toFloat() {
-        return (float) (value & maxValue);
-    }
-
+    /**
+     * Returns the unsigned value as a double.
+     * <p>
+     * This masks the internal value based on the configured bit width,
+     * ensuring proper unsigned interpretation.
+     * This class isn't designed for precise floating-point arithmetic, but this method
+     * provides a convenient conversion when working with doubles.
+     *
+     * @return the unsigned value as a double
+     */
     public double toDouble() {
         return (double) (value & maxValue);
+    }
+
+    /**
+     * Returns the unsigned value as a float.
+     * <p>
+     * This masks the internal value based on the configured bit width,
+     * ensuring proper unsigned interpretation.
+     * Use this for approximate calculations or display, but avoid it for precision-critical logic.
+     *
+     * @return the unsigned value as a float
+     */
+    public float toFloat() {
+        return (float) (value & maxValue);
     }
 
     public void resetValue() {
