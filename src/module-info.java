@@ -26,6 +26,7 @@ module ButtonClicker {
     exports net.alek.buttonclicker.ui;
     exports net.alek.buttonclicker.ui.components;
     exports net.alek.buttonclicker.util;
+    exports net.alek.buttonclicker.util.arithmetic;
     exports net.alek.buttonclicker.write.json;
     exports net.alek.buttonclicker.write.saves;
     exports net.alek.buttonclicker.write.settings;

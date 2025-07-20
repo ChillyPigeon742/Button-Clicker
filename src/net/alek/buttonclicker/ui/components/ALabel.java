@@ -1,6 +1,6 @@
 package net.alek.buttonclicker.ui.components;
 
-import net.alek.buttonclicker.util.Unsigned;
+import net.alek.buttonclicker.util.arithmetic.UnsignedLong;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +10,7 @@ public class ALabel extends JLabel {
     private boolean isSpinning;
     private double rotationSpeed = 0.05;
     private double angle = 0;
-    private Unsigned fps = new Unsigned(9, 60);
+    private UnsignedLong fps = new UnsignedLong(9, 60, false);
 
     public ALabel() {
         setDoubleBuffered(true);
@@ -57,7 +57,7 @@ public class ALabel extends JLabel {
         repaint();
     }
 
-    public void setFPS(Unsigned fps) {
+    public void setFPS(UnsignedLong fps) {
         if (fps.toShort() == 0) {
             stopSpinning();
         }
@@ -80,7 +80,7 @@ public class ALabel extends JLabel {
         return angle;
     }
 
-    public Unsigned getFPS() {
+    public UnsignedLong getFPS() {
         return fps;
     }
 
