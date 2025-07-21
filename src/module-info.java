@@ -1,8 +1,6 @@
 module net.alek.buttonclicker {
     requires java.desktop;
     requires com.formdev.flatlaf;
-    requires javafx.media;
-    requires javafx.swing;
     requires java.smartcardio;
 
     exports net.alek.buttonclicker.audio;
@@ -18,7 +16,6 @@ module net.alek.buttonclicker {
     exports net.alek.buttonclicker.read.saves;
     exports net.alek.buttonclicker.read.settings;
     exports net.alek.buttonclicker.services;
-    exports net.alek.buttonclicker.singletons;
     exports net.alek.buttonclicker.transfer.event;
     exports net.alek.buttonclicker.transfer.event.payload;
     exports net.alek.buttonclicker.transfer.event.type;
@@ -26,6 +23,7 @@ module net.alek.buttonclicker {
     exports net.alek.buttonclicker.transfer.request.payload;
     exports net.alek.buttonclicker.ui;
     exports net.alek.buttonclicker.ui.components;
+    exports net.alek.buttonclicker.ui.menus;
     exports net.alek.buttonclicker.util;
     exports net.alek.buttonclicker.util.arithmetic;
     exports net.alek.buttonclicker.write.json;

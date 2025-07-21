@@ -1,7 +1,5 @@
 package net.alek.buttonclicker.audio;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import net.alek.buttonclicker.data.asset.Audio;
 import net.alek.buttonclicker.transfer.request.Request;
 
