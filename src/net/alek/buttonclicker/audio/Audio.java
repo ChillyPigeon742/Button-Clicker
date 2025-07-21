@@ -1,7 +1,5 @@
-package net.alek.buttonclicker.singletons;
+package net.alek.buttonclicker.audio;
 
-import net.alek.buttonclicker.audio.Music;
-import net.alek.buttonclicker.audio.SFX;
 import net.alek.buttonclicker.transfer.request.Request;
 import net.alek.buttonclicker.transfer.request.payload.SoundManagerClassPayload;
 

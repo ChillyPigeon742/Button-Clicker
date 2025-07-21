@@ -1,8 +1,9 @@
-module ButtonClicker {
+module net.alek.buttonclicker {
     requires java.desktop;
     requires com.formdev.flatlaf;
     requires javafx.media;
     requires javafx.swing;
+    requires java.smartcardio;
 
     exports net.alek.buttonclicker.audio;
     exports net.alek.buttonclicker.command;

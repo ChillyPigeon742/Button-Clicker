@@ -7,7 +7,6 @@ import net.alek.buttonclicker.transfer.request.payload.SettingsFilePayload;
 import net.alek.buttonclicker.ui.RenderService;
 
 import java.awt.*;
-import java.util.Map;
 
 public class SettingsReader {
     private static final JSONReader jsonReader;
@@ -82,9 +81,6 @@ public class SettingsReader {
     }
 
     public SettingsReader loadSettings(){
-        Object currentSaveKey = settings.get("currentSave");
-        Map<String, Object> currentSave = getCurrentSave();
-
         if (currentSaveKey == null) {
             RenderService.startGameButton.setText("Select A Save To Continue");
             RenderService.startGameButton.setBackground(Color.GRAY);

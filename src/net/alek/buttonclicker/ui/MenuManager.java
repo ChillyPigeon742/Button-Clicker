@@ -1,14 +1,27 @@
 package net.alek.buttonclicker.ui;
 
-import java.util.Objects;
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
 
 public class MenuManager{
+    private static JPanel container;
+    private static CardLayout layout;
+    private static Map<Menu, JPanel> menuPanels = new EnumMap<>(Menu.class);
+    private static Deque<Menu> menuHistory = new ArrayDeque<>();
 
-    public static boolean StupidBooleanIHaveToMakeForTheBackToButtonTextToSetProperlyWhenYouOpenAnyOfTheMenusInTheSettingsMenuSinceIDontHaveAnythingToHookOntoToMakeItSetToBackToPauseMenu = false;
-    public static boolean resetWindow = false;
+    static {
+        for(Menu menu : Menu.values()){
+            menuPanels.put(menu, menu.panelSupplier.get());
+
+            if(Objects.equals(menu.name(), "MENU")){
+                menuPanels.get(menu).setVisible(true);
+            }
+        }
+    }
     
-    public static void openMenu(String menuID){
-        if(Objects.equals(menuID, "Spark")){
+    public static void openMenu(Menu menu){
+        if(Objects.equals(menuID, "Main")){
             RenderService.buttonClickerVersionText.setVisible(true);
             RenderService.currentSaveText.setVisible(true);
             RenderService.startGameButton.setVisible(true);
@@ -88,7 +101,7 @@ public class MenuManager{
     }
 
     public static void closeMenu(String menuID){
-        if(Objects.equals(menuID, "Spark")){
+        if(Objects.equals(menuID, "Main")){
             RenderService.buttonClickerVersionText.setVisible(false);
             RenderService.currentSaveText.setVisible(false);
             RenderService.startGameButton.setVisible(false);
@@ -169,84 +182,32 @@ public class MenuManager{
     }
 
     public static boolean isMenuOpen(String menuID){
-        if(Objects.equals(menuID, "Spark")){
-            if(RenderService.saveManagerButton.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+        if(Objects.equals(menuID, "Main")){
+            return RenderService.saveManagerButton.isVisible();
         }else if(Objects.equals(menuID, "Save Manager")){
-            if(RenderService.save1Button.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.save1Button.isVisible();
         }else if(Objects.equals(menuID, "Choose A Side")){
-            if(RenderService.lightSideButton.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.lightSideButton.isVisible();
         }else if(Objects.equals(menuID, "Enter A Save Name")){
-            if(RenderService.saveNameField.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.saveNameField.isVisible();
         }else if(Objects.equals(menuID, "Save Info")){
-            if(RenderService.saveInfoText.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.saveInfoText.isVisible();
         }else if(Objects.equals(menuID, "Settings")){
-            if(RenderService.masterVolumeSlider.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.masterVolumeSlider.isVisible();
         }else if(Objects.equals(menuID, "Wiki")){
-            if(RenderService.wikiEditorPane.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.wikiEditorPane.isVisible();
         }else if(Objects.equals(menuID, "Credits")){
-            if(RenderService.creditsText.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.creditsText.isVisible();
         }else if(Objects.equals(menuID, "Loading")){
-            if(RenderService.loadingBar.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.loadingBar.isVisible();
         }else if(Objects.equals(menuID, "Game")){
-            if(RenderService.buttonTop.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.buttonTop.isVisible();
         }else if(Objects.equals(menuID, "Pause")){
-            if(Objects.equals(RenderService.quitButton.getText(), "Return To Spark Menu")){
-                return true;
-            }else{
-                return false;
-            }
+            return Objects.equals(RenderService.quitButton.getText(), "Return To Spark Menu");
         }else if(Objects.equals(menuID, "Shop")){
-            if(RenderService.shopItem1.isVisible()){
-                return true;
-            }else{
-                return false;
-            }
+            return RenderService.shopItem1.isVisible();
         }else if(Objects.equals(menuID, "Debug")){
-            if(Objects.equals(RenderService.titleText.getText(), "Debug")){
-                return true;
-            }else{
-                return false;
-            }
+            return Objects.equals(RenderService.titleText.getText(), "Debug");
         }
         return false;
     }

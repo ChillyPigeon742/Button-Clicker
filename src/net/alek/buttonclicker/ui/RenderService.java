@@ -18,8 +18,6 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class RenderService {
-    public static GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
     public static JFrame frame = new JFrame();
 
     public static JLayeredPane contentPane = new JLayeredPane();
@@ -1159,30 +1157,6 @@ public class RenderService {
             }
         };
         worker.execute();
-    }
-
-    public static void textFieldLimit(JTextField textField, int maxCharacters) {
-        ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
-            @Override
-            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-                    throws BadLocationException {
-                if ((fb.getDocument().getLength() + string.trim().length()) <= maxCharacters) {
-                    super.insertString(fb, offset, string.trim(), attr);
-                }
-            }
-
-            @Override
-            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
-                    throws BadLocationException {
-                if ((fb.getDocument().getLength() - length + text.trim().length()) <= maxCharacters) {
-                    super.replace(fb, offset, length, text.trim(), attrs);
-                }
-            }
-        });
-    }
-
-    public static boolean isTextFieldEmpty(JTextField textField) {
-        return textField.getText().trim().isEmpty();
     }
 
     public static void setResetWindowTrigger(){
