@@ -1177,7 +1177,7 @@ public class RenderService {
         Graphics2D g = img.createGraphics();
 
         int tileSize = size / 4;
-        Color purple = new Color(128, 0, 128);
+        Color purple = new Color(251, 62, 249);
         Color black = Color.BLACK;
 
         for (int y = 0; y < size; y += tileSize) {

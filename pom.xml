@@ -14,30 +14,51 @@
         <app.version>${project.version}</app.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <javafx.version>21.0.5</javafx.version>
         <flatlaf.version>3.6</flatlaf.version>
+        <lwjgl.version>3.3.6</lwjgl.version>
+        <lwjgl.natives>natives-windows</lwjgl.natives>
 
         <compiler.version>3.13.0</compiler.version>
         <resource.filtering.version>3.3.1</resource.filtering.version>
         <shade.version>3.5.0</shade.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.lwjgl</groupId>
+                <artifactId>lwjgl-bom</artifactId>
+                <version>${lwjgl.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
+    <dependencies>
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
             <version>${flatlaf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-openal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-openal</artifactId>
+            <classifier>${lwjgl.natives}</classifier>
         </dependency>
     </dependencies>
 

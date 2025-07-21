@@ -73,6 +73,7 @@ public class Music {
     public void resumeMusic(){
         if(getMusicAudioPlayer().getStatus()== MediaPlayer.Status.PAUSED){
             getMusicAudioPlayer().play();
+            getMusicAudioPlayer().set
         }
         if(isFinishedPlaying()){
             getMusicDelayTimer().resume();
