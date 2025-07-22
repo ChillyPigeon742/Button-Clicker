@@ -1,10 +1,10 @@
 package net.alek.buttonclicker.data.asset;
 
-import javafx.scene.media.Media;
+import net.alek.buttonclicker.audio.SoundClip;
 
 public record SFX(
-        Media select,
-        Media click,
-        Media purchase,
-        Media declined
+        SoundClip select,
+        SoundClip click,
+        SoundClip purchase,
+        SoundClip declined
 ) {}

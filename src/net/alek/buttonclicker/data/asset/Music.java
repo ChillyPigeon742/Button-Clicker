@@ -1,13 +1,13 @@
 package net.alek.buttonclicker.data.asset;
 
-import javafx.scene.media.Media;
+import net.alek.buttonclicker.audio.SoundClip;
 
 public record Music(
-        Media menu1,
-        Media menu2,
-        Media loading,
-        Media game1,
-        Media game2,
-        Media pause,
-        Media shop
+        SoundClip menu1,
+        SoundClip menu2,
+        SoundClip loading,
+        SoundClip game1,
+        SoundClip game2,
+        SoundClip pause,
+        SoundClip shop
 ) {}

@@ -2,6 +2,8 @@ module net.alek.buttonclicker {
     requires java.desktop;
     requires com.formdev.flatlaf;
     requires java.smartcardio;
+    requires org.lwjgl.openal;
+    requires org.lwjgl.stb;
 
     exports net.alek.buttonclicker.audio;
     exports net.alek.buttonclicker.command;

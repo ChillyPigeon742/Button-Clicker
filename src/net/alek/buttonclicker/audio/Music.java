@@ -11,12 +11,10 @@ import java.util.Random;
 
 public class Music {
     private MediaPlayer musicAudioPlayer;
-    private MediaPlayer sMusicAudioPlayer;
     private final ATimer musicDelayTimer = new ATimer();
-
     private final Map<Track, TrackInfo> trackMap = new HashMap<>();
 
-    private double musicVolume;
+    private byte musicVolume;
     private byte musicDelay;
     private boolean finishedPlaying = false;
     
@@ -24,13 +22,13 @@ public class Music {
         Audio audio = (Audio) Request.GET_AUDIO.request().await().get();
         net.alek.buttonclicker.data.asset.Music music = audio.music();
 
-        trackMap.put(Track.MENU1, new TrackInfo(music.menu1(), false, Track.MENU2, false));
-        trackMap.put(Track.MENU2, new TrackInfo(music.menu2(), false, Track.MENU1, false));
-        trackMap.put(Track.LOADING, new TrackInfo(music.loading(), false, null, false));
-        trackMap.put(Track.GAME1, new TrackInfo(music.game1(), false, Track.GAME2, false));
-        trackMap.put(Track.GAME2, new TrackInfo(music.game2(), false, Track.GAME1, false));
-        trackMap.put(Track.PAUSE, new TrackInfo(music.pause(), true, Track.PAUSE, true));
-        trackMap.put(Track.SHOP, new TrackInfo(music.shop(), true, Track.SHOP, true));
+        trackMap.put(Track.MENU1, new TrackInfo(music.menu1(), Track.MENU2, false));
+        trackMap.put(Track.MENU2, new TrackInfo(music.menu2(), Track.MENU1, false));
+        trackMap.put(Track.LOADING, new TrackInfo(music.loading(), null, false));
+        trackMap.put(Track.GAME1, new TrackInfo(music.game1(), Track.GAME2, false));
+        trackMap.put(Track.GAME2, new TrackInfo(music.game2(), Track.GAME1, false));
+        trackMap.put(Track.PAUSE, new TrackInfo(music.pause(), Track.PAUSE, true));
+        trackMap.put(Track.SHOP, new TrackInfo(music.shop(), Track.SHOP, true));
     }
 
     public void chooseMusic(){
@@ -45,10 +43,9 @@ public class Music {
         stopMusic();
         finishedPlaying = info.nextTrack == null;
 
-        loadTrack(info.isSecondaryPlayer ? MusicPlayerType.S_MUSIC_PLAYER : MusicPlayerType.MUSIC_PLAYER, info.media);
-        MediaPlayer player = info.isSecondaryPlayer ? sMusicAudioPlayer : musicAudioPlayer;
+        loadTrack(info.audio);
 
-        player.setOnEndOfMedia(() -> {
+        musicAudioPlayer.setOnEndOfMedia(() -> {
             finishedPlaying = true;
             musicDelayTimer.setInterval(musicDelay);
 
@@ -65,13 +62,12 @@ public class Music {
             musicDelayTimer.start();
         });
 
-        player.play();
+        musicAudioPlayer.play();
     }
 
     public void resumeMusic(){
         if(getMusicAudioPlayer().getStatus()== MediaPlayer.Status.PAUSED){
             getMusicAudioPlayer().play();
-            getMusicAudioPlayer().set
         }
         if(isFinishedPlaying()){
             getMusicDelayTimer().resume();
@@ -91,26 +87,18 @@ public class Music {
         getMusicDelayTimer().stop();
     }
 
-    public void loadTrack(MusicPlayerType type, Media track){
-        if(type==MusicPlayerType.MUSIC_PLAYER){
-            musicAudioPlayer = new MediaPlayer(track);
-            refreshVolume();
-        }else if(type==MusicPlayerType.S_MUSIC_PLAYER){
-            sMusicAudioPlayer = new MediaPlayer(track);
-            refreshVolume();
-        }
+    public void loadTrack(SoundClip track){
+        musicAudioPlayer = new MediaPlayer(track);
+        refreshVolume();
     }
 
     public void refreshVolume() {
         if (musicAudioPlayer != null && musicAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             musicAudioPlayer.setVolume(musicVolume);
         }
-        if (sMusicAudioPlayer != null && sMusicAudioPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
-            sMusicAudioPlayer.setVolume(musicVolume);
-        }
     }
 
-    public void setMusicVolume(double value) {
+    public void setMusicVolume(byte value) {
         musicVolume = value;
         refreshVolume();
     }
@@ -128,11 +116,6 @@ public class Music {
         return musicAudioPlayer;
     }
 
-    public MediaPlayer getSMusicAudioPlayer(){
-        return sMusicAudioPlayer;
-    }
-
-
     public ATimer getMusicDelayTimer(){
         return musicDelayTimer;
     }
@@ -146,14 +129,12 @@ public class Music {
     }
 
     private static class TrackInfo {
-        Media media;
-        boolean isSecondaryPlayer;
+        SoundClip audio;
         Track nextTrack;
         boolean conditionalLoop;
 
-        TrackInfo(Media media, boolean isSecondaryPlayer, Track nextTrack, boolean conditionalLoop) {
-            this.media = media;
-            this.isSecondaryPlayer = isSecondaryPlayer;
+        TrackInfo(SoundClip audio, Track nextTrack, boolean conditionalLoop) {
+            this.audio = audio;
             this.nextTrack = nextTrack;
             this.conditionalLoop = conditionalLoop;
         }
