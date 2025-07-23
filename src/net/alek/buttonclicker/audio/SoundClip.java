@@ -1,6 +1,6 @@
 package net.alek.buttonclicker.audio;
 
-import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.AL11;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -9,13 +9,13 @@ import java.util.concurrent.TimeUnit;
 public class SoundClip {
     private final int bufferId;
     private final int sourceId;
-
-    private final float durationSeconds;
     private final int sampleRate;
+    private final float durationSeconds;
 
     private volatile boolean manuallyStopped = false;
     private volatile boolean ended = false;
     private Runnable onEnd;
+
     private static final int AL_SAMPLE_OFFSET = 0x1024;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -25,11 +25,16 @@ public class SoundClip {
         return t;
     });
 
-    public SoundClip(int bufferId, int sourceId, float durationSeconds, int sampleRate) {
+    public SoundClip(int bufferId, int sourceId) {
         this.bufferId = bufferId;
         this.sourceId = sourceId;
-        this.durationSeconds = durationSeconds;
-        this.sampleRate = sampleRate;
+
+        int bufferSize = AL11.alGetBufferi(bufferId, AL11.AL_SIZE);
+        this.sampleRate = AL11.alGetBufferi(bufferId, AL11.AL_FREQUENCY);
+        int channels = AL11.alGetBufferi(bufferId, AL11.AL_CHANNELS);
+        int bitsPerSample = AL11.alGetBufferi(bufferId, AL11.AL_BITS);
+
+        this.durationSeconds = (float) bufferSize / (channels * (bitsPerSample / 8f) * sampleRate);
 
         scheduler.scheduleAtFixedRate(this::checkPlayback, 1, 1, TimeUnit.SECONDS);
     }
@@ -47,7 +52,7 @@ public class SoundClip {
     }
 
     public float getPlaybackPosition() {
-        int sampleOffset = AL10.alGetSourcei(sourceId, AL_SAMPLE_OFFSET);
+        int sampleOffset = AL11.alGetSourcei(sourceId, AL_SAMPLE_OFFSET);
         return (float) sampleOffset / sampleRate;
     }
 
@@ -58,38 +63,37 @@ public class SoundClip {
     public void play(boolean loop) {
         manuallyStopped = false;
         ended = false;
-        AL10.alSourcei(sourceId, AL10.AL_LOOPING, loop ? 1 : 0);
-        AL10.alSourcePlay(sourceId);
+        AL11.alSourcei(sourceId, AL11.AL_LOOPING, loop ? 1 : 0);
+        AL11.alSourcePlay(sourceId);
     }
 
     public void stop() {
         manuallyStopped = true;
         ended = false;
-        AL10.alSourceStop(sourceId);
+        AL11.alSourceStop(sourceId);
     }
 
     public void pause() {
-        AL10.alSourcePause(sourceId);
+        AL11.alSourcePause(sourceId);
     }
 
     public void resume() {
-        AL10.alSourcePlay(sourceId);
+        AL11.alSourcePlay(sourceId);
     }
 
     public void setVolume(float volume) {
-        AL10.alSourcef(sourceId, AL10.AL_GAIN, volume);
+        AL11.alSourcef(sourceId, AL11.AL_GAIN, volume);
     }
 
     public void setPitch(float pitch) {
-        AL10.alSourcef(sourceId, AL10.AL_PITCH, pitch);
+        AL11.alSourcef(sourceId, AL11.AL_PITCH, pitch);
     }
 
     private void checkPlayback() {
         if (ended || manuallyStopped) return;
 
-        int state = AL10.alGetSourcei(sourceId, AL10.AL_SOURCE_STATE);
-
-        if (state == AL10.AL_STOPPED) {
+        int state = AL11.alGetSourcei(sourceId, AL11.AL_SOURCE_STATE);
+        if (state == AL11.AL_STOPPED) {
             if (getPlaybackPosition() >= durationSeconds) {
                 ended = true;
                 if (onEnd != null) {
@@ -101,7 +105,7 @@ public class SoundClip {
 
     public void cleanup() {
         scheduler.shutdownNow();
-        AL10.alDeleteSources(sourceId);
-        AL10.alDeleteBuffers(bufferId);
+        AL11.alDeleteSources(sourceId);
+        AL11.alDeleteBuffers(bufferId);
     }
 }
