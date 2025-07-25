@@ -121,6 +121,7 @@
                         <manifest>
                             <mainClass>net.alek.buttonclicker.core.Spark</mainClass>
                         </manifest>
+                        <packaging>jar</packaging>
                     </archive>
                     <outputDirectory>${project.build.directory}/mods</outputDirectory>
                 </configuration>
