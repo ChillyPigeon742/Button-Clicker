@@ -1,6 +1,6 @@
 # ButtonClicker
   
-Source code of the game [**ButtonClicker**  on itch.io](https://alekgamedev.itch.io/button-clicker)  
+Source code of the game [ButtonClicker  on itch.io](https://alekgamedev.itch.io/button-clicker)  
 If you want to report a bug open a [new issue](https://github.com/ChillyPigeon742/Button-Clicker/issues/new) in the issues panel
   
 ## How to Build
@@ -24,7 +24,7 @@ Look inside your project folder for a folder called `target` and you should find
 Simply open a terminal window in the `mods` folder you found, and run the below command,  
 
 
-`jdeps --module-path mods --module net.alek.buttonclicker --multi-release 21 --recursive --list-deps`  
+`jdeps --module-path mods --module net.alek.buttonclicker --multi-release 21 --list-deps`  
 
 this will then print a list of dependencies which we need, we're going to use this soon.
 
