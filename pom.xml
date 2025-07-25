@@ -78,7 +78,7 @@
 
         <resources>
             <resource>
-                <directory>src/buttonclicker/assets</directory>
+                <directory>src/assets/buttonclicker</directory>
                 <filtering>false</filtering>
                 <includes>
                     <include>**/*</include>

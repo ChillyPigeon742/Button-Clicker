@@ -83,7 +83,7 @@ public class AudioLoader {
             int sourceId = AL10.alGenSources();
             AL10.alSourcei(sourceId, AL10.AL_BUFFER, bufferId);
 
-            return new SoundClip(bufferId, sourceId, (float) samples / sampleRate, sampleRate);
+            return new SoundClip(bufferId, sourceId);
         } catch (Exception e) {
             Event.LOG.publish(new LogPayload(LogType.ERROR, "Exception loading audio: " + path));
             e.printStackTrace();
