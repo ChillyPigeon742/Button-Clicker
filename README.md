@@ -21,7 +21,7 @@ Look inside your project folder for a folder called `target` and you should find
 
 ### Finding Dependencies
 
-Simply open a terminal window in the `mods` folder you found, and run the below command,  
+Simply open a terminal window in the `target` folder, and run the below command,  
 
 
 ```bash
