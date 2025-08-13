@@ -22,7 +22,6 @@ public enum Event {
         this.payloadType = payloadType;
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends Record> Class<T> getPayloadType() {
         return (Class<T>) payloadType;
     }
@@ -31,8 +30,12 @@ public enum Event {
         BUS.subscribe(this, mode, handler);
     }
 
-    public <T extends Record> void publish(T payload) {
-        BUS.publish(this, payload);
+    public <T extends Record> Awaitable publish(T payload) {
+        return BUS.publish(this, payload);
+    }
+
+    public Awaitable publish() {
+        return BUS.publish(this, null);
     }
 
     public static void shutdown() {

@@ -3,7 +3,7 @@ package net.alek.buttonclicker.read.assets;
 import net.alek.buttonclicker.data.asset.Fonts;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 
 import java.awt.*;
 import java.io.IOException;

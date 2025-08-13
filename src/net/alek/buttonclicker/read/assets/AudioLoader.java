@@ -8,7 +8,7 @@ import net.alek.buttonclicker.data.asset.SFX;
 import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.stb.STBVorbis;
 import org.lwjgl.stb.STBVorbisInfo;

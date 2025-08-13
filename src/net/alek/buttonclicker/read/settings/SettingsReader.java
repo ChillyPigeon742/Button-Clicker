@@ -2,7 +2,7 @@ package net.alek.buttonclicker.read.settings;
 
 import net.alek.buttonclicker.data.settings.SettingsFile;
 import net.alek.buttonclicker.read.json.JSONReader;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 import net.alek.buttonclicker.transfer.request.payload.SettingsFilePayload;
 import net.alek.buttonclicker.ui.RenderService;
 

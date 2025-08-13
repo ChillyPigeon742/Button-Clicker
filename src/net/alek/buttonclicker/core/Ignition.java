@@ -7,7 +7,7 @@ import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.services.AutoClickerDetectorService;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 
 public class Ignition {
     static {

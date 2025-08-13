@@ -6,7 +6,7 @@ import net.alek.buttonclicker.transfer.event.payload.LogPayload;
 import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
 import net.alek.buttonclicker.core.ErrorHandler;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 import net.alek.buttonclicker.ui.RenderService;
 
 import javax.imageio.ImageIO;

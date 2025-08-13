@@ -1,7 +1,7 @@
 package net.alek.buttonclicker.audio;
 
 import net.alek.buttonclicker.data.asset.Audio;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 import net.alek.buttonclicker.ui.MenuManager;
 import net.alek.buttonclicker.ui.components.ATimer;
 

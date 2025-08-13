@@ -1,7 +1,7 @@
 package net.alek.buttonclicker.audio;
 
 import net.alek.buttonclicker.data.asset.Audio;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,7 +2,7 @@ package net.alek.buttonclicker.core;
 
 import net.alek.buttonclicker.data.model.AppData;
 import net.alek.buttonclicker.transfer.event.type.Event;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,13 +12,10 @@ import java.lang.module.ResolvedModule;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 public class Spark {
     private static AppData appData;
-    private static final String DEFAULTS_PATH = "/assets/buttonclicker/config/default/";
 
     public static void main(String[] args) {
         boolean debug = args.length > 0 && "-debug".equals(args[0]);
@@ -81,7 +78,8 @@ public class Spark {
     private static void createFile(Path filePath){
         String fileName = String.valueOf(filePath.getFileName());
         if (Files.notExists(filePath)) {
-            try (var inSettings = Spark.class.getResourceAsStream( DEFAULTS_PATH + fileName)) {
+            try (var inSettings = Spark.class.getResourceAsStream(
+                    "/assets/buttonclicker/config/default/" + fileName)) {
                 Objects.requireNonNull(inSettings, "Default " + fileName +" resource not found");
                 Files.copy(inSettings, filePath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException | NullPointerException e) {
@@ -95,21 +93,22 @@ public class Spark {
     private static void eagerClassload() {
         final String basePackage = "net.alek.buttonclicker";
         final String basePath = basePackage.replace('.', '/');
-        final String moduleName = "ButtonClicker";
 
         ModuleLayer bootLayer = ModuleLayer.boot();
         Optional<ModuleReference> modRefOpt = bootLayer.configuration()
-                .findModule(moduleName)
+                .findModule(basePackage)
                 .map(ResolvedModule::reference);
 
         if (modRefOpt.isEmpty()) {
-            System.err.println("Module reference not found for: " + moduleName);
-            System.exit(moduleName.hashCode());
+            System.err.println("Module reference not found for: " + basePackage);
+            System.exit(basePackage.hashCode());
             return;
         }
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) classLoader = ClassLoader.getSystemClassLoader();
+
+        List<String> failedClasses = Collections.synchronizedList(new ArrayList<>());
 
         try (ModuleReader reader = modRefOpt.get().open()) {
             ClassLoader finalClassLoader = classLoader;
@@ -120,16 +119,23 @@ public class Spark {
                     .forEach(className -> {
                         try {
                             Class.forName(className, true, finalClassLoader);
-                        } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                            System.err.printf("Failed to load class: %s%n", className);
+                        } catch (Throwable e) {
+                            failedClasses.add(className);
                             e.printStackTrace();
-                            System.exit(className.hashCode());
                         }
                     });
+
+            if (!failedClasses.isEmpty()) {
+                System.err.println("Eager classload failed for:");
+                for (String fail : failedClasses) {
+                    System.err.println(" - " + fail);
+                }
+                System.exit(1);
+            }
         } catch (IOException e) {
-            System.err.printf("Failed to open ModuleReader for module: %s%n", moduleName);
+            System.err.printf("Failed to open ModuleReader for module: %s%n", basePackage);
             e.printStackTrace();
-            System.exit(moduleName.hashCode());
+            System.exit(basePackage.hashCode());
         }
     }
 

@@ -63,7 +63,7 @@ jlink --module-path "%JAVA_HOME%\jmods" --add-modules java.base,java.desktop --o
 ### Generating the final `executable` package
 
 Now that we have our trimmed runtime JDK with only the modules we need, we can generate the actual app.
-To do so we will use the `jpackage` command like so,  
+To do that we will use the `jpackage` command like so,  
 
 ```bash
 jpackage --module net.alek.buttonclicker/net.alek.buttonclicker.core.Spark --module-path mods --runtime-image runtime --type app-image --icon icon.ico --name ButtonClicker --dest output
@@ -75,4 +75,4 @@ We also use a custom `.ico` icon (Optional) and set the name of the app to **But
 
 Now you can delete the `mods` and `runtime` folders we generated previously as those have been added into the app  
 
-And that's it! You can simply launch the executable now to run the game
+That's it! You can now simply open the `output` folder and launch the executable to run the game

@@ -1,7 +1,8 @@
 package net.alek.buttonclicker.transfer.event;
 
-import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.event.type.Awaitable;
 import net.alek.buttonclicker.transfer.event.type.Event;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -36,7 +37,7 @@ public class EventBus {
                 .add(new Subscriber<>(mode, handler));
     }
 
-    public <T extends Record> void publish(Event event, T payload) {
+    public <T extends Record> Awaitable publish(Event event, T payload) {
         if (event == null) throw new IllegalArgumentException("Event cannot be null");
 
         Class<T> payloadType = event.getPayloadType();
@@ -47,19 +48,21 @@ public class EventBus {
         EventKey key = new EventKey(event, payloadType);
         List<Subscriber<?>> handlers = subscribers.get(key);
 
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
         if (handlers != null) {
             for (Subscriber<?> subscriber : handlers) {
-                deliver((Subscriber<T>) subscriber, payload);
+                if (subscriber.mode == SubscribeMethod.ASYNC) {
+                    CompletableFuture<Void> future = CompletableFuture.runAsync(() ->
+                            ((Consumer<T>) subscriber.handler).accept(payload), executor);
+                    futures.add(future);
+                } else {
+                    ((Consumer<T>) subscriber.handler).accept(payload);
+                }
             }
         }
-    }
 
-    private <T extends Record> void deliver(Subscriber<T> subscriber, T payload) {
-        if (subscriber.mode == SubscribeMethod.ASYNC) {
-            executor.submit(() -> subscriber.handler.accept(payload));
-        } else {
-            subscriber.handler.accept(payload);
-        }
+        return new Awaitable(futures);
     }
 
     public void shutdown() {

@@ -1,6 +1,6 @@
 package net.alek.buttonclicker.audio;
 
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.request.type.Request;
 import net.alek.buttonclicker.transfer.request.payload.SoundManagerClassPayload;
 
 public class Audio {

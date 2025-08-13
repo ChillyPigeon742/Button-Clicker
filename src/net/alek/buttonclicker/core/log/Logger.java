@@ -1,19 +1,20 @@
 package net.alek.buttonclicker.core.log;
 
-import net.alek.buttonclicker.core.ErrorHandler;
 import net.alek.buttonclicker.data.model.AppData;
+import net.alek.buttonclicker.transfer.event.EventBus;
 import net.alek.buttonclicker.transfer.event.payload.LogPayload;
-import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
 import net.alek.buttonclicker.transfer.event.type.Event;
-import net.alek.buttonclicker.transfer.request.Request;
+import net.alek.buttonclicker.transfer.event.type.SubscribeMethod;
+import net.alek.buttonclicker.transfer.request.type.Request;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Logger {
-    public static File log = new File("Data/BC-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log");
-
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
     private static final String YELLOW = "\u001B[33m";
@@ -22,22 +23,38 @@ public class Logger {
     private static PrintStream terminalStream;
     private static PrintStream fileStream;
     private static final Object lock = new Object();
+    private static final boolean debug;
+    private static final Path logPath;
+    private static final Path logFile;
 
     static {
+        AppData appData = (AppData) Request.GET_APPDATA.request().await().get();
+        debug = appData.debugMode();
+        logPath = appData.LOGS_PATH();
+
+        String logFileName = "FractalViewer-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log";
+        logFile = Path.of(String.valueOf(logPath), logFileName);
+        try {
+            Files.createFile(logFile);
+        } catch (IOException e) {
+            System.err.println("Failed to initialize log file!");
+            System.exit(-1);
+        }
+
         Event.LOG.subscribe(SubscribeMethod.ASYNC, (LogPayload p) -> logWriter(p.message(), p.logType()));
         setupLogger();
     }
 
     private static void setupLogger() {
         try {
-            fileStream = new PrintStream(new FileOutputStream(log, true), true);
+            fileStream = new PrintStream(Files.newOutputStream(logFile, StandardOpenOption.APPEND), true);
             terminalStream = System.out;
             PrintStream originalOut = System.out;
             PrintStream originalErr = System.err;
 
             System.setOut(new PrintStream(new TeeOutputStream(originalOut, fileStream), true));
             System.setErr(new PrintStream(new TeeOutputStream(originalErr, fileStream), true));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             System.err.println("Failed to setup logger: " + e.getMessage());
             System.exit(-1);
         }
@@ -47,7 +64,7 @@ public class Logger {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         for (StackTraceElement element : stackTrace) {
             String className = element.getClassName();
-            if (!className.equals(Logger.class.getName())) {
+            if (!className.equals(Logger.class.getName()) && !className.equals(EventBus.class.getName()) && !className.equals(Event.class.getName())) {
                 String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
                 return simpleClassName + ":" + element.getLineNumber();
             }
@@ -56,9 +73,7 @@ public class Logger {
     }
 
     private static void logWriter(String toWrite, LogType type) {
-        if (type == LogType.DEBUG){
-            AppData appData = (AppData) Request.GET_APPDATA.request().await().get();
-            boolean debug = appData.debugMode();
+        if (type == LogType.DEBUG) {
             if (!debug) return;
         }
 
