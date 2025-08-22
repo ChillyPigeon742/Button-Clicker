@@ -47,7 +47,7 @@ public class Spark {
 
         setupAppDataFolder();
         eagerClassload();
-        Event.START_APP.publish(null);
+        Event.START_APP.publish();
     }
 
     private static void setupAppDataFolder() {

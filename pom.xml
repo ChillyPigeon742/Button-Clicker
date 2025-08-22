@@ -8,9 +8,11 @@
     <groupId>net.alek</groupId>
     <artifactId>ButtonClicker</artifactId>
     <version>0.8.0_INDEV</version>
-    <name>Button Clicker</name>
+    <name>ButtonClicker</name>
 
     <properties>
+        <java.version>21</java.version>
+
         <app.version>${project.version}</app.version>
         <mod.dir>target/mods</mod.dir>
         <native.dir>target/natives</native.dir>
@@ -19,10 +21,11 @@
         <flatlaf.version>3.6.1</flatlaf.version>
         <lwjgl.version>3.3.6</lwjgl.version>
 
-        <compiler.version>3.13.0</compiler.version>
-        <resource.filtering.version>3.3.1</resource.filtering.version>
+        <compiler.plugin.version>3.13.0</compiler.plugin.version>
+        <resource.filtering.plugin.version>3.3.1</resource.filtering.plugin.version>
         <jar.plugin.version>3.4.1</jar.plugin.version>
         <dependency.plugin.version>3.6.0</dependency.plugin.version>
+        <antrun.plugin.version>1.8</antrun.plugin.version>
     </properties>
 
     <profiles>
@@ -141,16 +144,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.version}</version>
+                <version>${compiler.plugin.version}</version>
                 <configuration>
-                    <release>21</release>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${resource.filtering.version}</version>
+                <version>${resource.filtering.plugin.version}</version>
             </plugin>
 
             <plugin>
@@ -170,7 +173,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>${dependency.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-mods</id>
@@ -202,7 +205,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <version>${antrun.plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

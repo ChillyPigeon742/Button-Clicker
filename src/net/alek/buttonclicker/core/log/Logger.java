@@ -32,7 +32,7 @@ public class Logger {
         debug = appData.debugMode();
         logPath = appData.LOGS_PATH();
 
-        String logFileName = "FractalViewer-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log";
+        String logFileName = "ButtonClicker-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".log";
         logFile = Path.of(String.valueOf(logPath), logFileName);
         try {
             Files.createFile(logFile);

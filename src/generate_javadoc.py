@@ -4,7 +4,7 @@ from pathlib import Path
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent  # From src/ -> project/
-SOURCE_ROOT = BASE_DIR / "src"  # Where your source files live
+SOURCE_ROOT = BASE_DIR / "src"  # Where our source files live
 MODULE_PATH = BASE_DIR / "target" / "dependency"  # JAR dependencies path
 BASE_PACKAGE = "net.alek.buttonclicker"
 OUTPUT_DIR = BASE_DIR / "docs"
@@ -26,9 +26,9 @@ def generate_javadoc():
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     if result.returncode == 0:
-        print("✅ Javadoc generated successfully at:", OUTPUT_DIR)
+        print("Javadoc generated successfully at:", OUTPUT_DIR)
     else:
-        print("❌ Javadoc generation failed:")
+        print("Javadoc generation failed:")
         print(result.stderr)
 
 if __name__ == "__main__":

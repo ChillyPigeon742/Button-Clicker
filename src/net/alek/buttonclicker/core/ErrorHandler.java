@@ -60,7 +60,7 @@ public class ErrorHandler {
 
         Logger.Log.error("Unloading Resources...");
         GUIUtils.setWindowIcon(ImageLoader.getImages().missingIcon().getImage());
-        Event.UNLOAD_GAME.publish(null);
+        Event.UNLOAD_GAME.publish();
 
         Logger.Log.error("Unloading Themes...");
         FlatLaf.unregisterCustomDefaultsSource("assets.buttonclicker.config");
